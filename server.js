@@ -1,4 +1,4 @@
-// --- Archivo: server.js (VERSIÓN CON CORRECCIÓN FINAL) ---
+// --- Archivo: server.js (VERSIÓN CON MODELO DE IA CORREGIDO) ---
 const express = require('express');
 const cors = require('cors');
 const db = require('./database');
@@ -17,7 +17,9 @@ const PORT = process.env.PORT || 3000;
 let genAI, model;
 if (process.env.API_KEY) {
     genAI = new GoogleGenerativeAI(process.env.API_KEY);
-    model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    // --- ¡AQUÍ ESTÁ LA CORRECCIÓN! ---
+    // Cambiamos "gemini-pro" por "gemini-1.5-flash", que es más nuevo y rápido
+    model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 } else {
     console.error("Error: La API_KEY no está configurada. El chat de IA no funcionará.");
 }
@@ -76,8 +78,6 @@ app.get('/api/riesgo/:id', (req, res) => {
         if (riesgo) {
             res.json(riesgo);
         } else {
-            // --- ¡AQUÍ ESTABA EL ERROR QUE ROMPÍA TODO! ---
-            // Decía "44," en lugar de 404
             res.status(404).json({ mensaje: 'Sin evaluación' });
         }
     } catch (error) {
