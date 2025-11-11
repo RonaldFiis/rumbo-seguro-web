@@ -1,0 +1,98 @@
+/* --- public/style.css (VERSIÓN PRO + Logo y Texto) --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary: #005A9C;
+    --primary-dark: #003d6b;
+    --secondary: #4CAF50;
+    --accent: #FF9800;
+    --danger: #F44336;
+    --dark: #1a202c;
+    --gray: #718096;
+    --light: #f7fafc;
+    --white: #ffffff;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+}
+
+/* --- RESETEO BASE --- */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background-color: var(--light); color: var(--dark); line-height: 1.6; }
+a { text-decoration: none; color: inherit; transition: color 0.2s; }
+ul { list-style: none; }
+
+/* --- UTILIDADES --- */
+.container { width: 90%; max-width: 1200px; margin: 0 auto; }
+.text-center { text-align: center; }
+.mt-4 { margin-top: 1.5rem; }
+.mb-4 { margin-bottom: 1.5rem; }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.grid { display: grid; gap: 2rem; }
+.grid-3 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+
+/* --- BOTONES PRO --- */
+.btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 600;
+    transition: all 0.2s ease; cursor: pointer; border: none; gap: 0.5rem;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.btn:active { transform: translateY(0); }
+.btn-primary { background: var(--primary); color: var(--white); }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+.btn-outline:hover { background: var(--primary); color: var(--white); }
+.btn-success { background: var(--secondary); color: var(--white); }
+.btn-danger { background: var(--white); color: var(--danger); border: 1px solid var(--danger); }
+.btn-danger:hover { background: var(--danger); color: var(--white); }
+
+/* --- NAVBAR --- */
+.navbar { background: var(--white); box-shadow: var(--shadow-sm); position: sticky; top: 0; z-index: 100; padding: 1rem 0; }
+/* ----- ¡CAMBIO AQUÍ! ----- */
+.nav-logo {
+    display: flex; /* Para alinear imagen y texto */
+    align-items: center; /* Centra verticalmente */
+    gap: 12px; /* Espacio entre logo y texto */
+    font-size: 1.5rem; /* Tamaño del texto "Rumbo Seguro" */
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: -0.5px;
+}
+.nav-links a { color: var(--gray); font-weight: 500; padding: 0.5rem 1rem; border-radius: 0.375rem; }
+.nav-links a:hover { color: var(--primary); background: var(--light); }
+.nav-logo img {
+    height: 50px; /* ¡AUMENTADO EL TAMAÑO! (ajusta si lo quieres más grande) */
+    vertical-align: middle;
+}
+
+/* --- HERO SECTION --- */
+.hero {
+    background: linear-gradient(135deg, rgba(0,90,156,0.95) 0%, rgba(26,32,44,0.9) 100%), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1920&q=80');
+    background-size: cover; background-position: center;
+    color: var(--white); padding: 8rem 0; clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+}
+.hero h1 { font-size: 3.5rem; line-height: 1.1; font-weight: 800; margin-bottom: 1.5rem; }
+.hero p { font-size: 1.25rem; color: rgba(255,255,255,0.9); max-width: 600px; margin-bottom: 2.5rem; }
+
+/* --- CARDS --- */
+.card { background: var(--white); border-radius: 1rem; padding: 2rem; box-shadow: var(--shadow-sm); transition: all 0.3s ease; border: 1px solid rgba(0,0,0,0.05); }
+.card:hover { box-shadow: var(--shadow-lg); transform: translateY(-5px); border-color: var(--primary); }
+.icon-box { width: 60px; height: 60px; background: var(--light); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1.5rem; }
+
+/* --- AUTH FORMS (Login/Registro) --- */
+.auth-wrapper { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; background: var(--light); }
+.auth-card { width: 100%; max-width: 420px; background: var(--white); padding: 2.5rem; border-radius: 1.5rem; box-shadow: var(--shadow-lg); }
+.form-label { display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--dark); }
+.form-input { width: 100%; padding: 0.75rem 1rem; border: 2px solid var(--light); border-radius: 0.5rem; font-size: 1rem; transition: all 0.2s; }
+.form-input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(0,90,156,0.1); }
+
+/* --- DASHBOARD COMPONENTS --- */
+.risk-badge { padding: 0.5rem 1rem; border-radius: 2rem; font-weight: 700; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 1px; }
+.bg-Bajo { background: #C6F6D5; color: #276749; }
+.bg-Medio { background: #FEEBC8; color: #9C4221; }
+.bg-Alto { background: #FED7D7; color: #9B2C2C; }
+.bg-Crítico { background: #822727; color: #FFD7D7; }
+.bg-Pendiente { background: #E2E8F0; color: #4A5568; }

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Asistente Virtual - Rumbo Seguro</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilos específicos del chat */
+        body { background-color: var(--light); }
+        .chat-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: var(--white);
+            border-radius: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            height: 75vh; /* Altura del chat */
+        }
+        .chat-header {
+            padding: 1.5rem;
+            border-bottom: 2px solid var(--light);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .chat-header img { height: 40px; }
+        .chat-header h2 { color: var(--primary); margin: 0; }
+        .chat-messages {
+            flex-grow: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+        .message {
+            display: flex;
+            margin-bottom: 1rem;
+            max-width: 80%;
+        }
+        .message-bubble {
+            padding: 0.75rem 1rem;
+            border-radius: 1.25rem;
+            line-height: 1.4;
+        }
+        .message.user {
+            justify-content: flex-end; /* Usuario a la derecha */
+        }
+        .message.user .message-bubble {
+            background: var(--primary);
+            color: var(--white);
+            border-bottom-right-radius: 0.25rem;
+        }
+        .message.assistant {
+            justify-content: flex-start; /* Asistente a la izquierda */
+        }
+        .message.assistant .message-bubble {
+            background: var(--light);
+            color: var(--dark);
+            border-bottom-left-radius: 0.25rem;
+        }
+        .chat-input {
+            padding: 1.5rem;
+            border-top: 2px solid var(--light);
+        }
+        .chat-input form {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .chat-input .form-input {
+            flex-grow: 1;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <a href="dashboard.html" class="btn-outline" style="padding: 0.5rem 0.8rem; border: none;">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <img src="images/logo.svg" alt="Logo">
+            <div>
+                <h2 style="font-size: 1.2rem;">Asistente Virtual</h2>
+                <span style="color: var(--secondary); font-size: 0.8rem; font-weight: 600;">• En línea</span>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chat-messages">
+            <div class="message assistant">
+                <span class="message-bubble">¡Hola! Soy tu asistente Rumbo Seguro. Pregúntame sobre 'tutorías' o 'riesgo académico'.</span>
+            </div>
+        </div>
+
+        <div class="chat-input">
+            <form id="chat-form">
+                <input type="text" id="message-input" class="form-input" placeholder="Escribe tu pregunta aquí..." required autocomplete="off">
+                <button type="submit" class="btn btn-primary" style="padding: 0.75rem;">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const chatForm = document.getElementById('chat-form');
+        const messageInput = document.getElementById('message-input');
+        const chatMessages = document.getElementById('chat-messages');
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            // 1. Mostrar mensaje del usuario
+            addMessage(message, 'user');
+            messageInput.value = '';
+
+            // 2. Enviar al backend
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+                const data = await res.json();
+                
+                // 3. Mostrar respuesta del asistente
+                addMessage(data.reply, 'assistant');
+
+            } catch (error) {
+                console.error('Error:', error);
+                addMessage('Oops, tuve un problema de conexión. Intenta de nuevo.', 'assistant');
+            }
+        });
+
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender);
+            
+            const bubble = document.createElement('span');
+            bubble.classList.add('message-bubble');
+            bubble.textContent = text;
+            
+            messageDiv.appendChild(bubble);
+            chatMessages.appendChild(messageDiv);
+            
+            // Auto-scroll al final
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    </script>
+</body>
+</html>

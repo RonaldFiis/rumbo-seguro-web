@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autoevaluación - Rumbo Seguro</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilos adicionales para el test */
+        .test-wrapper {
+            max-width: 700px;
+            margin: 2rem auto;
+            padding: 2.5rem;
+            background: var(--white);
+            border-radius: 1.5rem;
+            box-shadow: var(--shadow-lg);
+        }
+        .pregunta {
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 1.5rem;
+        }
+        .pregunta p { font-weight: 600; font-size: 1.1rem; margin-bottom: 1rem; color: var(--dark); }
+        .pregunta label {
+            display: flex; align-items: center;
+            margin: 0.5rem 0; cursor: pointer;
+            padding: 1rem; border-radius: 0.5rem;
+            border: 2px solid var(--light);
+            transition: all 0.2s;
+        }
+        .pregunta label:hover { border-color: var(--primary); background: #f5f9ff; }
+        .pregunta input[type="radio"] {
+            margin-right: 1rem; transform: scale(1.2); accent-color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-wrapper">
+        <a href="dashboard.html" class="nav-links" style="color: var(--gray); font-weight: 500; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 1.5rem;">
+            <i class="fas fa-arrow-left"></i> Volver al Panel
+        </a>
+
+        <h2 style="color: var(--primary); margin-bottom: 0.5rem;">📝 Autoevaluación Inicial</h2>
+        <p style="color: var(--gray); margin-bottom: 2rem;">Tus respuestas son confidenciales y nos ayudan a personalizar tu apoyo.</p>
+        
+        <form id="test-form">
+            <div class="pregunta">
+                <p>1. ¿Con qué frecuencia organizas tu tiempo para estudiar?</p>
+                <label><input type="radio" name="p1" value="0" required> Siempre me organizo bien (0 pts)</label>
+                <label><input type="radio" name="p1" value="1"> A veces, me cuesta empezar (1 pt)</label>
+                <label><input type="radio" name="p1" value="3"> Casi nunca, estudio a última hora (3 pts)</label>
+            </div>
+            <div class="pregunta">
+                <p>2. ¿Te sientes abrumado emocionalmente por la carga académica?</p>
+                <label><input type="radio" name="p2" value="0" required> No, lo manejo bien (0 pts)</label>
+                <label><input type="radio" name="p2" value="1"> A veces siento mucho estrés (1 pt)</label>
+                <label><input type="radio" name="p2" value="3"> Sí, pienso frecuentemente en dejar cursos (3 pts)</label>
+            </div>
+             <div class="pregunta">
+                <p>3. ¿Cuentas con apoyo familiar y condiciones para estudiar?</p>
+                <label><input type="radio" name="p3" value="0" required> Sí, tengo todo el apoyo necesario (0 pts)</label>
+                <label><input type="radio" name="p3" value="2"> Regular, a veces hay dificultades (2 pts)</label>
+                <label><input type="radio" name="p3" value="4"> No, tengo muchos problemas externos (4 pts)</label>
+            </div>
+            <div class="pregunta" style="border: none;">
+                 <p>4. ¿Cómo te va con la metodología de tus docentes actuales?</p>
+                 <label><input type="radio" name="p4" value="0" required> Entiendo bien a la mayoría (0 pts)</label>
+                 <label><input type="radio" name="p4" value="1"> Me cuesta entender a algunos (1 pt)</label>
+                 <label><input type="radio" name="p4" value="3"> No entiendo casi nada y me desmotiva (3 pts)</label>
+            </div>
+            <button type="submit" class="btn btn-success" style="width: 100%; font-size: 1.1rem; padding: 1rem;">
+                <i class="fas fa-check-circle"></i> Enviar Resultados
+            </button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('test-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const usuario = JSON.parse(localStorage.getItem('usuario'));
+            if (!usuario) return window.location.href = 'index.html';
+
+            const formData = new FormData(e.target);
+            let puntajeTotal = 0;
+            for (let valor of formData.values()) puntajeTotal += parseInt(valor);
+
+            try {
+                const res = await fetch('/api/riesgo', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ estudiante_id: usuario.id, puntaje: puntajeTotal })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    alert(`✅ Evaluación completada.\n\nNivel de Riesgo: ${data.nivel.toUpperCase()}`);
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert('❌ Error al guardar. Verifica que el servidor esté encendido.');
+                }
+            } catch (error) { alert('❌ Error de conexión.'); }
+        });
+    </script>
+</body>
+</html>

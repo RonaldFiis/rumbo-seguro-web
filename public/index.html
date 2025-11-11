@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rumbo Seguro - FIIS UNI</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container flex items-center justify-between">
+            <a href="#" class="nav-logo">
+                <img src="images/logo.svg" alt="Rumbo Seguro Logo">
+                <span>RUMBO SEGURO</span>
+            </a>
+            <div class="nav-links flex items-center" style="gap: 1rem;">
+                <a href="login.html" class="btn btn-outline">Iniciar Sesión</a>
+                <a href="registro.html" class="btn btn-primary">Comenzar Ahora</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container">
+            <h1>Tu compañero integral para<br>el éxito académico en la FIIS</h1>
+            <p>No estás solo en este camino. Recibe tutorías personalizadas, apoyo emocional y asistencia inteligente 24/7 para alcanzar tus metas.</p>
+            <div class="flex" style="gap: 1rem;">
+                <a href="registro.html" class="btn btn-primary btn-lg">
+                    <i class="fas fa-rocket"></i> Crear cuenta estudiante
+                </a>
+                <a href="#servicios" class="btn" style="background: rgba(255,255,255,0.1); color: white; backdrop-filter: blur(5px);">
+                    <i class="fas fa-play-circle"></i> Ver cómo funciona
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <section id="servicios" style="padding: 6rem 0;">
+        <div class="container">
+            <div class="text-center mb-4">
+                <h2 style="font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem;">Tres pilares para tu éxito</h2>
+                <p style="color: var(--gray); max-width: 600px; margin: 0 auto;">Una metodología validada que combina tecnología y factor humano.</p>
+            </div>
+
+            <div class="grid grid-3 mt-4">
+                <div class="card">
+                    <div class="icon-box"><i class="fas fa-brain"></i></div>
+                    <h3>Detección Temprana</h3>
+                    <p style="color: var(--gray); margin-top: 0.5rem;">Nuestro algoritmo inteligente identifica tus necesidades antes de que se conviertan en problemas.</p>
+                </div>
+                <div class="card">
+                    <div class="icon-box"><i class="fas fa-user-friends"></i></div>
+                    <h3>Tutoría Especializada</h3>
+                    <p style="color: var(--gray); margin-top: 0.5rem;">Conecta con compañeros de ciclos superiores que ya superaron los retos que tú enfrentas ahora.</p>
+                </div>
+                <div class="card">
+                    <div class="icon-box"><i class="fas fa-heart"></i></div>
+                    <h3>Soporte Emocional</h3>
+                    <p style="color: var(--gray); margin-top: 0.5rem;">Un espacio seguro con profesionales listos para escucharte y darte herramientas de manejo de estrés.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer style="background: var(--dark); color: var(--gray); padding: 3rem 0; text-align: center;">
+        <div class="container">
+            <p>© 2025 Rumbo Seguro. Un proyecto de innovación de la FIIS UNI.</p>
+        </div>
+    </footer>
+</body>
+</html>

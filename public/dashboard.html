@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel - Rumbo Seguro</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: var(--light); }
+        .header {
+            background: var(--white);
+            padding: 1rem 0;
+            border-bottom: 2px solid #eee;
+        }
+        .header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .user-info { font-weight: 500; color: var(--gray); }
+        .user-info strong { color: var(--dark); }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <a href="index.html" class="nav-logo" style="font-size: 1.2rem; gap: 10px;">
+                <img src="images/logo.svg" alt="Rumbo Seguro Logo" style="height: 40px;">
+                <span>RUMBO SEGURO</span>
+            </a>
+            <div class="user-controls flex items-center" style="gap: 1.5rem;">
+                <span class="user-info">Hola, <strong id="nombre-usuario">...</strong></span>
+                <button id="btn-logout" class="btn btn-danger" style="padding: 0.5rem 1rem;">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="margin-top: 2rem;" id="panel-contenido">
+        <div class="text-center" style="padding: 50px; color: var(--gray);">
+            <i class="fas fa-spinner fa-spin fa-3x"></i>
+            <p style="margin-top: 20px;">Cargando tu panel...</p>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const usuario = JSON.parse(localStorage.getItem('usuario'));
+            if (!usuario) return window.location.href = 'login.html';
+
+            document.getElementById('nombre-usuario').textContent = usuario.nombres;
+            const panel = document.getElementById('panel-contenido');
+
+            document.getElementById('btn-logout').addEventListener('click', () => {
+                localStorage.removeItem('usuario');
+                window.location.href = 'index.html';
+            });
+
+            if (usuario.rol === 'estudiante') {
+                renderEstudiante(panel, usuario);
+            } else if (usuario.rol === 'tutor') {
+                renderTutor(panel);
+            } else if (usuario.rol === 'psicologo') {
+                renderPsicologo(panel);
+            }
+        });
+
+        async function renderEstudiante(panel, usuario) {
+            let riesgoHTML = '<span class="risk-badge bg-Pendiente">Pendiente</span>';
+            let msgRiesgo = 'No has realizado tu evaluación inicial.';
+            let colorClase = 'card-blue';
+
+            try {
+                const res = await fetch(`/api/riesgo/${usuario.id}`);
+                if (res.ok) {
+                    const r = await res.json();
+                    riesgoHTML = `<span class="risk-badge bg-${r.nivel}">${r.nivel.toUpperCase()}</span>`;
+                    msgRiesgo = `Evaluado el: ${new Date(r.fecha_evaluacion).toLocaleDateString()}`;
+                    
+                    if (r.nivel === 'Crítico') colorClase = 'card-red';
+                    else if (r.nivel === 'Alto' || r.nivel === 'Medio') colorClase = 'card-orange';
+                    else if (r.nivel === 'Bajo') colorClase = 'card-green';
+                }
+            } catch (e) {}
+
+            panel.innerHTML = `
+                <h2 style="margin-bottom: 1.5rem; font-weight: 700;">👋 Bienvenido, ${usuario.nombres.split(' ')[0]}</h2>
+                <div class="grid grid-3">
+                    <div class="card ${colorClase}">
+                        <h3 style="margin-bottom: 1rem;"><i class="fas fa-chart-line"></i> Tu Estado Actual</h3>
+                        <p style="font-size: 1.2rem;">Nivel de Riesgo: ${riesgoHTML}</p>
+                        <p style="color: var(--gray); font-size: 0.9rem; margin: 0.5rem 0 1rem;">${msgRiesgo}</p>
+                        <a href="evaluacion.html" class="btn btn-success" style="width: 100%;">
+                            <i class="fas fa-clipboard-list"></i> ${riesgoHTML.includes('Pendiente') ? 'Realizar Evaluación' : 'Volver a Evaluar'}
+                        </a>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fas fa-robot" style="color: var(--primary);"></i> Asistente Virtual</h3>
+                        <p style="color: var(--gray); margin: 0.5rem 0 1rem;">Tu compañero de IA está listo para ayudarte 24/7.</p>
+                        <a href="asistente.html" class="btn btn-primary" style="width: 100%;">Hablar con IA</a>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fas fa-user-friends" style="color: var(--accent);"></i> Tutorías</h3>
+                        <p style="color: var(--gray); margin: 0.5rem 0 1rem;">Reserva una sesión con un tutor para el curso que necesites.</p>
+                        <button class="btn btn-outline" style="width: 100%;" onclick="alert('Próximamente...')">Ver Tutores</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTutor(panel) {
+            panel.innerHTML = `
+                <h2 style="margin-bottom: 1.5rem; font-weight: 700;">👨‍🏫 Panel de Docente Tutor</h2>
+                <div class="card card-orange">
+                    <h3><i class="fas fa-users"></i> Mis Estudiantes Asignados</h3>
+                    <p style="color: var(--gray); margin: 0.5rem 0 1rem;">Actualmente tienes <strong>0</strong> estudiantes asignados.</p>
+                    <button class="btn btn-primary">Ver lista completa</button>
+                </div>
+            `;
+        }
+
+        function renderPsicologo(panel) {
+            panel.innerHTML = `
+                <h2 style="margin-bottom: 1.5rem; font-weight: 700;">🧠 Panel de Psicología</h2>
+                <div class="card card-red">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Alertas Críticas</h3>
+                    <p style="color: var(--gray); margin: 0.5rem 0 1rem;"><strong>0</strong> casos requieren atención inmediata.</p>
+                    <button class="btn btn-danger">Revisar Casos</button>
+                </div>
+                <div class="card card-blue">
+                    <h3><i class="fas fa-calendar-alt"></i> Citas de Hoy</h3>
+                    <p style="color: var(--gray);">No hay citas programadas [Demo]</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
