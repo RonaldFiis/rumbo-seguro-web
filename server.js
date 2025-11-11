@@ -1,4 +1,4 @@
-// --- Archivo: server.js (VERSIÓN CON DIAGNÓSTICO DE IA) ---
+// --- Archivo: server.js (VERSIÓN CON CORRECCIÓN DE IA) ---
 const express = require('express');
 const cors = require('cors');
 const db = require('./database');
@@ -9,7 +9,6 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 require('dotenv').config();
 
 // --- LÍNEA DE DIAGNÓSTICO ---
-// Esto nos dirá si está leyendo tu archivo .env correctamente
 console.log("🔑 Verificando API Key:", process.env.API_KEY ? "¡Encontrada!" : "¡NO ENCONTRADA! Revisa tu archivo .env");
 // --- FIN DE LÍNEA DE DIAGNÓSTICO ---
 
@@ -77,14 +76,13 @@ app.get('/api/riesgo/:id', (req, res) => {
     try {
         const riesgo = db.prepare('SELECT * FROM riesgo WHERE estudiante_id = ?').get(req.params.id);
         if (riesgo) res.json(riesgo);
-        else res.status(404).json({ mensaje: 'Sin evaluación' });
+        else res.status(44,).json({ mensaje: 'Sin evaluación' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
 app.post('/api/chat', async (req, res) => {
-    // Si la IA no se pudo inicializar (falta la llave), envía un error amigable.
     if (!model) {
         console.log("Intento de chat fallido: El modelo de IA no está cargado.");
         return res.status(500).json({ reply: "Lo siento, mi conexión con la IA no está configurada. (Error: API_KEY no encontrada)" });
@@ -104,11 +102,17 @@ app.post('/api/chat', async (req, res) => {
     `;
 
     try {
+        // --- ¡LA CORRECCIÓN ESTÁ AQUÍ! ---
+        // Envolvimos el texto en [{ text: ... }]
         const chat = model.startChat({
-            history: [{ role: "user", parts: systemPrompt }, { role: "model", parts: "¡Entendido! Estoy listo para ayudar a los estudiantes de la FIIS." }]
+            history: [
+                { role: "user", parts: [{ text: systemPrompt }] },
+                { role: "model", parts: [{ text: "¡Entendido! Estoy listo para ayudar a los estudiantes de la FIIS." }] }
+            ]
         });
+        // --- FIN DE LA CORRECCIÓN ---
         
-        const result = await chat.sendMessage(userMessage);
+        const result = await chat.sendMessage(userMessage); // .sendMessage(string) es correcto
         const response = await result.response;
         const text = response.text();
         
