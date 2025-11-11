@@ -1,4 +1,4 @@
-// --- Archivo: server.js (VERSIÓN CON MODELO DE IA "gemini-1.0-pro") ---
+// --- Archivo: server.js (VERSIÓN CON MODELO "gemini-1.5-pro-latest") ---
 const express = require('express');
 const cors = require('cors');
 const db = require('./database');
@@ -18,8 +18,8 @@ let genAI, model;
 if (process.env.API_KEY) {
     genAI = new GoogleGenerativeAI(process.env.API_KEY);
     // --- ¡AQUÍ ESTÁ LA CORRECCIÓN FINAL! ---
-    // Cambiamos "gemini-1.5-flash" por "gemini-1.0-pro", el más estable.
-    model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
+    // Cambiamos al modelo más reciente
+    model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
 } else {
     console.error("Error: La API_KEY no está configurada. El chat de IA no funcionará.");
 }
