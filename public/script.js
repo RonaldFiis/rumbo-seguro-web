@@ -1,16 +1,21 @@
-// public/script.js (ACTUALIZADO)
+// --- Archivo: public/script.js (VERSIÓN FINAL PARA RENDER) ---
+
+/* Lógica para el formulario de LOGIN (en login.html) */
 const loginForm = document.getElementById('login-form');
-const msgError = document.getElementById('msg-error');
+// Asegúrate de que tu HTML de login tenga id="msg-error" para el error
+const msgErrorLogin = document.getElementById('msg-error'); 
 
 if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
-        if (msgError) msgError.style.display = 'none';
+        
+        if (msgErrorLogin) msgErrorLogin.style.display = 'none';
 
         try {
-            const res = await fetch('http://localhost:3000/api/login', {
+            // USA RUTA RELATIVA (¡ESTA ES LA CORRECCIÓN!)
+            const res = await fetch('/api/login', { 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
@@ -21,15 +26,16 @@ if (loginForm) {
                 localStorage.setItem('usuario', JSON.stringify(data.usuario));
                 window.location.href = 'dashboard.html';
             } else {
-                if (msgError) {
-                    msgError.textContent = data.error || 'Error de credenciales';
-                    msgError.style.display = 'block';
+                if (msgErrorLogin) {
+                    msgErrorLogin.textContent = data.error || 'Error de credenciales';
+                    msgErrorLogin.style.display = 'block';
                 }
             }
         } catch (error) {
-            if (msgError) {
-                msgError.textContent = 'Error de conexión';
-                msgError.style.display = 'block';
+            console.error('Error de fetch en login:', error);
+            if (msgErrorLogin) {
+                msgErrorLogin.textContent = 'Error de conexión con el servidor.';
+                msgErrorLogin.style.display = 'block';
             }
         }
     });
