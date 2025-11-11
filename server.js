@@ -1,12 +1,10 @@
-// --- Archivo: server.js (VERSIÓN CON OPENROUTER) ---
+// --- Archivo: server.js (VERSIÓN CON MODELO MISTRAL) ---
 const express = require('express');
 const cors = require('cors');
 const db = require('./database');
 const path = require('path');
-// ¡Ya no necesitamos la librería de Google!
 require('dotenv').config();
 
-// Verificamos la nueva llave
 console.log("🔑 Verificando API Key de OpenRouter:", process.env.API_KEY ? "¡Encontrada!" : "¡NO ENCONTRADA! Revisa tus variables de entorno.");
 
 const app = express();
@@ -20,7 +18,6 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // --- RUTAS API (Backend) ---
-// ... (Tus rutas de /registro, /login, /riesgo, etc. se quedan igual) ...
 app.get('/api/status', (req, res) => res.send('✅ Servidor funcionando'));
 
 app.post('/api/registro', (req, res) => {
@@ -94,7 +91,6 @@ app.post('/api/chat', async (req, res) => {
     `;
 
     try {
-        // Usamos fetch, que ya viene en Node.js
         const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
             method: "POST",
             headers: {
@@ -102,8 +98,9 @@ app.post('/api/chat', async (req, res) => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                // Usamos un modelo gratuito y rápido de OpenRouter
-                "model": "nousresearch/hermes-2-pro-mistral-7b:free", 
+                // --- ¡AQUÍ ESTÁ EL CAMBIO! ---
+                // Usamos el modelo gratuito más popular y estable
+                "model": "mistralai/mistral-7b-instruct:free", 
                 "messages": [
                     { "role": "system", "content": systemPrompt },
                     { "role": "user", "content": userMessage }
@@ -112,7 +109,10 @@ app.post('/api/chat', async (req, res) => {
         });
 
         if (!response.ok) {
-            throw new Error(`Error de OpenRouter: ${response.statusText}`);
+            // Logueamos el error detallado que nos da OpenRouter
+            const errorBody = await response.text();
+            console.error("Error de OpenRouter:", errorBody);
+            throw new Error(`Error de OpenRouter: ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();
