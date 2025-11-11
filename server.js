@@ -1,4 +1,4 @@
-// --- Archivo: server.js (VERSIÓN CON CORRECCIÓN DE IA) ---
+// --- Archivo: server.js (VERSIÓN CON CORRECCIÓN FINAL) ---
 const express = require('express');
 const cors = require('cors');
 const db = require('./database');
@@ -8,9 +8,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 // Carga las variables de .env (tu API Key)
 require('dotenv').config();
 
-// --- LÍNEA DE DIAGNÓSTICO ---
 console.log("🔑 Verificando API Key:", process.env.API_KEY ? "¡Encontrada!" : "¡NO ENCONTRADA! Revisa tu archivo .env");
-// --- FIN DE LÍNEA DE DIAGNÓSTICO ---
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -75,8 +73,13 @@ app.post('/api/riesgo', (req, res) => {
 app.get('/api/riesgo/:id', (req, res) => {
     try {
         const riesgo = db.prepare('SELECT * FROM riesgo WHERE estudiante_id = ?').get(req.params.id);
-        if (riesgo) res.json(riesgo);
-        else res.status(44,).json({ mensaje: 'Sin evaluación' });
+        if (riesgo) {
+            res.json(riesgo);
+        } else {
+            // --- ¡AQUÍ ESTABA EL ERROR QUE ROMPÍA TODO! ---
+            // Decía "44," en lugar de 404
+            res.status(404).json({ mensaje: 'Sin evaluación' });
+        }
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -102,17 +105,14 @@ app.post('/api/chat', async (req, res) => {
     `;
 
     try {
-        // --- ¡LA CORRECCIÓN ESTÁ AQUÍ! ---
-        // Envolvimos el texto en [{ text: ... }]
         const chat = model.startChat({
             history: [
                 { role: "user", parts: [{ text: systemPrompt }] },
                 { role: "model", parts: [{ text: "¡Entendido! Estoy listo para ayudar a los estudiantes de la FIIS." }] }
             ]
         });
-        // --- FIN DE LA CORRECCIÓN ---
         
-        const result = await chat.sendMessage(userMessage); // .sendMessage(string) es correcto
+        const result = await chat.sendMessage(userMessage);
         const response = await result.response;
         const text = response.text();
         
