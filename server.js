@@ -1,4 +1,4 @@
-// --- Archivo: server.js (VERSIÓN CON MODELO MISTRAL) ---
+// --- Archivo: server.js (VERSIÓN CON CORRECCIÓN DE TYPO) ---
 const express = require('express');
 const cors = require('cors');
 const db = require('./database');
@@ -98,9 +98,7 @@ app.post('/api/chat', async (req, res) => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                // --- ¡AQUÍ ESTÁ EL CAMBIO! ---
-                // Usamos el modelo gratuito más popular y estable
-                "model": "mistralai/mistral-7b-instruct:free", 
+                "model": "google/gemma-7b-it:free", 
                 "messages": [
                     { "role": "system", "content": systemPrompt },
                     { "role": "user", "content": userMessage }
@@ -109,7 +107,6 @@ app.post('/api/chat', async (req, res) => {
         });
 
         if (!response.ok) {
-            // Logueamos el error detallado que nos da OpenRouter
             const errorBody = await response.text();
             console.error("Error de OpenRouter:", errorBody);
             throw new Error(`Error de OpenRouter: ${response.status} ${response.statusText}`);
@@ -122,6 +119,7 @@ app.post('/api/chat', async (req, res) => {
 
     } catch (error) {
         console.error("Error al llamar a la API de OpenRouter:", error);
+        // --- ¡AQUÍ ESTABA EL ERROR! ---
         res.status(500).json({ reply: "Oops, mi cerebro principal (IA) tuvo un error. Intenta de nuevo." });
     }
 });
