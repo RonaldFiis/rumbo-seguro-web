@@ -1,28 +1,16 @@
-// --- Archivo: server.js (VERSIÓN CON MODELO "gemini-1.5-pro-latest") ---
+// --- Archivo: server.js (VERSIÓN CON OPENROUTER) ---
 const express = require('express');
 const cors = require('cors');
 const db = require('./database');
 const path = require('path');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-
-// Carga las variables de .env (tu API Key)
+// ¡Ya no necesitamos la librería de Google!
 require('dotenv').config();
 
-console.log("🔑 Verificando API Key:", process.env.API_KEY ? "¡Encontrada!" : "¡NO ENCONTRADA! Revisa tu archivo .env");
+// Verificamos la nueva llave
+console.log("🔑 Verificando API Key de OpenRouter:", process.env.API_KEY ? "¡Encontrada!" : "¡NO ENCONTRADA! Revisa tus variables de entorno.");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-// --- Configuración de IA ---
-let genAI, model;
-if (process.env.API_KEY) {
-    genAI = new GoogleGenerativeAI(process.env.API_KEY);
-    // --- ¡AQUÍ ESTÁ LA CORRECCIÓN FINAL! ---
-    // Cambiamos al modelo más reciente
-    model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
-} else {
-    console.error("Error: La API_KEY no está configurada. El chat de IA no funcionará.");
-}
 
 // --- Middlewares ---
 app.use(cors());
@@ -32,6 +20,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // --- RUTAS API (Backend) ---
+// ... (Tus rutas de /registro, /login, /riesgo, etc. se quedan igual) ...
 app.get('/api/status', (req, res) => res.send('✅ Servidor funcionando'));
 
 app.post('/api/registro', (req, res) => {
@@ -85,10 +74,10 @@ app.get('/api/riesgo/:id', (req, res) => {
     }
 });
 
+// --- ¡RUTA DE CHAT ACTUALIZADA PARA OPENROUTER! ---
 app.post('/api/chat', async (req, res) => {
-    if (!model) {
-        console.log("Intento de chat fallido: El modelo de IA no está cargado.");
-        return res.status(500).json({ reply: "Lo siento, mi conexión con la IA no está configurada. (Error: API_KEY no encontrada)" });
+    if (!process.env.API_KEY) {
+        return res.status(500).json({ reply: "Error del servidor: La API_KEY no está configurada." });
     }
 
     const userMessage = req.body.message;
@@ -105,24 +94,38 @@ app.post('/api/chat', async (req, res) => {
     `;
 
     try {
-        const chat = model.startChat({
-            history: [
-                { role: "user", parts: [{ text: systemPrompt }] },
-                { role: "model", parts: [{ text: "¡Entendido! Estoy listo para ayudar a los estudiantes de la FIIS." }] }
-            ]
+        // Usamos fetch, que ya viene en Node.js
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${process.env.API_KEY}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                // Usamos un modelo gratuito y rápido de OpenRouter
+                "model": "nousresearch/hermes-2-pro-mistral-7b:free", 
+                "messages": [
+                    { "role": "system", "content": systemPrompt },
+                    { "role": "user", "content": userMessage }
+                ]
+            })
         });
+
+        if (!response.ok) {
+            throw new Error(`Error de OpenRouter: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        const reply = data.choices[0].message.content;
         
-        const result = await chat.sendMessage(userMessage);
-        const response = await result.response;
-        const text = response.text();
-        
-        res.json({ reply: text });
+        res.json({ reply });
 
     } catch (error) {
-        console.error("Error al llamar a la API de Gemini:", error);
-        res.status(500).json({ reply: "Oops, mi cerebro principal (Gemini) tuvo un error. Intenta de nuevo." });
+        console.error("Error al llamar a la API de OpenRouter:", error);
+        res.status(500).json({ reply: "Oops, mi cerebro principal (IA) tuvo un error. Intenta de nuevo." });
     }
 });
+// --- FIN DE LA RUTA DE CHAT ---
 
 // --- RUTA COMODÍN (Debe ir siempre AL FINAL) ---
 app.get(/(.*)/, (req, res) => {
