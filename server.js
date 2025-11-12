@@ -1,11 +1,12 @@
-// --- Archivo: server.js (VERSIÓN CON CORRECCIÓN DE TYPO) ---
+// --- Archivo: server.js (VERSIÓN CON MODELO MythoMax) ---
 const express = require('express');
 const cors = require('cors');
-const db = require('./database');
+const supabase = require('./database'); // Importamos Supabase
 const path = require('path');
 require('dotenv').config();
 
-console.log("🔑 Verificando API Key de OpenRouter:", process.env.API_KEY ? "¡Encontrada!" : "¡NO ENCONTRADA! Revisa tus variables de entorno.");
+// Verificamos la API Key de OpenRouter
+console.log("🔑 Verificando API Key de OpenRouter:", process.env.API_KEY ? "¡Encontrada!" : "¡NO ENCONTRADA!");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,63 +21,104 @@ app.use(express.static(path.join(__dirname, 'public')));
 // --- RUTAS API (Backend) ---
 app.get('/api/status', (req, res) => res.send('✅ Servidor funcionando'));
 
-app.post('/api/registro', (req, res) => {
+// --- RUTA 2: Registro (SUPABASE) ---
+app.post('/api/registro', async (req, res) => {
     const { nombres, email, password, rol } = req.body;
     if (!nombres || !email || !password) return res.status(400).json({ error: 'Faltan datos' });
+
     try {
-        const info = db.prepare('INSERT INTO usuarios (nombres, email, password, rol) VALUES (?, ?, ?, ?)')
-                       .run(nombres, email, password, rol || 'estudiante');
-        res.status(201).json({ mensaje: 'Registrado', id: info.lastInsertRowid });
+        const { data, error } = await supabase
+            .from('usuarios')
+            .insert({ nombres, email, password, rol: rol || 'estudiante' })
+            .select()
+            .single();
+
+        if (error) {
+            if (error.code === '23505') { // Email duplicado
+                return res.status(409).json({ error: 'Email ya registrado' });
+            }
+            throw error;
+        }
+        res.status(201).json({ mensaje: 'Registrado', id: data.id });
     } catch (error) {
-        if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') return res.status(409).json({ error: 'Email ya registrado' });
+        console.error('Error al registrar:', error.message);
         res.status(500).json({ error: error.message });
     }
 });
 
-app.post('/api/login', (req, res) => {
+// --- RUTA 3: Login (SUPABASE) ---
+app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     try {
-        const user = db.prepare('SELECT * FROM usuarios WHERE email = ?').get(email);
-        if (!user || String(user.password) !== String(password)) {
+        const { data: user, error } = await supabase
+            .from('usuarios')
+            .select('*')
+            .eq('email', email)
+            .single();
+
+        if (error || !user || String(user.password) !== String(password)) {
             return res.status(401).json({ error: 'Credenciales incorrectas' });
         }
-        res.status(200).json({ mensaje: 'OK', usuario: { id: user.id, nombres: user.nombres, email: user.email, rol: user.rol } });
+
+        res.status(200).json({
+            mensaje: 'OK',
+            usuario: { id: user.id, nombres: user.nombres, email: user.email, rol: user.rol }
+        });
     } catch (error) {
+        console.error('Error en login:', error.message);
         res.status(500).json({ error: 'Error de servidor' });
     }
 });
 
-app.post('/api/riesgo', (req, res) => {
+// --- RUTA 4: Guardar Evaluación (SUPABASE) ---
+app.post('/api/riesgo', async (req, res) => {
     const { estudiante_id, puntaje } = req.body;
     let nivel = puntaje >= 7 ? 'Crítico' : puntaje >= 5 ? 'Alto' : puntaje >= 3 ? 'Medio' : 'Bajo';
+    
     try {
-        db.prepare(`INSERT OR REPLACE INTO riesgo (estudiante_id, nivel, puntaje, fecha_evaluacion) VALUES (?, ?, ?, DATETIME('now'))`)
-          .run(estudiante_id, nivel, puntaje);
-        res.json({ mensaje: 'Guardado', nivel, puntaje });
+        const { data, error } = await supabase
+            .from('riesgo')
+            .upsert({ 
+                estudiante_id, 
+                nivel, 
+                puntaje,
+                fecha_evaluacion: (new Date()).toISOString() 
+            }, { onConflict: 'estudiante_id' })
+            .select()
+            .single();
+
+        if (error) throw error;
+        res.json({ mensaje: 'Guardado', nivel: data.nivel, puntaje: data.puntaje });
     } catch (error) {
+        console.error('Error al guardar riesgo:', error.message);
         res.status(500).json({ error: 'Error al guardar' });
     }
 });
 
-app.get('/api/riesgo/:id', (req, res) => {
+// --- RUTA 5: Obtener Riesgo (SUPABASE) ---
+app.get('/api/riesgo/:id', async (req, res) => {
+    const id = req.params.id;
     try {
-        const riesgo = db.prepare('SELECT * FROM riesgo WHERE estudiante_id = ?').get(req.params.id);
-        if (riesgo) {
-            res.json(riesgo);
-        } else {
-            res.status(404).json({ mensaje: 'Sin evaluación' });
+        const { data: riesgo, error } = await supabase
+            .from('riesgo')
+            .select('*')
+            .eq('estudiante_id', id)
+            .single();
+            
+        if (error || !riesgo) {
+            return res.status(404).json({ mensaje: 'Sin evaluación' });
         }
+        res.json(riesgo);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// --- ¡RUTA DE CHAT ACTUALIZADA PARA OPENROUTER! ---
+// --- RUTA 6: CHAT CON IA (OPENROUTER) ---
 app.post('/api/chat', async (req, res) => {
     if (!process.env.API_KEY) {
         return res.status(500).json({ reply: "Error del servidor: La API_KEY no está configurada." });
     }
-
     const userMessage = req.body.message;
     const systemPrompt = `
         Eres "Rumbo Seguro", un asistente virtual amigable y empático para estudiantes de la
@@ -98,7 +140,9 @@ app.post('/api/chat', async (req, res) => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                "model": "google/gemma-7b-it:free", 
+                // --- ¡AQUÍ ESTÁ EL CAMBIO! ---
+                // Usamos el modelo gratuito más popular y estable
+                "model": "gryphe/mythomax-l2-13b:free", 
                 "messages": [
                     { "role": "system", "content": systemPrompt },
                     { "role": "user", "content": userMessage }
@@ -119,7 +163,6 @@ app.post('/api/chat', async (req, res) => {
 
     } catch (error) {
         console.error("Error al llamar a la API de OpenRouter:", error);
-        // --- ¡AQUÍ ESTABA EL ERROR! ---
         res.status(500).json({ reply: "Oops, mi cerebro principal (IA) tuvo un error. Intenta de nuevo." });
     }
 });
