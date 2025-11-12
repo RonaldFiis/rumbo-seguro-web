@@ -1,23 +1,22 @@
-const Database = require('better-sqlite3');
-const db = new Database('rumbo_seguro.db'); // verbose quitado para menos ruido
+// --- Archivo: database.js (VERSIÓN SUPABASE CORRECTA) ---
+const { createClient } = require('@supabase/supabase-js');
 
-db.exec(`
-    CREATE TABLE IF NOT EXISTS usuarios (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombres TEXT NOT NULL,
-        email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL,
-        rol TEXT NOT NULL DEFAULT 'estudiante',
-        fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-    CREATE TABLE IF NOT EXISTS riesgo (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        estudiante_id INTEGER UNIQUE,
-        nivel TEXT NOT NULL,
-        puntaje REAL NOT NULL,
-        fecha_evaluacion DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (estudiante_id) REFERENCES usuarios(id)
-    );
-`);
-console.log('💾 Base de datos conectada y tablas verificadas.');
-module.exports = db;
+// Carga las variables de entorno que pusiste en Render
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
+
+let supabase;
+
+// Verifica si las llaves existen
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+    console.error('Error: Faltan las variables de entorno SUPABASE_URL o SUPABASE_KEY.');
+    console.log('Asegúrate de añadirlas en el panel de "Environment" de Render.');
+} else {
+    // Crea y exporta el cliente de Supabase
+    // Esto es nuestro nuevo 'db'
+    supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log('✅ Conexión con Supabase lista.');
+}
+
+// ¡ASEGÚRATE DE EXPORTAR 'supabase', NO LA LIBRERÍA!
+module.exports = supabase;
