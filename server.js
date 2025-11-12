@@ -1,4 +1,4 @@
-// --- Archivo: server.js (VERSIÓN CON MODELO "AUTO" A PRUEBA DE BALAS) ---
+// --- Archivo: server.js (VERSIÓN CON MODELO MIXTRAL) ---
 const express = require('express');
 const cors = require('cors');
 const supabase = require('./database'); // Importamos Supabase
@@ -141,14 +141,12 @@ app.post('/api/chat', async (req, res) => {
             },
             body: JSON.stringify({
                 // --- ¡AQUÍ ESTÁ EL CAMBIO! ---
-                // Usamos el modelo automático que NUNCA falla
-                "model": "openrouter/auto", 
+                // Usamos el modelo Mixtral, que es gratuito y muy popular
+                "model": "mistralai/mixtral-8x7b-instruct:free", 
                 "messages": [
                     { "role": "system", "content": systemPrompt },
                     { "role": "user", "content": userMessage }
-                ],
-                // Le decimos a OpenRouter que use cualquier modelo gratuito
-                "route": "free" 
+                ]
             })
         });
 
