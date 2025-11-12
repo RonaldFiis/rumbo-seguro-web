@@ -6,6 +6,35 @@
     <title>Crear Cuenta - Rumbo Seguro</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilo para ocultar el campo de especialidad */
+        #campo-especialidad {
+            display: none; /* Oculto por defecto */
+        }
+        /* ¡NUEVO! Estilo para las casillas */
+        .checkbox-group {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 2px solid var(--light);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            background: #fafafa;
+        }
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+        .checkbox-group label:hover {
+            background-color: #f0f5ff;
+        }
+        .checkbox-group input {
+            margin-right: 0.75rem;
+            width: auto;
+        }
+    </style>
 </head>
 <body class="auth-wrapper">
 
@@ -43,6 +72,25 @@
                     <option value="psicologo">🧠 Psicólogo(a)</option>
                 </select>
             </div>
+            
+            <div id="campo-especialidad" style="margin-bottom: 1.5rem;">
+                <label for="especialidad" class="form-label">¿En qué cursos puedes ser tutor?</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="curso" value="Cálculo Diferencial"> Cálculo Diferencial</label>
+                    <label><input type="checkbox" name="curso" value="Cálculo Integral"> Cálculo Integral</label>
+                    <label><input type="checkbox" name="curso" value="Cálculo Multivariable"> Cálculo Multivariable</label>
+                    <label><input type="checkbox" name="curso" value="Álgebra Lineal"> Álgebra Lineal</label>
+                    <label><input type="checkbox" name="curso" value="Geometría Analítica"> Geometría Analítica</label>
+                    <label><input type="checkbox" name="curso" value="Física I"> Física I</label>
+                    <label><input type="checkbox" name="curso" value="Química I"> Química I</label>
+                    <label><input type="checkbox" name="curso" value="Química 2"> Química 2</label>
+                    <label><input type="checkbox" name="curso" value="Dibujo de Ingeniería"> Dibujo de Ingeniería</label>
+                    <label><input type="checkbox" name="curso" value="Introducción a la Computación"> Introducción a la Computación</label>
+                    <label><input type="checkbox" name="curso" value="Algoritmia y Estructura de Datos"> Algoritmia y Estructura de Datos</label>
+                    <label><input type="checkbox" name="curso" value="Matemática Discreta"> Matemática Discreta</label>
+                </div>
+            </div>
+
             <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1rem;">
                 <i class="fas fa-user-plus"></i> Registrarme
             </button>
@@ -54,21 +102,48 @@
     </div>
 
     <script>
+        const rolSelect = document.getElementById('rol');
+        const campoEspecialidad = document.getElementById('campo-especialidad');
+
+        // Función para mostrar/ocultar el campo
+        rolSelect.addEventListener('change', () => {
+            if (rolSelect.value === 'tutor') {
+                campoEspecialidad.style.display = 'block'; // Mostrar
+            } else {
+                campoEspecialidad.style.display = 'none'; // Ocultar
+            }
+        });
+
         document.getElementById('registro-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const errorDiv = document.getElementById('msg-error');
             const successDiv = document.getElementById('msg-success');
             errorDiv.style.display = 'none'; successDiv.style.display = 'none';
 
+            const rol = document.getElementById('rol').value;
+
+            // --- ¡NUEVA LÓGICA PARA LEER CHECKBOXES! ---
+            let especialidadesSeleccionadas = [];
+            if (rol === 'tutor') {
+                const checkboxes = document.querySelectorAll('#campo-especialidad input[name="curso"]:checked');
+                checkboxes.forEach((checkbox) => {
+                    especialidadesSeleccionadas.push(checkbox.value);
+                });
+            }
+            // Convertimos el array en un solo string separado por comas
+            const especialidadString = especialidadesSeleccionadas.join(', ');
+            // --- FIN DE LA NUEVA LÓGICA ---
+
             const datos = {
                 nombres: document.getElementById('nombres').value.trim(),
                 email: document.getElementById('email').value.trim(),
                 password: document.getElementById('password').value,
-                rol: document.getElementById('rol').value
+                rol: rol,
+                es_tutor: rol === 'tutor',
+                especialidad: rol === 'tutor' ? especialidadString : null
             };
 
             try {
-                // ESTA ES LA LÍNEA IMPORTANTE: Habla con tu backend, no con Supabase
                 const res = await fetch('/api/registro', { 
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -81,7 +156,6 @@
                     successDiv.style.display = 'block';
                     setTimeout(() => window.location.href = 'login.html', 2000);
                 } else {
-                    // Muestra el error que envía el backend (ej. "Email ya registrado")
                     errorDiv.textContent = data.error || 'Error al registrar';
                     errorDiv.style.display = 'block';
                 }
