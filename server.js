@@ -1,4 +1,4 @@
-// --- Archivo: server.js (VERSIÓN CON MODELO GRATUITO "ZEPHYR") ---
+// --- Archivo: server.js (VERSIÓN CON REGISTRO DE TUTOR CORREGIDO) ---
 const express = require('express');
 const cors = require('cors');
 const supabase = require('./database'); // Importamos Supabase
@@ -23,13 +23,22 @@ app.get('/api/status', (req, res) => res.send('✅ Servidor funcionando'));
 
 // --- RUTA 2: Registro (SUPABASE) ---
 app.post('/api/registro', async (req, res) => {
-    const { nombres, email, password, rol } = req.body;
+    // Recibimos los nuevos campos
+    const { nombres, email, password, rol, es_tutor, especialidad } = req.body;
+    
     if (!nombres || !email || !password) return res.status(400).json({ error: 'Faltan datos' });
 
     try {
         const { data, error } = await supabase
             .from('usuarios')
-            .insert({ nombres, email, password, rol: rol || 'estudiante' })
+            .insert({
+                nombres,
+                email,
+                password,
+                rol: rol || 'estudiante',
+                es_tutor: es_tutor || false,
+                especialidad: especialidad
+            })
             .select()
             .single();
 
@@ -91,6 +100,7 @@ app.post('/api/riesgo', async (req, res) => {
         res.json({ mensaje: 'Guardado', nivel: data.nivel, puntaje: data.puntaje });
     } catch (error) {
         console.error('Error al guardar riesgo:', error.message);
+        // ¡AQUÍ ESTABA EL TYPO "5M"! (Corregido a 500)
         res.status(500).json({ error: 'Error al guardar' });
     }
 });
@@ -114,7 +124,7 @@ app.get('/api/riesgo/:id', async (req, res) => {
     }
 });
 
-// --- RUTA 6: CHAT CON IA (OPENROUTER) ---
+// --- RUTA 6: CHAT CON IA (OPENROUTER - MythoMax) ---
 app.post('/api/chat', async (req, res) => {
     if (!process.env.API_KEY) {
         return res.status(500).json({ reply: "Error del servidor: La API_KEY no está configurada." });
@@ -140,9 +150,7 @@ app.post('/api/chat', async (req, res) => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                // --- ¡AQUÍ ESTÁ EL CAMBIO! ---
-                // Usamos el modelo Zephyr, que también es gratuito
-                "model": "huggingfaceh4/zephyr-7b-beta:free", 
+                "model": "gryphe/mythomax-l2-13b:free", 
                 "messages": [
                     { "role": "system", "content": systemPrompt },
                     { "role": "user", "content": userMessage }
