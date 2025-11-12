@@ -68,7 +68,8 @@
             };
 
             try {
-                const res = await fetch('/api/registro', { // No es necesario 'http://localhost:3000'
+                // ESTA ES LA LÍNEA IMPORTANTE: Habla con tu backend, no con Supabase
+                const res = await fetch('/api/registro', { 
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(datos)
@@ -80,6 +81,7 @@
                     successDiv.style.display = 'block';
                     setTimeout(() => window.location.href = 'login.html', 2000);
                 } else {
+                    // Muestra el error que envía el backend (ej. "Email ya registrado")
                     errorDiv.textContent = data.error || 'Error al registrar';
                     errorDiv.style.display = 'block';
                 }
