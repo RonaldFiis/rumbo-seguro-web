@@ -1,4 +1,4 @@
-// --- Archivo: server.js (VERSIÓN CON MODELO MIXTRAL) ---
+// --- Archivo: server.js (VERSIÓN CON MODELO GRATUITO "ZEPHYR") ---
 const express = require('express');
 const cors = require('cors');
 const supabase = require('./database'); // Importamos Supabase
@@ -141,8 +141,8 @@ app.post('/api/chat', async (req, res) => {
             },
             body: JSON.stringify({
                 // --- ¡AQUÍ ESTÁ EL CAMBIO! ---
-                // Usamos el modelo Mixtral, que es gratuito y muy popular
-                "model": "mistralai/mixtral-8x7b-instruct:free", 
+                // Usamos el modelo Zephyr, que también es gratuito
+                "model": "huggingfaceh4/zephyr-7b-beta:free", 
                 "messages": [
                     { "role": "system", "content": systemPrompt },
                     { "role": "user", "content": userMessage }
