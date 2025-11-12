@@ -29,6 +29,9 @@
                 <span>RUMBO SEGURO</span>
             </a>
             <div class="user-controls flex items-center" style="gap: 1.5rem;">
+                <a href="biblioteca.html" class="nav-links" style="font-weight: 600;">
+                    <i class="fas fa-book"></i> Biblioteca
+                </a>
                 <span class="user-info">Hola, <strong id="nombre-usuario">...</strong></span>
                 <button id="btn-logout" class="btn btn-danger" style="padding: 0.5rem 1rem;">
                     <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
@@ -60,7 +63,7 @@
             if (usuario.rol === 'estudiante') {
                 renderEstudiante(panel, usuario);
             } else if (usuario.rol === 'tutor') {
-                renderTutor(panel);
+                renderTutor(panel, usuario); // Pasamos el usuario al render de tutor
             } else if (usuario.rol === 'psicologo') {
                 renderPsicologo(panel);
             }
@@ -77,7 +80,6 @@
                     const r = await res.json();
                     riesgoHTML = `<span class="risk-badge bg-${r.nivel}">${r.nivel.toUpperCase()}</span>`;
                     msgRiesgo = `Evaluado el: ${new Date(r.fecha_evaluacion).toLocaleDateString()}`;
-                    
                     if (r.nivel === 'Crítico') colorClase = 'card-red';
                     else if (r.nivel === 'Alto' || r.nivel === 'Medio') colorClase = 'card-orange';
                     else if (r.nivel === 'Bajo') colorClase = 'card-green';
@@ -109,13 +111,30 @@
             `;
         }
 
-        function renderTutor(panel) {
+        async function renderTutor(panel, usuario) {
+            // ¡NUEVO! Cargamos la especialidad del tutor
+            let especialidad = 'No definida';
+            try {
+                // Hacemos una llamada rápida para obtener los datos más frescos del tutor
+                const res = await supabase.from('usuarios').select('especialidad').eq('id', usuario.id).single();
+                if (res.data && res.data.especialidad) {
+                    especialidad = res.data.especialidad;
+                }
+            } catch(e) {}
+
             panel.innerHTML = `
                 <h2 style="margin-bottom: 1.5rem; font-weight: 700;">👨‍🏫 Panel de Docente Tutor</h2>
-                <div class="card card-orange">
-                    <h3><i class="fas fa-users"></i> Mis Estudiantes Asignados</h3>
-                    <p style="color: var(--gray); margin: 0.5rem 0 1rem;">Actualmente tienes <strong>0</strong> estudiantes asignados.</p>
-                    <button class="btn btn-primary">Ver lista completa</button>
+                <div class="grid grid-2">
+                    <div class="card card-blue">
+                        <h3><i class="fas fa-chalkboard-teacher"></i> Mis Especialidades</h3>
+                        <p style="color: var(--gray); margin: 0.5rem 0 1rem;">Cursos: <strong>${especialidad || 'Aún no has definido tus cursos.'}</strong></p>
+                        <button class="btn btn-outline">Editar Perfil</button>
+                    </div>
+                    <div class="card card-orange">
+                        <h3><i class="fas fa-users"></i> Solicitudes de Tutoría</h3>
+                        <p style="color: var(--gray); margin: 0.5rem 0 1rem;">Actualmente tienes <strong>0</strong> solicitudes pendientes.</p>
+                        <button class="btn btn-primary">Ver Solicitudes</button>
+                    </div>
                 </div>
             `;
         }
