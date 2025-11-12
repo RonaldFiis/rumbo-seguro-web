@@ -1,7 +1,8 @@
-// --- Archivo: server.js (VERSIÓN CON MODELO MythoMax) ---
+// --- Archivo: server.js (VERSIÓN CON SUPABASE Y IA) ---
 const express = require('express');
 const cors = require('cors');
-const supabase = require('./database'); // Importamos Supabase
+// ¡CAMBIO! Ya no importamos 'db' (sqlite), importamos 'supabase'
+const supabase = require('./database'); 
 const path = require('path');
 require('dotenv').config();
 
@@ -21,7 +22,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // --- RUTAS API (Backend) ---
 app.get('/api/status', (req, res) => res.send('✅ Servidor funcionando'));
 
-// --- RUTA 2: Registro (SUPABASE) ---
+// --- RUTA 2: Registro (¡ACTUALIZADA PARA SUPABASE!) ---
 app.post('/api/registro', async (req, res) => {
     const { nombres, email, password, rol } = req.body;
     if (!nombres || !email || !password) return res.status(400).json({ error: 'Faltan datos' });
@@ -29,16 +30,23 @@ app.post('/api/registro', async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('usuarios')
-            .insert({ nombres, email, password, rol: rol || 'estudiante' })
-            .select()
-            .single();
+            .insert({
+                nombres,
+                email,
+                password,
+                rol: rol || 'estudiante'
+            })
+            .select() // .select() hace que nos devuelva el usuario creado
+            .single(); // .single() asegura que solo sea uno
 
         if (error) {
-            if (error.code === '23505') { // Email duplicado
+            // Error 23505 es "duplicate key" (email ya existe)
+            if (error.code === '23505') {
                 return res.status(409).json({ error: 'Email ya registrado' });
             }
-            throw error;
+            throw error; // Lanza otros errores
         }
+        
         res.status(201).json({ mensaje: 'Registrado', id: data.id });
     } catch (error) {
         console.error('Error al registrar:', error.message);
@@ -46,17 +54,20 @@ app.post('/api/registro', async (req, res) => {
     }
 });
 
-// --- RUTA 3: Login (SUPABASE) ---
+// --- RUTA 3: Login (¡ACTUALIZADA PARA SUPABASE!) ---
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     try {
         const { data: user, error } = await supabase
             .from('usuarios')
             .select('*')
-            .eq('email', email)
-            .single();
+            .eq('email', email) // Busca donde email == email
+            .single(); // Espera solo un resultado
 
-        if (error || !user || String(user.password) !== String(password)) {
+        if (error || !user) {
+            return res.status(401).json({ error: 'Credenciales incorrectas' });
+        }
+        if (String(user.password) !== String(password)) {
             return res.status(401).json({ error: 'Credenciales incorrectas' });
         }
 
@@ -70,7 +81,7 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// --- RUTA 4: Guardar Evaluación (SUPABASE) ---
+// --- RUTA 4: Guardar Evaluación (¡ACTUALIZADA PARA SUPABASE!) ---
 app.post('/api/riesgo', async (req, res) => {
     const { estudiante_id, puntaje } = req.body;
     let nivel = puntaje >= 7 ? 'Crítico' : puntaje >= 5 ? 'Alto' : puntaje >= 3 ? 'Medio' : 'Bajo';
@@ -88,6 +99,7 @@ app.post('/api/riesgo', async (req, res) => {
             .single();
 
         if (error) throw error;
+        
         res.json({ mensaje: 'Guardado', nivel: data.nivel, puntaje: data.puntaje });
     } catch (error) {
         console.error('Error al guardar riesgo:', error.message);
@@ -95,7 +107,7 @@ app.post('/api/riesgo', async (req, res) => {
     }
 });
 
-// --- RUTA 5: Obtener Riesgo (SUPABASE) ---
+// --- RUTA 5: Obtener Riesgo (¡ACTUALIZADA PARA SUPABASE!) ---
 app.get('/api/riesgo/:id', async (req, res) => {
     const id = req.params.id;
     try {
@@ -106,7 +118,7 @@ app.get('/api/riesgo/:id', async (req, res) => {
             .single();
             
         if (error || !riesgo) {
-            return res.status(404).json({ mensaje: 'Sin evaluación' });
+            return res.status(44,).json({ mensaje: 'Sin evaluación' });
         }
         res.json(riesgo);
     } catch (error) {
@@ -131,7 +143,6 @@ app.post('/api/chat', async (req, res) => {
         4.  **Conocimiento local (FIIS/UNI):** Actúa como si conocieras la UNI.
         5.  **Respuestas cortas:** Mantén tus respuestas concisas para un chat.
     `;
-
     try {
         const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
             method: "POST",
@@ -140,8 +151,6 @@ app.post('/api/chat', async (req, res) => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                // --- ¡AQUÍ ESTÁ EL CAMBIO! ---
-                // Usamos el modelo gratuito más popular y estable
                 "model": "gryphe/mythomax-l2-13b:free", 
                 "messages": [
                     { "role": "system", "content": systemPrompt },
