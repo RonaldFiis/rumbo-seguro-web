@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Biblioteca - Rumbo Seguro</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: var(--light); }
+        .header { background: var(--white); padding: 1rem 0; border-bottom: 2px solid #eee; }
+        .header .container { display: flex; align-items: center; }
+        .main-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr; /* Columna de lista (más ancha) y columna de subida (más angosta) */
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .file-list-item {
+            background: var(--white);
+            border: 1px solid #eee;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .file-info .curso {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            background: #e3f2fd;
+            padding: 0.2rem 0.5rem;
+            border-radius: 1rem;
+        }
+        .file-info .uploader {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        .upload-form {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow-sm);
+            position: sticky; /* Para que el formulario se quede fijo al hacer scroll */
+            top: 100px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <a href="dashboard.html" class="nav-links" style="color: var(--gray); font-weight: 500; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="fas fa-arrow-left"></i> Volver al Panel
+            </a>
+        </div>
+    </header>
+
+    <main class="container main-container">
+        <section id="lista-recursos">
+            <h2 style="margin-bottom: 1.5rem;">📚 Biblioteca de Recursos</h2>
+            <div id="recursos-container">
+                <p style="color: var(--gray);">Cargando recursos...</p>
+                </div>
+        </section>
+
+        <aside>
+            <form id="upload-form" class="upload-form">
+                <h3><i class="fas fa-upload"></i> Aporta un Archivo</h3>
+                <p style="font-size: 0.9rem; color: var(--gray); margin-bottom: 1rem;">Sube exámenes, PCs o solucionarios.</p>
+
+                <div style="margin-bottom: 1rem;">
+                    <label for="nombre_archivo" class="form-label">Nombre (Ej. PC1 2024-1)</label>
+                    <input type="text" id="nombre_archivo" class="form-input" required>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label for="curso" class="form-label">Curso</label>
+                    <select id="curso" class="form-input" style="background: white;">
+                        <option value="Cálculo Diferencial">Cálculo Diferencial</option>
+                        <option value="Cálculo Integral">Cálculo Integral</option>
+                        <option value="Álgebra Lineal">Álgebra Lineal</option>
+                        <option value="Geometría Analítica">Geometría Analítica</option>
+                        <option value="Física I">Física I</option>
+                        <option value="Química I">Química I</option>
+                        <option value="Algoritmia">Algoritmia</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label for="tipo" class="form-label">Tipo de Archivo</label>
+                    <select id="tipo" class="form-input" style="background: white;">
+                        <option value="Práctica Calificada">Práctica Calificada (PC)</option>
+                        <option value="Examen Parcial">Examen Parcial</option>
+                        <option value="Examen Final">Examen Final</option>
+                        <option value="Solucionario">Solucionario</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="archivo" class="form-label">Archivo (PDF o Imagen)</label>
+                    <input type="file" id="archivo" class="form-input" required accept=".pdf,.png,.jpg,.jpeg">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Subir Archivo</button>
+                <div id="upload-status" style="margin-top: 1rem; text-align: center;"></div>
+            </form>
+        </aside>
+    </main>
+
+    <script>
+        // Función para cargar los recursos de la biblioteca
+        async function cargarRecursos() {
+            const container = document.getElementById('recursos-container');
+            container.innerHTML = '<p style="color: var(--gray);">Cargando recursos...</p>';
+
+            try {
+                const res = await fetch('/api/biblioteca');
+                const recursos = await res.json();
+
+                if (recursos.length === 0) {
+                    container.innerHTML = '<p style="color: var(--gray);">No hay recursos en la biblioteca todavía. ¡Sé el primero en subir uno!</p>';
+                    return;
+                }
+
+                container.innerHTML = ''; // Limpiar
+                recursos.forEach(recurso => {
+                    const item = document.createElement('div');
+                    item.className = 'file-list-item';
+                    item.innerHTML = `
+                        <div class="file-info">
+                            <span class="curso">${recurso.curso}</span>
+                            <h4 style="margin: 0.5rem 0;">${recurso.nombre_archivo}</h4>
+                            <span class="uploader">Subido por ${recurso.usuarios ? recurso.usuarios.nombres : 'Anónimo'} (${recurso.tipo})</span>
+                        </div>
+                        <a href="${recurso.url_descarga}" target="_blank" class="btn btn-success" style="padding: 0.5rem 1rem;">
+                            <i class="fas fa-download"></i> Descargar
+                        </a>
+                    `;
+                    container.appendChild(item);
+                });
+            } catch (error) {
+                container.innerHTML = '<p style="color: var(--danger);">Error al cargar los recursos.</p>';
+            }
+        }
+
+        // Lógica para subir un archivo nuevo
+        document.getElementById('upload-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const usuario = JSON.parse(localStorage.getItem('usuario'));
+            if (!usuario) return alert('Debes iniciar sesión para subir archivos.');
+
+            const statusDiv = document.getElementById('upload-status');
+            statusDiv.textContent = 'Subiendo... ⏳';
+            statusDiv.style.color = 'var(--primary)';
+
+            // 1. Creamos el FormData (para enviar texto Y archivos)
+            const formData = new FormData();
+            formData.append('nombre_archivo', document.getElementById('nombre_archivo').value);
+            formData.append('curso', document.getElementById('curso').value);
+            formData.append('tipo', document.getElementById('tipo').value);
+            formData.append('archivo', document.getElementById('archivo').files[0]);
+            formData.append('uploader_id', usuario.id);
+
+            try {
+                // 2. Enviamos el formulario al backend
+                const res = await fetch('/api/recursos', {
+                    method: 'POST',
+                    body: formData // ¡No se usa headers 'Content-Type' con FormData!
+                });
+
+                if (res.ok) {
+                    statusDiv.textContent = '¡Archivo subido con éxito! ✅';
+                    statusDiv.style.color = 'var(--secondary)';
+                    document.getElementById('upload-form').reset(); // Limpiar formulario
+                    cargarRecursos(); // Recargar la lista
+                } else {
+                    const data = await res.json();
+                    throw new Error(data.error || 'Error del servidor');
+                }
+            } catch (error) {
+                statusDiv.textContent = `Error: ${error.message}`;
+                statusDiv.style.color = 'var(--danger)';
+            }
+        });
+
+        // Carga inicial
+        document.addEventListener('DOMContentLoaded', cargarRecursos);
+    </script>
+</body>
+</html>
