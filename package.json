@@ -1,23 +1,24 @@
 {
   "name": "rumbo-seguro-proyecto",
   "version": "1.0.0",
-  "description": "",
+  "description": "Proyecto Rumbo Seguro para la feria FIIS",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "rumbo-seguro",
+    "fiis",
+    "uni"
+  ],
+  "author": "Matthews Ronald Ayala Zubilete",
   "license": "ISC",
   "dependencies": {
-    "@google/generative-ai": "^0.16.0",
-    "@libsql/turso-cli": "^0.8.2",
     "@supabase/supabase-js": "^2.44.4",
-    "better-sqlite3": "^11.1.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "sqlite3": "^5.1.7"
+    "multer": "^1.4.5-lts.1"
   }
 }
