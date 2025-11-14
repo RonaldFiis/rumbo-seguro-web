@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Encuentra un Tutor - Rumbo Seguro</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: var(--light); }
+        .header { background: var(--white); padding: 1rem 0; border-bottom: 2px solid #eee; }
+        .header .container { display: flex; align-items: center; }
+        .tutor-card {
+            background: var(--white);
+            border-radius: 1rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+        }
+        .tutor-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-left: 5px solid var(--primary);
+        }
+        .tutor-info { display: flex; align-items: center; gap: 1.5rem; }
+        .tutor-avatar {
+            font-size: 2rem;
+            color: var(--primary);
+            background: var(--light);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tutor-details h3 { margin: 0; color: var(--dark); }
+        .tutor-details p { margin: 0; color: var(--gray); font-size: 0.9rem; }
+        .tutor-details .specialty { font-weight: 600; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <a href="dashboard.html" class="nav-links" style="color: var(--gray); font-weight: 500; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="fas fa-arrow-left"></i> Volver al Panel
+            </a>
+        </div>
+    </header>
+
+    <main class="container" style="margin-top: 2rem;">
+        <h2 style="margin-bottom: 1.5rem;">👨‍🏫 Encuentra un Tutor</h2>
+        <p style="color: var(--gray); margin-bottom: 2rem;">Estos son los tutores y docentes registrados. Contáctalos para coordinar una sesión.</p>
+        
+        <div id="lista-de-tutores">
+            <div class="text-center" style="padding: 50px; color: var(--gray);">
+                <i class="fas fa-spinner fa-spin fa-3x"></i>
+                <p style="margin-top: 20px;">Buscando tutores disponibles...</p>
+            </div>
+            </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const container = document.getElementById('lista-de-tutores');
+            
+            try {
+                // 1. Llamamos a la nueva ruta del backend
+                const res = await fetch('/api/tutores');
+                const tutores = await res.json();
+
+                if (tutores.length === 0) {
+                    container.innerHTML = '<p style="color: var(--gray);">No hay tutores registrados por el momento.</p>';
+                    return;
+                }
+
+                container.innerHTML = ''; // Limpiamos el mensaje de "Cargando..."
+                
+                // 2. Creamos una tarjeta por cada tutor
+                tutores.forEach(tutor => {
+                    const card = document.createElement('div');
+                    card.className = 'tutor-card';
+                    card.innerHTML = `
+                        <div class="tutor-info">
+                            <div class="tutor-avatar"><i class="fas fa-user-graduate"></i></div>
+                            <div class="tutor-details">
+                                <h3>${tutor.nombres}</h3>
+                                <p>Especialidad: <span class="specialty">${tutor.especialidad || 'General'}</span></p>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="solicitarTutor(${tutor.id})">
+                            <i class="fas fa-calendar-plus"></i> Solicitar Tutoría
+                        </button>
+                    `;
+                    container.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error('Error al cargar tutores:', error);
+                container.innerHTML = '<p style="color: var(--danger);">Error al cargar la lista de tutores.</p>';
+            }
+        });
+
+        // (¡Próximamente!) Función para guardar la solicitud
+        function solicitarTutor(tutorId) {
+            alert('¡Función en desarrollo! El siguiente paso será guardar esta solicitud en la tabla "tutorias". ID del Tutor: ' + tutorId);
+            // Aquí es donde haríamos un fetch POST a '/api/solicitar-tutoria'
+        }
+    </script>
+</body>
+</html>
