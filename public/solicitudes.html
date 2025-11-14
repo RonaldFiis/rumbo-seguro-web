@@ -60,7 +60,7 @@
                 <i class="fas fa-spinner fa-spin fa-3x"></i>
                 <p style="margin-top: 20px;">Buscando solicitudes...</p>
             </div>
-            </div>
+        </div>
     </main>
 
     <script>
@@ -68,7 +68,7 @@
         
         document.addEventListener('DOMContentLoaded', async () => {
             if (!usuario || usuario.rol !== 'tutor') {
-                window.location.href = 'login.html'; // Seguridad
+                window.location.href = 'login.html';
                 return;
             }
             cargarSolicitudes(usuario.id);
@@ -76,26 +76,30 @@
 
         async function cargarSolicitudes(tutorId) {
             const container = document.getElementById('lista-de-solicitudes');
-            container.innerHTML = '<div class="text-center" ...></div>'; // Feedback de carga
+            container.innerHTML = '<div class="text-center" ...></div>';
 
             try {
                 const res = await fetch(`/api/solicitudes-detalle/${tutorId}`);
                 const solicitudes = await res.json();
-                if (!res.ok) throw new Error('No se pudo cargar la lista');
+                
+                // Si hay error en el backend (ej. 500), lanzamos error
+                if (!res.ok) throw new Error(solicitudes.error || 'Error al cargar lista');
 
                 if (solicitudes.length === 0) {
                     container.innerHTML = '<div class="card text-center"><p>¡Genial! No tienes solicitudes pendientes.</p></div>';
                     return;
                 }
 
-                container.innerHTML = ''; // Limpiamos el "Cargando..."
+                container.innerHTML = '';
                 
                 solicitudes.forEach(solicitud => {
                     const card = document.createElement('div');
                     card.className = 'solicitud-card';
                     card.id = `solicitud-${solicitud.id}`;
                     
-                    const estudiante = solicitud.usuarios; // Objeto con 'nombres' y 'email'
+                    // ¡AQUÍ ESTÁ LA CORRECCIÓN DEL FRONTEND!
+                    // Antes era solicitud.usuarios, ahora es solicitud.estudiante
+                    const estudiante = solicitud.estudiante; 
                     
                     card.innerHTML = `
                         <div class="solicitud-header">
@@ -124,7 +128,6 @@
             }
         }
 
-        // --- ¡NUEVA FUNCIÓN! ---
         async function gestionarSolicitud(solicitudId, nuevoEstado) {
             const card = document.getElementById(`solicitud-${solicitudId}`);
             try {
@@ -136,10 +139,14 @@
 
                 if (!res.ok) throw new Error('Error al actualizar');
 
-                // Si tiene éxito, eliminamos la tarjeta de la vista
-                card.style.transition = 'opacity 0.5s ease';
+                // Animación de eliminación
                 card.style.opacity = '0';
                 setTimeout(() => card.remove(), 500);
+                
+                // Opcional: Mostrar mensaje de éxito
+                if (nuevoEstado === 'aceptada') {
+                    alert('¡Solicitud aceptada! Contacta al estudiante.');
+                }
 
             } catch (error) {
                 console.error('Error al gestionar solicitud:', error);
