@@ -1,4 +1,4 @@
-/* --- public/style.css (VERSIÓN PRO + Checkboxes) --- */
+/* --- public/style.css (VERSIÓN PRO + Checkboxes + Modal) --- */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
@@ -80,32 +80,21 @@ ul { list-style: none; }
 .form-input { width: 100%; padding: 0.75rem 1rem; border: 2px solid var(--light); border-radius: 0.5rem; font-size: 1rem; transition: all 0.2s; }
 .form-input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(0,90,156,0.1); }
 
-/* --- ¡NUEVOS ESTILOS PARA CHECKBOXES! --- */
-#campo-especialidad { display: none; /* Oculto por defecto */ }
+/* --- Checkboxes de Registro --- */
+#campo-especialidad { display: none; }
 .checkbox-group {
-    max-height: 200px;
-    overflow-y: auto;
-    border: 2px solid var(--light);
-    border-radius: 0.5rem;
-    padding: 0.75rem;
-    background: #fafafa;
+    max-height: 200px; overflow-y: auto; border: 2px solid var(--light);
+    border-radius: 0.5rem; padding: 0.75rem; background: #fafafa;
 }
 .checkbox-group label {
-    display: flex;
-    align-items: center;
-    padding: 0.5rem;
-    border-radius: 0.25rem;
-    cursor: pointer;
-    font-weight: 500;
+    display: flex; align-items: center; padding: 0.5rem;
+    border-radius: 0.25rem; cursor: pointer; font-weight: 500;
 }
 .checkbox-group label:hover { background-color: #f0f5ff; }
 .checkbox-group input {
-    margin-right: 0.75rem;
-    width: auto; /* Ancho automático para checkboxes */
-    accent-color: var(--primary);
-    transform: scale(1.1);
+    margin-right: 0.75rem; width: auto;
+    accent-color: var(--primary); transform: scale(1.1);
 }
-/* --- FIN DE NUEVOS ESTILOS --- */
 
 /* --- DASHBOARD COMPONENTS --- */
 .risk-badge { padding: 0.5rem 1rem; border-radius: 2rem; font-weight: 700; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 1px; }
@@ -114,3 +103,54 @@ ul { list-style: none; }
 .bg-Alto { background: #FED7D7; color: #9B2C2C; }
 .bg-Crítico { background: #822727; color: #FFD7D7; }
 .bg-Pendiente { background: #E2E8F0; color: #4A5568; }
+
+/* --- ¡NUEVO! ESTILOS PARA EL MODAL DE TUTORÍA --- */
+.modal-backdrop {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    display: none; /* Oculto por defecto */
+    align-items: center;
+    justify-content: center;
+}
+.modal-content {
+    background: var(--white);
+    padding: 2.5rem;
+    border-radius: 1.5rem;
+    box-shadow: var(--shadow-lg);
+    width: 90%;
+    max-width: 500px;
+}
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid var(--light);
+    padding-bottom: 1rem;
+}
+.modal-header h3 { color: var(--primary); }
+.modal-close {
+    background: transparent; border: none;
+    font-size: 1.5rem; cursor: pointer; color: var(--gray);
+}
+.modal-body { margin-top: 1.5rem; }
+.modal-body .radio-group label {
+    display: flex; align-items: center;
+    padding: 1rem; border: 2px solid var(--light);
+    border-radius: 0.5rem; margin-bottom: 0.5rem;
+    cursor: pointer;
+}
+.modal-body .radio-group label:hover { background: #f5f9ff; }
+.modal-body .radio-group input {
+    margin-right: 0.75rem; accent-color: var(--primary);
+    transform: scale(1.2);
+}
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+/* --- FIN DE ESTILOS DE MODAL --- */
