@@ -7,41 +7,38 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background-color: var(--light); }
-        .app-header {
-            background: var(--white); padding: 1rem 0; border-bottom: 2px solid #eee; margin-bottom: 2rem;
+        .header {
+            background: var(--white);
+            padding: 1rem 0;
+            border-bottom: 2px solid #eee;
         }
-        .app-header .container { display: flex; justify-content: space-between; align-items: center; }
-        .app-header .nav-logo { font-size: 1.2rem; gap: 10px; }
-        .app-header .nav-logo img { height: 40px; }
-        .app-header .user-controls { display: flex; align-items: center; gap: 1rem; }
-        .app-header .nav-link { font-weight: 600; color: var(--gray); display: flex; align-items: center; gap: 0.5rem; }
-        .app-header .nav-link:hover { color: var(--primary); }
-        .app-header .user-info { font-weight: 500; color: var(--gray); }
-        .app-header .user-info strong { color: var(--dark); }
+        .header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .user-info { font-weight: 500; color: var(--gray); }
+        .user-info strong { color: var(--dark); }
+        /* Estilo para la notificación del tutor */
         .notification-badge {
-            background: var(--danger); color: white; font-size: 0.8rem;
-            padding: 2px 8px; border-radius: 1rem; margin-left: 8px;
+            background: var(--danger);
+            color: white;
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 1rem;
+            margin-left: 8px;
         }
-        .welcome-banner {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: var(--white); padding: 2.5rem; border-radius: 1.5rem;
-            margin-bottom: 2rem; box-shadow: var(--shadow-lg);
-        }
-        .welcome-banner h2 { color: var(--white); font-size: 2rem; }
-        .welcome-banner p { color: rgba(255,255,255,0.8); }
-        .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; }
-        @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
-    <header class="app-header">
+    <header class="header">
         <div class="container">
-            <a href="index.html" class="nav-logo">
-                <img src="images/logo.svg" alt="Rumbo Seguro Logo">
+            <a href="index.html" class="nav-logo" style="font-size: 1.2rem; gap: 10px;">
+                <img src="images/logo.svg" alt="Rumbo Seguro Logo" style="height: 40px;">
                 <span>RUMBO SEGURO</span>
             </a>
-            <div class="user-controls">
-                <a href="biblioteca.html" class="nav-link">
+            <div class="user-controls flex items-center" style="gap: 1.5rem;">
+                <a href="biblioteca.html" class="nav-links" style="font-weight: 600;">
                     <i class="fas fa-book"></i> Biblioteca
                 </a>
                 <span class="user-info">Hola, <strong id="nombre-usuario">...</strong></span>
@@ -52,21 +49,19 @@
         </div>
     </header>
 
-    <main class="container" id="panel-contenido">
+    <main class="container" style="margin-top: 2rem;" id="panel-contenido">
         <div class="text-center" style="padding: 50px; color: var(--gray);">
             <i class="fas fa-spinner fa-spin fa-3x"></i>
+            <p style="margin-top: 20px;">Cargando tu panel...</p>
         </div>
     </main>
 
     <script>
-        const supabaseUrl = '<%= process.env.SUPABASE_URL %>';
-        const supabaseKey = '<%= process.env.SUPABASE_KEY %>';
-        
         document.addEventListener('DOMContentLoaded', async () => {
             const usuario = JSON.parse(localStorage.getItem('usuario'));
             if (!usuario) return window.location.href = 'login.html';
 
-            document.getElementById('nombre-usuario').textContent = usuario.nombres.split(' ')[0];
+            document.getElementById('nombre-usuario').textContent = usuario.nombres.split(' ')[0]; // Solo el primer nombre
             const panel = document.getElementById('panel-contenido');
 
             document.getElementById('btn-logout').addEventListener('click', () => {
@@ -87,6 +82,7 @@
             let riesgoHTML = '<span class="risk-badge bg-Pendiente">Pendiente</span>';
             let msgRiesgo = 'No has realizado tu evaluación inicial.';
             let colorClase = 'card-blue';
+
             try {
                 const res = await fetch(`/api/riesgo/${usuario.id}`);
                 if (res.ok) {
@@ -98,90 +94,93 @@
                     else if (r.nivel === 'Bajo') colorClase = 'card-green';
                 }
             } catch (e) {}
+
             panel.innerHTML = `
-                <div class="welcome-banner">
-                    <h2>👋 ¡Hola de nuevo, ${usuario.nombres.split(' ')[0]}!</h2>
-                    <p>Revisa tu estado y accede a tus herramientas de apoyo.</p>
-                </div>
-                <div class="dashboard-grid">
-                    <div class="main-content">
-                        <div class="card ${colorClase}">
-                            <h3 style="margin-bottom: 1rem;"><i class="fas fa-chart-line"></i> Tu Estado Actual</h3>
-                            <p style="font-size: 1.5rem; font-weight: 600;">Nivel de Riesgo: ${riesgoHTML}</p>
-                            <p style="color: var(--gray); font-size: 1rem; margin: 0.5rem 0 1.5rem;">${msgRiesgo}</p>
-                            <a href="evaluacion.html" class="btn btn-success" style="font-size: 1rem;">
-                                <i class="fas fa-clipboard-list"></i> ${riesgoHTML.includes('Pendiente') ? 'Realizar Evaluación' : 'Volver a Evaluar'}
-                            </a>
-                        </div>
+                <h2 style="margin-bottom: 1.5rem; font-weight: 700;">👋 Bienvenido, ${usuario.nombres.split(' ')[0]}</h2>
+                <div class="grid grid-3">
+                    <div class="card ${colorClase}">
+                        <h3 style="margin-bottom: 1rem;"><i class="fas fa-chart-line"></i> Tu Estado Actual</h3>
+                        <p style="font-size: 1.2rem;">Nivel de Riesgo: ${riesgoHTML}</p>
+                        <p style="color: var(--gray); font-size: 0.9rem; margin: 0.5rem 0 1rem;">${msgRiesgo}</p>
+                        <a href="evaluacion.html" class="btn btn-success" style="width: 100%;">
+                            <i class="fas fa-clipboard-list"></i> ${riesgoHTML.includes('Pendiente') ? 'Realizar Evaluación' : 'Volver a Evaluar'}
+                        </a>
                     </div>
-                    <aside class="sidebar" style="display: flex; flex-direction: column; gap: 1.5rem;">
-                        <div class="card">
-                            <h3><i class="fas fa-robot" style="color: var(--primary);"></i> Asistente Virtual</h3>
-                            <a href="asistente.html" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Hablar con IA</a>
-                        </div>
-                        <div class="card">
-                            <h3><i class="fas fa-user-friends" style="color: var(--accent);"></i> Tutorías</h3>
-                            <a href="tutorias.html" class="btn btn-outline" style="width: 100%; margin-top: 1rem;">Ver Tutores</a>
-                        </div>
-                    </aside>
+                    <div class="card">
+                        <h3><i class="fas fa-robot" style="color: var(--primary);"></i> Asistente Virtual</h3>
+                        <p style="color: var(--gray); margin: 0.5rem 0 1rem;">Tu compañero de IA está listo para ayudarte 24/7.</p>
+                        <a href="asistente.html" class="btn btn-primary" style="width: 100%;">Hablar con IA</a>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fas fa-user-friends" style="color: var(--accent);"></i> Tutorías</h3>
+                        <p style="color: var(--gray); margin: 0.5rem 0 1rem;">Reserva una sesión con un tutor para el curso que necesites.</p>
+                        <a href="tutorias.html" class="btn btn-outline" style="width: 100%;">Ver Tutores</a>
+                    </div>
                 </div>
             `;
         }
 
         async function renderTutor(panel, usuario) {
-            let especialidad = 'No definida';
+            let especialidad = 'No definida'; // Lo dejaremos así hasta que construyamos "Editar Perfil"
             let conteoSolicitudes = 0;
             let badgeHTML = '';
+
             try {
-                // Hacemos un fetch para los datos del tutor (nombre, especialidad)
-                const userRes = await fetch(`/api/usuario/${usuario.id}`);
-                const userData = await userRes.json();
-                if (userData && userData.especialidad) {
-                    especialidad = userData.especialidad;
+                // --- ¡BUG ARREGLADO! ---
+                // 1. Usamos 'await' y 'fetch' correctamente
+                const res = await fetch(`/api/solicitudes-tutor/${usuario.id}`);
+                
+                if (!res.ok) {
+                    console.error("Error del servidor al contar solicitudes");
+                    throw new Error('Error al cargar conteo'); 
                 }
                 
-                // Hacemos fetch para el conteo de solicitudes
-                const countRes = await fetch(`/api/solicitudes-tutor/${usuario.id}`);
-                const data = await countRes.json();
-                if (!countRes.ok) throw new Error(data.error);
+                // 2. Leemos la respuesta como JSON
+                const data = await res.json();
                 
+                // 3. Asignamos el conteo
                 conteoSolicitudes = data.count;
+                // --- FIN DEL ARREGLO ---
+                
                 if (conteoSolicitudes > 0) {
                     badgeHTML = `<span class="notification-badge">${conteoSolicitudes}</span>`;
                 }
-            } catch(e) { console.error("Error al cargar datos del tutor:", e.message); }
+
+            } catch(e) {
+                console.error("Error al cargar datos del tutor:", e.message);
+                // Si el fetch falla, el conteo se queda en 0, que es lo que veías antes.
+            }
 
             panel.innerHTML = `
-                <div class="welcome-banner"><h2>👨‍🏫 Panel de Docente Tutor</h2></div>
-                <div class="dashboard-grid">
-                    <div>
-                        <div class="card card-blue">
-                            <h3><i class="fas fa-chalkboard-teacher"></i> Mis Especialidades</h3>
-                            <p style="color: var(--gray); margin: 0.5rem 0 1rem;">Cursos: <strong>${especialidad || 'Aún no has definido tus cursos.'}</strong></p>
-                            <a href="perfil.html" class="btn btn-outline">
-                                <i class="fas fa-edit"></i> Editar Perfil
-                            </a>
-                        </div>
+                <h2 style="margin-bottom: 1.5rem; font-weight: 700;">👨‍🏫 Panel de Docente Tutor</h2>
+                <div class="grid grid-2">
+                    <div class="card card-blue">
+                        <h3><i class="fas fa-chalkboard-teacher"></i> Mis Especialidades</h3>
+                        <p style="color: var(--gray); margin: 0.5rem 0 1rem;">Cursos: <strong>${especialidad}</strong></p>
+                        <button class="btn btn-outline" onclick="alert('Esta función se habilitará en el siguiente paso.')">Editar Perfil</button>
                     </div>
-                    <aside>
-                        <div class="card card-orange">
-                            <h3><i class="fas fa-users"></i> Solicitudes ${badgeHTML}</h3>
-                            <p style="color: var(--gray); margin: 0.5rem 0 1rem;">Tienes <strong>${conteoSolicitudes}</strong> solicitudes pendientes.</p>
-                            <button class="btn btn-primary" onclick="alert('Próximamente')">Ver Solicitudes</button>
-                        </div>
-                    </aside>
-                </div>`;
+                    <div class="card card-orange">
+                        <h3><i class="fas fa-users"></i> Solicitudes de Tutoría ${badgeHTML}</h3>
+                        <p style="color: var(--gray); margin: 0.5rem 0 1rem;">Actualmente tienes <strong>${conteoSolicitudes}</strong> solicitudes pendientes.</p>
+                        <button class="btn btn-primary" onclick="alert('Esta función se habilitará en el siguiente paso.')">Ver Solicitudes</button>
+                    </div>
+                </div>
+            `;
         }
 
         function renderPsicologo(panel) {
-            // (Sin cambios)
             panel.innerHTML = `
-                <div class="welcome-banner"><h2>🧠 Panel de Psicología</h2></div>
+                <h2 style="margin-bottom: 1.5rem; font-weight: 700;">🧠 Panel de Psicología</h2>
                 <div class="card card-red">
                     <h3><i class="fas fa-exclamation-triangle"></i> Alertas Críticas</h3>
                     <p style="color: var(--gray); margin: 0.5rem 0 1rem;"><strong>0</strong> casos requieren atención inmediata.</p>
                     <button class="btn btn-danger" onclick="alert('Próximamente')">Revisar Casos</button>
-                </div>`;
+                </div>
+                <div class="card card-blue">
+                    <h3><i class="fas fa-calendar-alt"></i> Citas de Hoy</h3>
+                    <p style="color: var(--gray);">No hay citas programadas [Demo]</p>
+                </div>
+            `;
         }
     </script>
 </body>
