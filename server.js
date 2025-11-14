@@ -1,4 +1,4 @@
-// --- Archivo: server.js (VERSIÓN CON PERMISOS DE SUBIDA) ---
+// --- Archivo: server.js (VERSIÓN CON RUTA PARA LISTAR TUTORES) ---
 const express = require('express');
 const cors = require('cors');
 const supabase = require('./database'); // Importamos Supabase
@@ -119,6 +119,25 @@ app.post('/api/chat', async (req, res) => {
     }
 });
 
+// --- ¡NUEVA RUTA! OBTENER LISTA DE TUTORES ---
+app.get('/api/tutores', async (req, res) => {
+    try {
+        // Pedimos a Supabase todos los usuarios donde 'es_tutor' sea 'true'
+        // y solo seleccionamos las columnas que nos importan
+        const { data, error } = await supabase
+            .from('usuarios')
+            .select('id, nombres, especialidad')
+            .eq('es_tutor', true); // ¡La magia está aquí!
+
+        if (error) throw error;
+        res.json(data);
+    } catch (error) {
+        console.error('Error al obtener tutores:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+// --- FIN DE NUEVA RUTA ---
+
 // --- RUTAS DE BIBLIOTECA ---
 
 // RUTA 7: Obtener lista de recursos
@@ -135,54 +154,28 @@ app.get('/api/biblioteca', async (req, res) => {
     }
 });
 
-// RUTA 8: Subir un nuevo recurso (¡CON VERIFICACIÓN DE ROL!)
+// RUTA 8: Subir un nuevo recurso (CON VERIFICACIÓN DE ROL!)
 app.post('/api/recursos', upload.single('archivo'), async (req, res) => {
     try {
         const { nombre_archivo, curso, tipo, uploader_id } = req.body;
         const file = req.file;
-
         if (!file) return res.status(400).json({ error: 'No se recibió ningún archivo.' });
         
-        // --- ¡NUEVA VERIFICACIÓN DE SEGURIDAD! ---
-        const { data: usuario, error: userError } = await supabase
-            .from('usuarios')
-            .select('rol')
-            .eq('id', uploader_id)
-            .single();
+        // Verificación de seguridad
+        const { data: usuario, error: userError } = await supabase.from('usuarios').select('rol').eq('id', uploader_id).single();
+        if (userError || !usuario) return res.status(404).json({ error: 'Usuario no encontrado.' });
+        if (usuario.rol === 'estudiante') return res.status(403).json({ error: 'No tienes permiso para subir archivos.' });
 
-        if (userError || !usuario) {
-            return res.status(404).json({ error: 'Usuario no encontrado.' });
-        }
-        
-        if (usuario.rol === 'estudiante') {
-            return res.status(403).json({ error: 'No tienes permiso para subir archivos.' });
-        }
-        // --- FIN DE LA VERIFICACIÓN ---
-
+        // Subida a Supabase Storage
         const fileName = `public/${Date.now()}-${file.originalname}`;
-
-        const { data: uploadData, error: uploadError } = await supabase
-            .storage
-            .from('recursos_academicos')
-            .upload(fileName, file.buffer, { contentType: file.mimetype });
-
+        const { data: uploadData, error: uploadError } = await supabase.storage.from('recursos_academicos').upload(fileName, file.buffer, { contentType: file.mimetype });
         if (uploadError) throw uploadError;
 
-        const { data: publicUrlData } = supabase
-            .storage
-            .from('recursos_academicos')
-            .getPublicUrl(fileName);
+        // Obtener URL pública
+        const { data: publicUrlData } = supabase.storage.from('recursos_academicos').getPublicUrl(fileName);
 
-        const { error: dbError } = await supabase
-            .from('recursos')
-            .insert({
-                nombre_archivo,
-                curso,
-                tipo,
-                uploader_id,
-                url_descarga: publicUrlData.publicUrl
-            });
-
+        // Guardar en tabla 'recursos'
+        const { error: dbError } = await supabase.from('recursos').insert({ nombre_archivo, curso, tipo, uploader_id, url_descarga: publicUrlData.publicUrl });
         if (dbError) throw dbError;
 
         res.status(201).json({ mensaje: 'Archivo subido y registrado exitosamente' });
