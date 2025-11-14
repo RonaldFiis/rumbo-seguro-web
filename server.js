@@ -99,6 +99,7 @@ app.patch('/api/usuario/:id', async (req, res) => {
     }
 });
 
+
 // --- RUTA 4: Guardar Evaluación (SUPABASE) ---
 app.post('/api/riesgo', async (req, res) => {
     const { estudiante_id, puntaje } = req.body;
@@ -220,7 +221,7 @@ app.get('/api/solicitudes-tutor/:tutor_id', async (req, res) => {
     try {
         const { count, error } = await supabase
             .from('tutorias')
-            .select('*', { count: 'exact', head: true }) // 'head: true' hace que sea más rápido
+            .select('*', { count: 'exact', head: true })
             .eq('tutor_id', tutor_id)
             .eq('estado', 'solicitada');
         if (error) throw error;
