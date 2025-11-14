@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mis Solicitudes - Rumbo Seguro</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: var(--light); }
+        .app-header {
+            background: var(--white); padding: 1rem 0; border-bottom: 2px solid #eee; margin-bottom: 2rem;
+        }
+        .app-header .container { display: flex; align-items: center; }
+        .app-header .nav-link { font-weight: 600; color: var(--gray); display: flex; align-items: center; gap: 0.5rem; }
+        .app-header .nav-link:hover { color: var(--primary); }
+        
+        .solicitud-card {
+            background: var(--white);
+            border-radius: 1rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            border-left: 5px solid var(--accent);
+        }
+        .solicitud-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .solicitud-header h3 { color: var(--dark); margin: 0; }
+        .solicitud-header .curso {
+            font-size: 1rem; font-weight: 700; color: var(--primary);
+            background: #e3f2fd; padding: 0.3rem 0.8rem; border-radius: 1rem;
+        }
+        .solicitud-body p { color: var(--gray); margin: 0; }
+        .solicitud-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--light);
+        }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <div class="container">
+            <a href="dashboard.html" class="nav-link">
+                <i class="fas fa-arrow-left"></i> Volver al Panel
+            </a>
+        </div>
+    </header>
+
+    <main class="container" style="max-width: 800px;">
+        <h2 style="margin-bottom: 2rem;">📥 Solicitudes de Tutoría Pendientes</h2>
+        
+        <div id="lista-de-solicitudes">
+            <div class="text-center" style="padding: 50px; color: var(--gray);">
+                <i class="fas fa-spinner fa-spin fa-3x"></i>
+                <p style="margin-top: 20px;">Buscando solicitudes...</p>
+            </div>
+            </div>
+    </main>
+
+    <script>
+        const usuario = JSON.parse(localStorage.getItem('usuario'));
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!usuario || usuario.rol !== 'tutor') {
+                window.location.href = 'login.html'; // Seguridad
+                return;
+            }
+            cargarSolicitudes(usuario.id);
+        });
+
+        async function cargarSolicitudes(tutorId) {
+            const container = document.getElementById('lista-de-solicitudes');
+            container.innerHTML = '<div class="text-center" ...></div>'; // Feedback de carga
+
+            try {
+                const res = await fetch(`/api/solicitudes-detalle/${tutorId}`);
+                const solicitudes = await res.json();
+                if (!res.ok) throw new Error('No se pudo cargar la lista');
+
+                if (solicitudes.length === 0) {
+                    container.innerHTML = '<div class="card text-center"><p>¡Genial! No tienes solicitudes pendientes.</p></div>';
+                    return;
+                }
+
+                container.innerHTML = ''; // Limpiamos el "Cargando..."
+                
+                solicitudes.forEach(solicitud => {
+                    const card = document.createElement('div');
+                    card.className = 'solicitud-card';
+                    card.id = `solicitud-${solicitud.id}`;
+                    
+                    const estudiante = solicitud.usuarios; // Objeto con 'nombres' y 'email'
+                    
+                    card.innerHTML = `
+                        <div class="solicitud-header">
+                            <h3>${estudiante.nombres}</h3>
+                            <span class="curso">${solicitud.curso}</span>
+                        </div>
+                        <div class="solicitud-body">
+                            <p>Quiere contactarte para una tutoría de ${solicitud.curso}.</p>
+                            <p style="font-size: 0.9rem; margin-top: 5px;">Contacto: ${estudiante.email}</p>
+                        </div>
+                        <div class="solicitud-actions">
+                            <button class="btn btn-success" onclick="gestionarSolicitud(${solicitud.id}, 'aceptada')">
+                                <i class="fas fa-check"></i> Aceptar
+                            </button>
+                            <button class="btn btn-danger" onclick="gestionarSolicitud(${solicitud.id}, 'rechazada')">
+                                <i class="fas fa-times"></i> Rechazar
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error('Error al cargar solicitudes:', error);
+                container.innerHTML = '<div class="card card-red"><p>Error al cargar las solicitudes.</p></div>';
+            }
+        }
+
+        // --- ¡NUEVA FUNCIÓN! ---
+        async function gestionarSolicitud(solicitudId, nuevoEstado) {
+            const card = document.getElementById(`solicitud-${solicitudId}`);
+            try {
+                const res = await fetch(`/api/tutorias/${solicitudId}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nuevo_estado: nuevoEstado })
+                });
+
+                if (!res.ok) throw new Error('Error al actualizar');
+
+                // Si tiene éxito, eliminamos la tarjeta de la vista
+                card.style.transition = 'opacity 0.5s ease';
+                card.style.opacity = '0';
+                setTimeout(() => card.remove(), 500);
+
+            } catch (error) {
+                console.error('Error al gestionar solicitud:', error);
+                alert(`Error al ${nuevoEstado} la solicitud.`);
+            }
+        }
+    </script>
+</body>
+</html>
