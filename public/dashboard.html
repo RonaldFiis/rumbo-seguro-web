@@ -19,6 +19,15 @@
         }
         .user-info { font-weight: 500; color: var(--gray); }
         .user-info strong { color: var(--dark); }
+        /* Estilo para la notificación del tutor */
+        .notification-badge {
+            background: var(--danger);
+            color: white;
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 1rem;
+            margin-left: 8px;
+        }
     </style>
 </head>
 <body>
@@ -113,21 +122,33 @@
 
         async function renderTutor(panel, usuario) {
             let especialidad = 'No definida';
+            let conteoSolicitudes = 0;
+            let badgeHTML = '';
+
             try {
-                // Hacemos una llamada rápida para obtener los datos más frescos del tutor
-                const { data, error } = await supabase
+                // Hacemos una llamada para obtener los datos más frescos del tutor
+                const { data: userData, error: userError } = await supabase
                     .from('usuarios')
                     .select('especialidad')
                     .eq('id', usuario.id)
                     .single();
                 
-                if (error) throw error;
+                if (userError) throw userError;
+                if (userData && userData.especialidad) especialidad = userData.especialidad;
                 
-                if (data && data.especialidad) {
-                    especialidad = data.especialidad;
+                // --- ¡NUEVO! CONTAMOS LAS SOLICITUDES ---
+                const { data: countData, error: countError } = await fetch(`/api/solicitudes-tutor/${usuario.id}`);
+                if (countError) throw countError;
+                
+                const { count } = await countData.json();
+                conteoSolicitudes = count;
+                if (count > 0) {
+                    badgeHTML = `<span class="notification-badge">${count}</span>`;
                 }
+                // --- FIN DEL CONTEO ---
+
             } catch(e) {
-                console.error("Error al cargar especialidad del tutor:", e.message);
+                console.error("Error al cargar datos del tutor:", e.message);
             }
 
             panel.innerHTML = `
@@ -139,8 +160,8 @@
                         <button class="btn btn-outline">Editar Perfil</button>
                     </div>
                     <div class="card card-orange">
-                        <h3><i class="fas fa-users"></i> Solicitudes de Tutoría</h3>
-                        <p style="color: var(--gray); margin: 0.5rem 0 1rem;">Actualmente tienes <strong>0</strong> solicitudes pendientes.</p>
+                        <h3><i class="fas fa-users"></i> Solicitudes de Tutoría ${badgeHTML}</h3>
+                        <p style="color: var(--gray); margin: 0.5rem 0 1rem;">Actualmente tienes <strong>${conteoSolicitudes}</strong> solicitudes pendientes.</p>
                         <button class="btn btn-primary">Ver Solicitudes</button>
                     </div>
                 </div>
