@@ -63,7 +63,7 @@
             if (usuario.rol === 'estudiante') {
                 renderEstudiante(panel, usuario);
             } else if (usuario.rol === 'tutor') {
-                renderTutor(panel, usuario); // Pasamos el usuario al render de tutor
+                renderTutor(panel, usuario);
             } else if (usuario.rol === 'psicologo') {
                 renderPsicologo(panel);
             }
@@ -105,17 +105,15 @@
                     <div class="card">
                         <h3><i class="fas fa-user-friends" style="color: var(--accent);"></i> Tutorías</h3>
                         <p style="color: var(--gray); margin: 0.5rem 0 1rem;">Reserva una sesión con un tutor para el curso que necesites.</p>
-                        <button class="btn btn-outline" style="width: 100%;" onclick="alert('Próximamente...')">Ver Tutores</button>
+                        <a href="tutorias.html" class="btn btn-outline" style="width: 100%;">Ver Tutores</a>
                     </div>
                 </div>
             `;
         }
 
         async function renderTutor(panel, usuario) {
-            // ¡NUEVO! Cargamos la especialidad del tutor
             let especialidad = 'No definida';
             try {
-                // Hacemos una llamada rápida para obtener los datos más frescos del tutor
                 const res = await supabase.from('usuarios').select('especialidad').eq('id', usuario.id).single();
                 if (res.data && res.data.especialidad) {
                     especialidad = res.data.especialidad;
