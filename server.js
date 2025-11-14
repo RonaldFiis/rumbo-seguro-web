@@ -1,4 +1,4 @@
-// --- Archivo: server.js (VERSIÓN CON RUTA PARA LISTAR TUTORES) ---
+// --- Archivo: server.js (VERSIÓN CON SISTEMA DE SOLICITUD DE TUTORÍAS) ---
 const express = require('express');
 const cors = require('cors');
 const supabase = require('./database'); // Importamos Supabase
@@ -119,33 +119,10 @@ app.post('/api/chat', async (req, res) => {
     }
 });
 
-// --- ¡NUEVA RUTA! OBTENER LISTA DE TUTORES ---
-app.get('/api/tutores', async (req, res) => {
-    try {
-        // Pedimos a Supabase todos los usuarios donde 'es_tutor' sea 'true'
-        // y solo seleccionamos las columnas que nos importan
-        const { data, error } = await supabase
-            .from('usuarios')
-            .select('id, nombres, especialidad')
-            .eq('es_tutor', true); // ¡La magia está aquí!
-
-        if (error) throw error;
-        res.json(data);
-    } catch (error) {
-        console.error('Error al obtener tutores:', error.message);
-        res.status(500).json({ error: error.message });
-    }
-});
-// --- FIN DE NUEVA RUTA ---
-
 // --- RUTAS DE BIBLIOTECA ---
-
-// RUTA 7: Obtener lista de recursos
 app.get('/api/biblioteca', async (req, res) => {
     try {
-        const { data, error } = await supabase
-            .from('recursos')
-            .select(`id, created_at, nombre_archivo, curso, tipo, url_descarga, usuarios ( nombres )`);
+        const { data, error } = await supabase.from('recursos').select(`id, created_at, nombre_archivo, curso, tipo, url_descarga, usuarios ( nombres )`);
         if (error) throw error;
         res.json(data);
     } catch (error) {
@@ -153,28 +130,21 @@ app.get('/api/biblioteca', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-
-// RUTA 8: Subir un nuevo recurso (CON VERIFICACIÓN DE ROL!)
 app.post('/api/recursos', upload.single('archivo'), async (req, res) => {
     try {
         const { nombre_archivo, curso, tipo, uploader_id } = req.body;
         const file = req.file;
         if (!file) return res.status(400).json({ error: 'No se recibió ningún archivo.' });
         
-        // Verificación de seguridad
         const { data: usuario, error: userError } = await supabase.from('usuarios').select('rol').eq('id', uploader_id).single();
         if (userError || !usuario) return res.status(404).json({ error: 'Usuario no encontrado.' });
         if (usuario.rol === 'estudiante') return res.status(403).json({ error: 'No tienes permiso para subir archivos.' });
 
-        // Subida a Supabase Storage
         const fileName = `public/${Date.now()}-${file.originalname}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage.from('recursos_academicos').upload(fileName, file.buffer, { contentType: file.mimetype });
+        const { error: uploadError } = await supabase.storage.from('recursos_academicos').upload(fileName, file.buffer, { contentType: file.mimetype });
         if (uploadError) throw uploadError;
 
-        // Obtener URL pública
         const { data: publicUrlData } = supabase.storage.from('recursos_academicos').getPublicUrl(fileName);
-
-        // Guardar en tabla 'recursos'
         const { error: dbError } = await supabase.from('recursos').insert({ nombre_archivo, curso, tipo, uploader_id, url_descarga: publicUrlData.publicUrl });
         if (dbError) throw dbError;
 
@@ -184,7 +154,63 @@ app.post('/api/recursos', upload.single('archivo'), async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-// --- FIN DE RUTAS DE BIBLIOTECA ---
+
+// --- ¡NUEVAS RUTAS DE TUTORÍA! ---
+app.get('/api/tutores', async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('usuarios')
+            .select('id, nombres, especialidad')
+            .eq('es_tutor', true);
+        if (error) throw error;
+        res.json(data);
+    } catch (error) {
+        console.error('Error al obtener tutores:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// RUTA PARA QUE UN ESTUDIANTE SOLICITE UNA TUTORÍA
+app.post('/api/solicitar-tutoria', async (req, res) => {
+    const { estudiante_id, tutor_id, curso } = req.body;
+    try {
+        const { data, error } = await supabase
+            .from('tutorias')
+            .insert({
+                estudiante_id: estudiante_id,
+                tutor_id: tutor_id,
+                curso: curso,
+                estado: 'solicitada' // Estado inicial
+            });
+        
+        if (error) throw error;
+        res.status(201).json({ mensaje: 'Solicitud enviada exitosamente' });
+    } catch (error) {
+        console.error('Error al solicitar tutoría:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// RUTA PARA QUE UN TUTOR VEA SUS SOLICITUDES PENDIENTES
+app.get('/api/solicitudes-tutor/:tutor_id', async (req, res) => {
+    const { tutor_id } = req.params;
+    try {
+        // Contamos cuántas filas coinciden
+        const { count, error } = await supabase
+            .from('tutorias')
+            .select('*', { count: 'exact' }) // Pide el conteo exacto
+            .eq('tutor_id', tutor_id)
+            .eq('estado', 'solicitada');
+
+        if (error) throw error;
+        res.json({ count: count || 0 });
+    } catch (error) {
+        console.error('Error al contar solicitudes:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+// --- FIN DE RUTAS DE TUTORÍA ---
+
 
 // --- RUTA COMODÍN (Debe ir siempre AL FINAL) ---
 app.get(/(.*)/, (req, res) => {
