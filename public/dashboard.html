@@ -136,16 +136,21 @@
                 if (userError) throw userError;
                 if (userData && userData.especialidad) especialidad = userData.especialidad;
                 
-                // --- ¡NUEVO! CONTAMOS LAS SOLICITUDES ---
-                const { data: countData, error: countError } = await fetch(`/api/solicitudes-tutor/${usuario.id}`);
-                if (countError) throw countError;
+                // --- ¡BUG ARREGLADO! ---
+                // 1. Usamos 'await' y 'fetch' correctamente
+                const res = await fetch(`/api/solicitudes-tutor/${usuario.id}`);
+                if (!res.ok) throw new Error('Error al cargar conteo');
                 
-                const { count } = await countData.json();
-                conteoSolicitudes = count;
-                if (count > 0) {
-                    badgeHTML = `<span class="notification-badge">${count}</span>`;
+                // 2. Leemos la respuesta como JSON
+                const data = await res.json();
+                
+                // 3. Asignamos el conteo
+                conteoSolicitudes = data.count;
+                // --- FIN DEL ARREGLO ---
+                
+                if (conteoSolicitudes > 0) {
+                    badgeHTML = `<span class="notification-badge">${conteoSolicitudes}</span>`;
                 }
-                // --- FIN DEL CONTEO ---
 
             } catch(e) {
                 console.error("Error al cargar datos del tutor:", e.message);
@@ -157,12 +162,12 @@
                     <div class="card card-blue">
                         <h3><i class="fas fa-chalkboard-teacher"></i> Mis Especialidades</h3>
                         <p style="color: var(--gray); margin: 0.5rem 0 1rem;">Cursos: <strong>${especialidad || 'Aún no has definido tus cursos.'}</strong></p>
-                        <button class="btn btn-outline">Editar Perfil</button>
+                        <button class="btn btn-outline" onclick="alert('Próximamente')">Editar Perfil</button>
                     </div>
                     <div class="card card-orange">
                         <h3><i class="fas fa-users"></i> Solicitudes de Tutoría ${badgeHTML}</h3>
                         <p style="color: var(--gray); margin: 0.5rem 0 1rem;">Actualmente tienes <strong>${conteoSolicitudes}</strong> solicitudes pendientes.</p>
-                        <button class="btn btn-primary">Ver Solicitudes</button>
+                        <button class="btn btn-primary" onclick="alert('Próximamente')">Ver Solicitudes</button>
                     </div>
                 </div>
             `;
@@ -174,7 +179,7 @@
                 <div class="card card-red">
                     <h3><i class="fas fa-exclamation-triangle"></i> Alertas Críticas</h3>
                     <p style="color: var(--gray); margin: 0.5rem 0 1rem;"><strong>0</strong> casos requieren atención inmediata.</p>
-                    <button class="btn btn-danger">Revisar Casos</button>
+                    <button class="btn btn-danger" onclick="alert('Próximamente')">Revisar Casos</button>
                 </div>
                 <div class="card card-blue">
                     <h3><i class="fas fa-calendar-alt"></i> Citas de Hoy</h3>
