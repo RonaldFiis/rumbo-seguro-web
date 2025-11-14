@@ -114,11 +114,21 @@
         async function renderTutor(panel, usuario) {
             let especialidad = 'No definida';
             try {
-                const res = await supabase.from('usuarios').select('especialidad').eq('id', usuario.id).single();
-                if (res.data && res.data.especialidad) {
-                    especialidad = res.data.especialidad;
+                // Hacemos una llamada rápida para obtener los datos más frescos del tutor
+                const { data, error } = await supabase
+                    .from('usuarios')
+                    .select('especialidad')
+                    .eq('id', usuario.id)
+                    .single();
+                
+                if (error) throw error;
+                
+                if (data && data.especialidad) {
+                    especialidad = data.especialidad;
                 }
-            } catch(e) {}
+            } catch(e) {
+                console.error("Error al cargar especialidad del tutor:", e.message);
+            }
 
             panel.innerHTML = `
                 <h2 style="margin-bottom: 1.5rem; font-weight: 700;">👨‍🏫 Panel de Docente Tutor</h2>
