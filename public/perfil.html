@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Perfil - Rumbo Seguro</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilos de la página de registro */
+        #campo-especialidad { display: none; }
+        .checkbox-group {
+            max-height: 200px; overflow-y: auto; border: 2px solid var(--light);
+            border-radius: 0.5rem; padding: 0.75rem; background: #fafafa;
+        }
+        .checkbox-group label {
+            display: flex; align-items: center; padding: 0.5rem;
+            border-radius: 0.25rem; cursor: pointer; font-weight: 500;
+        }
+        .checkbox-group label:hover { background-color: #f0f5ff; }
+        .checkbox-group input {
+            margin-right: 0.75rem; width: auto;
+            accent-color: var(--primary); transform: scale(1.1);
+        }
+        /* Fin estilos de registro */
+    </style>
+</head>
+<body class="auth-wrapper">
+
+    <div class="auth-card" style="max-width: 500px;">
+        <div class="text-center" style="margin-bottom: 2rem;">
+            <a href="dashboard.html" class="nav-links" style="color: var(--gray); font-weight: 500; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 1.5rem;">
+                <i class="fas fa-arrow-left"></i> Volver al Panel
+            </a>
+            <h2 style="color: var(--dark); font-weight: 700;">Editar Perfil de Tutor</h2>
+            <p style="color: var(--gray);">Actualiza tus datos y especialidades.</p>
+        </div>
+
+        <div id="msg-error" style="display: none; background: #ffebee; color: #c62828; padding: 10px; border-radius: 0.5rem; margin-bottom: 1rem; text-align: center;"></div>
+        <div id="msg-success" style="display: none; background: #e8f5e9; color: #2e7d32; padding: 10px; border-radius: 0.5rem; margin-bottom: 1rem; text-align: center;"></div>
+
+        <form id="perfil-form">
+            <div style="margin-bottom: 1rem;">
+                <label for="nombres" class="form-label">Nombre Completo</label>
+                <input type="text" id="nombres" class="form-input" required>
+            </div>
+            
+            <div id="campo-especialidad" style="margin-bottom: 1.5rem;">
+                <label for="especialidad" class="form-label">Mis Especialidades</label>
+                <div class="checkbox-group" id="cursos-checkboxes">
+                    </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1rem;">
+                <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+        </form>
+    </div>
+
+    <script>
+        const usuario = JSON.parse(localStorage.getItem('usuario'));
+        const form = document.getElementById('perfil-form');
+        const nombresInput = document.getElementById('nombres');
+        const campoEspecialidad = document.getElementById('campo-especialidad');
+        const checkboxesContainer = document.getElementById('cursos-checkboxes');
+        const msgError = document.getElementById('msg-error');
+        const msgSuccess = document.getElementById('msg-success');
+
+        // Lista completa de cursos (debe ser la misma que en registro.html)
+        const TODOS_LOS_CURSOS = [
+            'Cálculo Diferencial', 'Cálculo Integral', 'Cálculo Multivariable',
+            'Álgebra Lineal', 'Geometría Analítica', 'Ecuaciones Diferenciales',
+            'Cálculo Numérico', 'Física I', 'Física II', 'Química I', 'Química 2',
+            'Dibujo de Ingeniería', 'Introducción a la Computación',
+            'Algoritmia y Estructura de Datos', 'Programación Orientada a Objetos',
+            'Matemática Discreta', 'Estadística Aplicada'
+        ];
+
+        // 1. Cargar los datos actuales del tutor
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!usuario) { window.location.href = 'login.html'; return; }
+
+            // Mostrar campos de tutor (si es tutor)
+            if (usuario.rol === 'tutor') {
+                campoEspecialidad.style.display = 'block';
+                // Llenar la lista de checkboxes
+                TODOS_LOS_CURSOS.forEach(curso => {
+                    checkboxesContainer.innerHTML += `
+                        <label>
+                            <input type="checkbox" name="curso" value="${curso}"> ${curso}
+                        </label>
+                    `;
+                });
+            }
+
+            // Llamar a la API para obtener los datos
+            try {
+                const res = await fetch(`/api/usuario/${usuario.id}`);
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+
+                // Llenar el formulario con los datos
+                nombresInput.value = data.nombres;
+                
+                if (data.especialidad && usuario.rol === 'tutor') {
+                    const misEspecialidades = data.especialidad.split(',').map(s => s.trim());
+                    // Marcar los checkboxes que coincidan
+                    document.querySelectorAll('#cursos-checkboxes input[name="curso"]').forEach(checkbox => {
+                        if (misEspecialidades.includes(checkbox.value)) {
+                            checkbox.checked = true;
+                        }
+                    });
+                }
+            } catch (error) {
+                msgError.textContent = `Error al cargar tu perfil: ${error.message}`;
+                msgError.style.display = 'block';
+            }
+        });
+
+        // 2. Guardar los cambios
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            msgError.style.display = 'none';
+            msgSuccess.style.display = 'none';
+
+            let especialidadString = null;
+            if (usuario.rol === 'tutor') {
+                const especialidadesSeleccionadas = [];
+                document.querySelectorAll('#cursos-checkboxes input[name="curso"]:checked').forEach(cb => {
+                    especialidadesSeleccionadas.push(cb.value);
+                });
+                especialidadString = especialidadesSeleccionadas.join(', ');
+            }
+
+            const datosActualizados = {
+                nombres: nombresInput.value.trim(),
+                especialidad: especialidadString
+            };
+
+            try {
+                const res = await fetch(`/api/usuario/${usuario.id}`, {
+                    method: 'PATCH', // Usamos PATCH para actualizaciones parciales
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datosActualizados)
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+
+                msgSuccess.textContent = '¡Perfil actualizado con éxito!';
+                msgSuccess.style.display = 'block';
+                
+                // Actualizamos el nombre en el localStorage por si cambió
+                usuario.nombres = data.nombres;
+                localStorage.setItem('usuario', JSON.stringify(usuario));
+
+            } catch (error) {
+                msgError.textContent = `Error al guardar: ${error.message}`;
+                msgError.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
