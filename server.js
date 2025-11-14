@@ -1,4 +1,4 @@
-// --- Archivo: server.js (VERSIÓN CON CORRECCIÓN DE "TYPO" Y PERFIL) ---
+// --- Archivo: server.js (VERSIÓN CON EDICIÓN DE PERFIL Y ARREGLOS) ---
 const express = require('express');
 const cors = require('cors');
 const supabase = require('./database'); // Importamos Supabase
@@ -63,7 +63,7 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// --- RUTA 4: OBTENER PERFIL DE USUARIO (PARA EDITAR) ---
+// --- ¡NUEVA RUTA! OBTENER PERFIL DE USUARIO ---
 app.get('/api/usuario/:id', async (req, res) => {
     const { id } = req.params;
     try {
@@ -80,7 +80,7 @@ app.get('/api/usuario/:id', async (req, res) => {
     }
 });
 
-// --- RUTA 5: ACTUALIZAR PERFIL DE USUARIO ---
+// --- ¡NUEVA RUTA! ACTUALIZAR PERFIL DE USUARIO ---
 app.patch('/api/usuario/:id', async (req, res) => {
     const { id } = req.params;
     const { nombres, especialidad } = req.body;
@@ -99,7 +99,7 @@ app.patch('/api/usuario/:id', async (req, res) => {
     }
 });
 
-// --- RUTA 6: Guardar Evaluación (SUPABASE) ---
+// --- RUTA 4: Guardar Evaluación (SUPABASE) ---
 app.post('/api/riesgo', async (req, res) => {
     const { estudiante_id, puntaje } = req.body;
     let nivel = puntaje >= 7 ? 'Crítico' : puntaje >= 5 ? 'Alto' : puntaje >= 3 ? 'Medio' : 'Bajo';
@@ -112,18 +112,18 @@ app.post('/api/riesgo', async (req, res) => {
         res.json({ mensaje: 'Guardado', nivel: data.nivel, puntaje: data.puntaje });
     } catch (error) {
         console.error('Error al guardar riesgo:', error.message);
-        // --- ¡AQUÍ ESTÁ LA CORRECCIÓN DEL TYPO! ---
+        // ¡ARREGLO DEL TYPO!
         res.status(500).json({ error: 'Error al guardar' });
     }
 });
 
-// --- RUTA 7: Obtener Riesgo (SUPABASE) ---
+// --- RUTA 5: Obtener Riesgo (SUPABASE) ---
 app.get('/api/riesgo/:id', async (req, res) => {
     const id = req.params.id;
     try {
         const { data: riesgo, error } = await supabase.from('riesgo').select('*').eq('estudiante_id', id).single();
         if (error || !riesgo) {
-            // --- ¡AQUÍ ESTÁ LA CORRECCIÓN DEL OTRO TYPO! (44,) ---
+             // ¡ARREGLO DEL TYPO!
             return res.status(404).json({ mensaje: 'Sin evaluación' });
         }
         res.json(riesgo);
@@ -132,7 +132,7 @@ app.get('/api/riesgo/:id', async (req, res) => {
     }
 });
 
-// --- RUTA 8: CHAT CON IA (OPENROUTER) ---
+// --- RUTA 6: CHAT CON IA (OPENROUTER) ---
 app.post('/api/chat', async (req, res) => {
     if (!process.env.API_KEY) return res.status(500).json({ reply: "Error del servidor: La API_KEY no está configurada." });
     const userMessage = req.body.message;
