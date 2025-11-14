@@ -11,9 +11,13 @@
         .header .container { display: flex; align-items: center; }
         .main-container {
             display: grid;
-            grid-template-columns: 2fr 1fr; /* Columna de lista (más ancha) y columna de subida (más angosta) */
+            grid-template-columns: 1fr; /* Columna única por defecto */
             gap: 2rem;
             margin-top: 2rem;
+        }
+        /* ¡NUEVO! Estilo para la cuadrícula */
+        .main-container.tutor-view {
+            grid-template-columns: 2fr 1fr; /* 2 columnas si es tutor */
         }
         .file-list-item {
             background: var(--white);
@@ -33,17 +37,15 @@
             padding: 0.2rem 0.5rem;
             border-radius: 1rem;
         }
-        .file-info .uploader {
-            font-size: 0.8rem;
-            color: var(--gray);
-        }
+        .file-info .uploader { font-size: 0.8rem; color: var(--gray); }
         .upload-form {
             background: var(--white);
             padding: 1.5rem;
             border-radius: 1rem;
             box-shadow: var(--shadow-sm);
-            position: sticky; /* Para que el formulario se quede fijo al hacer scroll */
+            position: sticky;
             top: 100px;
+            display: none; /* ¡OCULTO POR DEFECTO! */
         }
     </style>
 </head>
@@ -56,7 +58,7 @@
         </div>
     </header>
 
-    <main class="container main-container">
+    <main class="container main-container" id="main-container">
         <section id="lista-recursos">
             <h2 style="margin-bottom: 1.5rem;">📚 Biblioteca de Recursos</h2>
             <div id="recursos-container">
@@ -64,8 +66,8 @@
                 </div>
         </section>
 
-        <aside>
-            <form id="upload-form" class="upload-form">
+        <aside id="upload-aside" class="upload-form">
+            <form id="upload-form">
                 <h3><i class="fas fa-upload"></i> Aporta un Archivo</h3>
                 <p style="font-size: 0.9rem; color: var(--gray); margin-bottom: 1rem;">Sube exámenes, PCs o solucionarios.</p>
 
@@ -78,11 +80,22 @@
                     <select id="curso" class="form-input" style="background: white;">
                         <option value="Cálculo Diferencial">Cálculo Diferencial</option>
                         <option value="Cálculo Integral">Cálculo Integral</option>
+                        <option value="Cálculo Multivariable">Cálculo Multivariable</option>
                         <option value="Álgebra Lineal">Álgebra Lineal</option>
                         <option value="Geometría Analítica">Geometría Analítica</option>
+                        <option value="Ecuaciones Diferenciales">Ecuaciones Diferenciales</option>
+                        <option value="Cálculo Numérico">Cálculo Numérico</option>
                         <option value="Física I">Física I</option>
+                        <option value="Física II">Física II</option>
                         <option value="Química I">Química I</option>
-                        <option value="Algoritmia">Algoritmia</option>
+                        <option value="Química 2">Química 2</option>
+                        <option value="Dibujo de Ingeniería">Dibujo de Ingeniería</option>
+                        <option value="Introducción a la Computación">Introducción a la Computación</option>
+                        <option value="Algoritmia y Estructura de Datos">Algoritmia y Estructura de Datos</Voption>
+                        <option value="Programación Orientada a Objetos">Programación Orientada a Objetos</option>
+                        <option value="Matemática Discreta">Matemática Discreta</option>
+                        <option value="Estadística Aplicada">Estadística Aplicada</option>
+                        <option value="Redacción y Comunicación">Redacción y Comunicación</option>
                         <option value="Otro">Otro</option>
                     </select>
                 </div>
@@ -93,6 +106,7 @@
                         <option value="Examen Parcial">Examen Parcial</option>
                         <option value="Examen Final">Examen Final</option>
                         <option value="Solucionario">Solucionario</option>
+                        <option value="Apuntes">Apuntes / Resumen</option>
                     </select>
                 </div>
                 <div style="margin-bottom: 1.5rem;">
@@ -106,20 +120,44 @@
     </main>
 
     <script>
+        // --- ¡NUEVA LÓGICA DE PERMISOS! ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const usuario = JSON.parse(localStorage.getItem('usuario'));
+            
+            // Redirigir si no hay sesión
+            if (!usuario) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Ocultar formulario si es estudiante
+            if (usuario.rol === 'estudiante') {
+                document.getElementById('upload-aside').style.display = 'none';
+            } else {
+                // Si es tutor o psicologo, mostrar formulario y cambiar a 2 columnas
+                document.getElementById('upload-aside').style.display = 'block';
+                document.getElementById('main-container').classList.add('tutor-view');
+            }
+
+            // Cargar recursos (función de abajo)
+            cargarRecursos();
+            
+            // Configurar formulario de subida (función de abajo)
+            setupUploadForm(usuario);
+        });
+        // --- FIN DE LÓGICA DE PERMISOS ---
+
         // Función para cargar los recursos de la biblioteca
         async function cargarRecursos() {
             const container = document.getElementById('recursos-container');
             container.innerHTML = '<p style="color: var(--gray);">Cargando recursos...</p>';
-
             try {
                 const res = await fetch('/api/biblioteca');
                 const recursos = await res.json();
-
                 if (recursos.length === 0) {
                     container.innerHTML = '<p style="color: var(--gray);">No hay recursos en la biblioteca todavía. ¡Sé el primero en subir uno!</p>';
                     return;
                 }
-
                 container.innerHTML = ''; // Limpiar
                 recursos.forEach(recurso => {
                     const item = document.createElement('div');
@@ -142,48 +180,40 @@
         }
 
         // Lógica para subir un archivo nuevo
-        document.getElementById('upload-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const usuario = JSON.parse(localStorage.getItem('usuario'));
-            if (!usuario) return alert('Debes iniciar sesión para subir archivos.');
+        function setupUploadForm(usuario) {
+            document.getElementById('upload-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const statusDiv = document.getElementById('upload-status');
+                statusDiv.textContent = 'Subiendo... ⏳';
+                statusDiv.style.color = 'var(--primary)';
 
-            const statusDiv = document.getElementById('upload-status');
-            statusDiv.textContent = 'Subiendo... ⏳';
-            statusDiv.style.color = 'var(--primary)';
+                const formData = new FormData();
+                formData.append('nombre_archivo', document.getElementById('nombre_archivo').value);
+                formData.append('curso', document.getElementById('curso').value);
+                formData.append('tipo', document.getElementById('tipo').value);
+                formData.append('archivo', document.getElementById('archivo').files[0]);
+                formData.append('uploader_id', usuario.id);
 
-            // 1. Creamos el FormData (para enviar texto Y archivos)
-            const formData = new FormData();
-            formData.append('nombre_archivo', document.getElementById('nombre_archivo').value);
-            formData.append('curso', document.getElementById('curso').value);
-            formData.append('tipo', document.getElementById('tipo').value);
-            formData.append('archivo', document.getElementById('archivo').files[0]);
-            formData.append('uploader_id', usuario.id);
-
-            try {
-                // 2. Enviamos el formulario al backend
-                const res = await fetch('/api/recursos', {
-                    method: 'POST',
-                    body: formData // ¡No se usa headers 'Content-Type' con FormData!
-                });
-
-                if (res.ok) {
-                    statusDiv.textContent = '¡Archivo subido con éxito! ✅';
-                    statusDiv.style.color = 'var(--secondary)';
-                    document.getElementById('upload-form').reset(); // Limpiar formulario
-                    cargarRecursos(); // Recargar la lista
-                } else {
-                    const data = await res.json();
-                    throw new Error(data.error || 'Error del servidor');
+                try {
+                    const res = await fetch('/api/recursos', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await res.json(); // Leer respuesta en todos los casos
+                    if (res.ok) {
+                        statusDiv.textContent = '¡Archivo subido con éxito! ✅';
+                        statusDiv.style.color = 'var(--secondary)';
+                        document.getElementById('upload-form').reset();
+                        cargarRecursos();
+                    } else {
+                        throw new Error(data.error || 'Error del servidor');
+                    }
+                } catch (error) {
+                    statusDiv.textContent = `Error: ${error.message}`;
+                    statusDiv.style.color = 'var(--danger)';
                 }
-            } catch (error) {
-                statusDiv.textContent = `Error: ${error.message}`;
-                statusDiv.style.color = 'var(--danger)';
-            }
-        });
-
-        // Carga inicial
-        document.addEventListener('DOMContentLoaded', cargarRecursos);
+            });
+        }
     </script>
 </body>
 </html>
