@@ -141,7 +141,7 @@
                 // Hacemos fetch para el conteo de solicitudes
                 const countRes = await fetch(`/api/solicitudes-tutor/${usuario.id}`);
                 const data = await countRes.json();
-                if (!countRes.ok) throw new Error(data.error);
+                if (!countRes.ok) throw new Error(data.error || 'Error al contar');
                 
                 conteoSolicitudes = data.count;
                 if (conteoSolicitudes > 0) {
