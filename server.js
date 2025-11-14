@@ -1,4 +1,4 @@
-// --- Archivo: server.js (VERSIÓN CON GESTIÓN DE TUTORÍAS) ---
+// --- Archivo: server.js (CORRECCIÓN DE RELACIÓN AMBIGUA) ---
 const express = require('express');
 const cors = require('cors');
 const supabase = require('./database'); // Importamos Supabase
@@ -63,7 +63,7 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// --- RUTA 4: OBTENER PERFIL DE USUARIO (PARA EDITAR) ---
+// --- RUTA 4: OBTENER PERFIL ---
 app.get('/api/usuario/:id', async (req, res) => {
     const { id } = req.params;
     try {
@@ -76,7 +76,7 @@ app.get('/api/usuario/:id', async (req, res) => {
     }
 });
 
-// --- RUTA 5: ACTUALIZAR PERFIL DE USUARIO ---
+// --- RUTA 5: ACTUALIZAR PERFIL ---
 app.patch('/api/usuario/:id', async (req, res) => {
     const { id } = req.params;
     const { nombres, especialidad } = req.body;
@@ -90,7 +90,7 @@ app.patch('/api/usuario/:id', async (req, res) => {
     }
 });
 
-// --- RUTA 6: Guardar Evaluación (SUPABASE) ---
+// --- RUTA 6: Guardar Evaluación ---
 app.post('/api/riesgo', async (req, res) => {
     const { estudiante_id, puntaje } = req.body;
     let nivel = puntaje >= 7 ? 'Crítico' : puntaje >= 5 ? 'Alto' : puntaje >= 3 ? 'Medio' : 'Bajo';
@@ -107,7 +107,7 @@ app.post('/api/riesgo', async (req, res) => {
     }
 });
 
-// --- RUTA 7: Obtener Riesgo (SUPABASE) ---
+// --- RUTA 7: Obtener Riesgo ---
 app.get('/api/riesgo/:id', async (req, res) => {
     const id = req.params.id;
     try {
@@ -222,11 +222,12 @@ app.get('/api/solicitudes-tutor/:tutor_id', async (req, res) => {
     }
 });
 
-// --- ¡NUEVA RUTA! OBTENER DETALLE DE SOLICITUDES ---
+// --- ¡CORRECCIÓN AQUÍ! OBTENER DETALLE DE SOLICITUDES ---
 app.get('/api/solicitudes-detalle/:tutor_id', async (req, res) => {
     const { tutor_id } = req.params;
     try {
-        // Pedimos las tutorías Y la información del estudiante que la pidió
+        // Usamos la sintaxis explicita para evitar ambigüedad:
+        // estudiante:usuarios!estudiante_id ( alias:tabla!llave_foranea )
         const { data, error } = await supabase
             .from('tutorias')
             .select(`
@@ -234,10 +235,10 @@ app.get('/api/solicitudes-detalle/:tutor_id', async (req, res) => {
                 created_at,
                 curso,
                 estado,
-                usuarios ( nombres, email ) 
+                estudiante:usuarios!estudiante_id ( nombres, email ) 
             `)
             .eq('tutor_id', tutor_id)
-            .eq('estado', 'solicitada'); // Solo las pendientes
+            .eq('estado', 'solicitada');
 
         if (error) throw error;
         res.json(data);
@@ -247,11 +248,10 @@ app.get('/api/solicitudes-detalle/:tutor_id', async (req, res) => {
     }
 });
 
-// --- ¡NUEVA RUTA! ACEPTAR/RECHAZAR SOLICITUD ---
+// --- ACEPTAR/RECHAZAR SOLICITUD ---
 app.patch('/api/tutorias/:id', async (req, res) => {
     const { id } = req.params;
-    const { nuevo_estado } = req.body; // 'aceptada' o 'rechazada'
-
+    const { nuevo_estado } = req.body;
     try {
         const { data, error } = await supabase
             .from('tutorias')
@@ -259,7 +259,6 @@ app.patch('/api/tutorias/:id', async (req, res) => {
             .eq('id', id)
             .select()
             .single();
-            
         if (error) throw error;
         res.json({ mensaje: `Solicitud ${nuevo_estado}`, data });
     } catch (error) {
