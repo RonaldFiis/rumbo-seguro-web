@@ -54,7 +54,7 @@
     <main class="container" style="margin-top: 2rem; max-width: 900px;">
         <h2 style="margin-bottom: 1.5rem;">👨‍🏫 Encuentra un Tutor</h2>
         <p style="color: var(--gray); margin-bottom: 2rem;">
-            Estos son los tutores y docentes que se han registrado para ayudar. Contáctalos para coordinar una sesión personalizada.
+            Estos son los tutores y docentes que se han registrado para ayudar. Elige un curso y solicita una sesión.
         </p>
         
         <div id="lista-de-tutores">
@@ -65,34 +65,65 @@
         </div>
     </main>
 
+    <div id="modal-solicitud" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Solicitar tutoría</h3>
+                <button id="modal-close-btn" class="modal-close">&times;</button>
+            </div>
+            <form id="modal-form">
+                <div class="modal-body">
+                    <p>Selecciona el curso para el que necesitas ayuda:</p>
+                    <div id="modal-cursos-list" class="radio-group">
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="modal-cancel-btn" class="btn btn-outline" style="border-color: #ccc; color: #555;">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> Enviar Solicitud
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
     <script>
         const usuario = JSON.parse(localStorage.getItem('usuario'));
+        const modal = document.getElementById('modal-solicitud');
+        const modalTitle = document.getElementById('modal-title');
+        const modalCursosList = document.getElementById('modal-cursos-list');
+        const modalForm = document.getElementById('modal-form');
         
         document.addEventListener('DOMContentLoaded', async () => {
-            if (!usuario) {
-                window.location.href = 'login.html'; // Seguridad
-                return;
-            }
-            
+            if (!usuario) { window.location.href = 'login.html'; return; }
+            cargarTutores();
+        });
+
+        // Cierra el modal
+        document.getElementById('modal-close-btn').onclick = () => modal.style.display = 'none';
+        document.getElementById('modal-cancel-btn').onclick = () => modal.style.display = 'none';
+
+        async function cargarTutores() {
             const container = document.getElementById('lista-de-tutores');
-            
+            container.innerHTML = '<div class="text-center" ...></div>'; // Feedback de carga
+
             try {
                 const res = await fetch('/api/tutores');
                 const tutores = await res.json();
-                if (!res.ok) throw new Error('No se pudo cargar la lista de tutores');
+                if (!res.ok) throw new Error('No se pudo cargar la lista');
 
                 if (tutores.length === 0) {
-                    container.innerHTML = '<div class="card text-center"><p>No hay tutores registrados por el momento. ¡Vuelve pronto!</p></div>';
+                    container.innerHTML = '<div class="card text-center"><p>No hay tutores registrados por el momento.</p></div>';
                     return;
                 }
 
-                container.innerHTML = ''; // Limpiamos el "Cargando..."
+                container.innerHTML = '';
                 
                 tutores.forEach(tutor => {
-                    if (tutor.id === usuario.id) return; // Un tutor no puede solicitarse a sí mismo
+                    if (tutor.id === usuario.id) return;
 
                     const card = document.createElement('div');
                     card.className = 'tutor-card';
+                    // ¡CAMBIO! Pasamos las especialidades a la función
                     card.innerHTML = `
                         <div class="tutor-info">
                             <div class="tutor-avatar"><i class="fas fa-user-graduate"></i></div>
@@ -101,7 +132,7 @@
                                 <p>Especialidad: <span class="specialty">${tutor.especialidad || 'General'}</span></p>
                             </div>
                         </div>
-                        <button class="btn btn-primary" onclick="solicitarTutor(${tutor.id}, '${tutor.nombres}')">
+                        <button class="btn btn-primary" onclick="abrirModalSolicitud(${tutor.id}, '${tutor.nombres}', '${tutor.especialidad}')">
                             <i class="fas fa-calendar-plus"></i> Solicitar Tutoría
                         </button>
                     `;
@@ -112,34 +143,69 @@
                 console.error('Error al cargar tutores:', error);
                 container.innerHTML = '<div class="card card-red"><p>Error al cargar la lista de tutores.</p></div>';
             }
-        });
+        }
 
         // --- ¡FUNCIÓN ACTUALIZADA! ---
-        async function solicitarTutor(tutorId, tutorNombre) {
-            const curso = prompt(`¿Para qué curso necesitas tutoría con ${tutorNombre}?`);
+        function abrirModalSolicitud(tutorId, tutorNombre, especialidades) {
+            modalTitle.textContent = `Solicitar tutoría con ${tutorNombre}`;
+            modalCursosList.innerHTML = ''; // Limpiar cursos anteriores
             
-            if (curso && curso.trim() !== '') {
+            // Genera los radio buttons
+            const cursos = especialidades.split(',').map(c => c.trim()).filter(c => c);
+            if(cursos.length === 0) {
+                modalCursosList.innerHTML = '<p style="color: var(--gray);">Este tutor no ha especificado sus cursos. Puedes añadir uno.</p>';
+                cursos.push("Tutoría General"); // Opción por defecto
+            }
+
+            cursos.forEach((curso, index) => {
+                modalCursosList.innerHTML += `
+                    <label>
+                        <input type="radio" name="curso_solicitado" value="${curso}" ${index === 0 ? 'checked' : ''}>
+                        ${curso}
+                    </label>
+                `;
+            });
+
+            // Muestra el modal
+            modal.style.display = 'flex';
+
+            // Maneja el envío del formulario del modal
+            modalForm.onsubmit = async (e) => {
+                e.preventDefault();
+                const cursoSeleccionado = new FormData(modalForm).get('curso_solicitado');
+                
+                if (!cursoSeleccionado) {
+                    alert('Por favor selecciona un curso.');
+                    return;
+                }
+                
+                // Deshabilita el botón para evitar envíos dobles
+                modalForm.querySelector('button[type="submit"]').disabled = true;
+                
                 try {
                     const res = await fetch('/api/solicitar-tutoria', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            estudiante_id: usuario.id, // ID del estudiante logueado
-                            tutor_id: tutorId,       // ID del tutor seleccionado
-                            curso: curso
+                            estudiante_id: usuario.id,
+                            tutor_id: tutorId,
+                            curso: cursoSeleccionado
                         })
                     });
-
                     const data = await res.json();
                     if (!res.ok) throw new Error(data.error);
 
-                    alert('✅ ¡Solicitud enviada! El tutor se pondrá en contacto contigo.');
-                
+                    alert('✅ ¡Solicitud enviada! El tutor será notificado.');
+                    modal.style.display = 'none';
+
                 } catch (error) {
                     console.error('Error al solicitar tutoría:', error);
                     alert(`Error al enviar la solicitud: ${error.message}`);
+                } finally {
+                    // Vuelve a habilitar el botón
+                    modalForm.querySelector('button[type="submit"]').disabled = false;
                 }
-            }
+            };
         }
     </script>
 </body>
