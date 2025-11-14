@@ -11,32 +11,40 @@
 
     <div class="auth-card">
         <div class="text-center" style="margin-bottom: 2rem;">
-            <a href="index.html" class="nav-logo" style="justify-content: center; margin-bottom: 1.5rem;">
-                <img src="images/logo.svg" alt="Rumbo Seguro Logo">
-                <span>RUMBO SEGURO</span>
+            <a href="index.html" class="nav-logo" style="justify-content: center; margin-bottom: 1.5rem; text-decoration: none;">
+                <img src="images/logo.svg" alt="Rumbo Seguro Logo" style="height: 60px;">
+                <span style="font-size: 1.8rem;">RUMBO SEGURO</span>
             </a>
-            <h2 style="color: var(--dark); font-weight: 700;">¡Hola de nuevo! 👋</h2>
+            <h2 style="color: var(--dark); font-weight: 700; margin-bottom: 0.5rem;">¡Hola de nuevo! 👋</h2>
             <p style="color: var(--gray);">Ingresa a tu panel personal</p>
         </div>
 
-        <div id="msg-error" style="display: none; background: #ffebee; color: #c62828; padding: 10px; border-radius: 0.5rem; margin-bottom: 1rem; text-align: center;"></div>
+        <div id="msg-error" style="display: none; background: #ffebee; color: #c62828; padding: 12px; border-radius: 0.5rem; margin-bottom: 1.5rem; text-align: center; font-size: 0.9rem; border: 1px solid #ef9a9a;"></div>
 
         <form id="login-form">
-            <div style="margin-bottom: 1rem;">
+            <div style="margin-bottom: 1.2rem;">
                 <label for="email" class="form-label">Correo Institucional</label>
-                <input type="email" id="email" class="form-input" required placeholder="ejemplo@uni.edu.pe">
+                <div style="position: relative;">
+                    <i class="fas fa-envelope" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--gray);"></i>
+                    <input type="email" id="email" class="form-input" style="padding-left: 40px;" required placeholder="usuario@uni.edu.pe">
+                </div>
             </div>
-            <div style="margin-bottom: 1.5rem;">
+            
+            <div style="margin-bottom: 2rem;">
                 <label for="password" class="form-label">Contraseña</label>
-                <input type="password" id="password" class="form-input" required placeholder="••••••••">
+                <div style="position: relative;">
+                    <i class="fas fa-lock" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--gray);"></i>
+                    <input type="password" id="password" class="form-input" style="padding-left: 40px;" required placeholder="••••••••">
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1rem;">
-                <i class="fas fa-sign-in-alt"></i> Ingresar a mi Panel
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 12px;">
+                Ingresar a mi Panel <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
             </button>
         </form>
 
-        <p class="text-center" style="margin-top: 1.5rem; color: var(--gray);">
-            ¿No tienes cuenta? <a href="registro.html" style="color: var(--primary); font-weight: 600;">Regístrate aquí</a>
+        <p class="text-center" style="margin-top: 2rem; color: var(--gray); font-size: 0.95rem;">
+            ¿Aún no tienes cuenta? <a href="registro.html" style="color: var(--primary); font-weight: 700; text-decoration: none;">Regístrate gratis</a>
         </p>
     </div>
 
