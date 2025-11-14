@@ -6,94 +6,73 @@
     <title>Crear Cuenta - Rumbo Seguro</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        #campo-especialidad { display: none; }
-        .checkbox-group {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 2px solid var(--light);
-            border-radius: 0.5rem;
-            padding: 0.75rem;
-            background: #fafafa;
-        }
-        .checkbox-group label {
-            display: flex; align-items: center; padding: 0.5rem;
-            border-radius: 0.25rem; cursor: pointer; font-weight: 500;
-        }
-        .checkbox-group label:hover { background-color: #f0f5ff; }
-        .checkbox-group input {
-            margin-right: 0.75rem; width: auto;
-            accent-color: var(--primary); transform: scale(1.1);
-        }
-    </style>
 </head>
 <body class="auth-wrapper">
 
-    <div class="auth-card">
-        <div class="text-center" style="margin-bottom: 2rem;">
-            <a href="index.html" class="nav-logo" style="justify-content: center; margin-bottom: 1.5rem;">
-                <img src="images/logo.svg" alt="Rumbo Seguro Logo">
-                <span>RUMBO SEGURO</span>
+    <div class="auth-card" style="max-width: 500px;"> <div class="text-center" style="margin-bottom: 2rem;">
+            <a href="index.html" class="nav-logo" style="justify-content: center; margin-bottom: 1.5rem; text-decoration: none;">
+                <img src="images/logo.svg" alt="Rumbo Seguro Logo" style="height: 50px;">
+                <span style="font-size: 1.5rem;">RUMBO SEGURO</span>
             </a>
-            <h2 style="color: var(--dark); font-weight: 700;">Crea tu cuenta</h2>
-            <p style="color: var(--gray);">Es gratis y solo toma un minuto.</p>
+            <h2 style="color: var(--dark); font-weight: 700; margin-bottom: 0.5rem;">Crea tu cuenta</h2>
+            <p style="color: var(--gray);">Únete a la comunidad estudiantil de la FIIS.</p>
         </div>
 
-        <div id="msg-error" style="display: none; background: #ffebee; color: #c62828; padding: 10px; border-radius: 0.5rem; margin-bottom: 1rem; text-align: center;"></div>
-        <div id="msg-success" style="display: none; background: #e8f5e9; color: #2e7d32; padding: 10px; border-radius: 0.5rem; margin-bottom: 1rem; text-align: center;"></div>
+        <div id="msg-error" style="display: none; background: #ffebee; color: #c62828; padding: 12px; border-radius: 0.5rem; margin-bottom: 1.5rem; text-align: center; font-size: 0.9rem; border: 1px solid #ef9a9a;"></div>
+        <div id="msg-success" style="display: none; background: #e8f5e9; color: #2e7d32; padding: 12px; border-radius: 0.5rem; margin-bottom: 1.5rem; text-align: center; font-size: 0.9rem; border: 1px solid #a5d6a7;"></div>
 
         <form id="registro-form">
             <div style="margin-bottom: 1rem;">
                 <label for="nombres" class="form-label">Nombre Completo</label>
                 <input type="text" id="nombres" class="form-input" required placeholder="Ej. Juan Pérez">
             </div>
+            
             <div style="margin-bottom: 1rem;">
                 <label for="email" class="form-label">Correo Institucional</label>
                 <input type="email" id="email" class="form-input" required placeholder="ejemplo@uni.edu.pe">
             </div>
+            
             <div style="margin-bottom: 1rem;">
                 <label for="password" class="form-label">Contraseña</label>
                 <input type="password" id="password" class="form-input" required placeholder="Mínimo 6 caracteres">
             </div>
+            
             <div style="margin-bottom: 1.5rem;">
-                <label for="rol" class="form-label">Soy:</label>
-                <select id="rol" class="form-input" style="background: white;">
-                    <option value="estudiante">🎓 Estudiante</option>
-                    <option value="tutor">👨‍🏫 Docente Tutor</option>
-                    <option value="psicologo">🧠 Psicólogo(a)</option>
-                </select>
+                <label for="rol" class="form-label">¿Cuál es tu rol?</label>
+                <div style="position: relative;">
+                    <i class="fas fa-user-tag" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--primary);"></i>
+                    <select id="rol" class="form-input" style="background: white; padding-left: 40px; appearance: none; cursor: pointer;">
+                        <option value="estudiante">🎓 Estudiante</option>
+                        <option value="tutor">👨‍🏫 Docente Tutor</option>
+                        <option value="psicologo">🧠 Psicólogo(a)</option>
+                    </select>
+                    <i class="fas fa-chevron-down" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--gray); pointer-events: none;"></i>
+                </div>
             </div>
             
-            <div id="campo-especialidad" style="margin-bottom: 1.5rem;">
-                <label for="especialidad" class="form-label">¿En qué cursos puedes ser tutor?</label>
-                <div class="checkbox-group">
+            <div id="campo-especialidad" style="margin-bottom: 1.5rem; display: none;">
+                <label for="especialidad" class="form-label" style="color: var(--primary);"><i class="fas fa-chalkboard-teacher"></i> Cursos que puedes enseñar:</label>
+                <div class="checkbox-group" style="background: #f8fafc; border-color: #e2e8f0;">
                     <label><input type="checkbox" name="curso" value="Cálculo Diferencial"> Cálculo Diferencial</label>
                     <label><input type="checkbox" name="curso" value="Cálculo Integral"> Cálculo Integral</label>
                     <label><input type="checkbox" name="curso" value="Cálculo Multivariable"> Cálculo Multivariable</label>
                     <label><input type="checkbox" name="curso" value="Álgebra Lineal"> Álgebra Lineal</label>
                     <label><input type="checkbox" name="curso" value="Geometría Analítica"> Geometría Analítica</label>
-                    <label><input type="checkbox" name="curso" value="Ecuaciones Diferenciales"> Ecuaciones Diferenciales</label>
-                    <label><input type="checkbox" name="curso" value="Cálculo Numérico"> Cálculo Numérico</label>
                     <label><input type="checkbox" name="curso" value="Física I"> Física I</label>
-                    <label><input type="checkbox" name="curso" value="Física II"> Física II</label>
                     <label><input type="checkbox" name="curso" value="Química I"> Química I</label>
-                    <label><input type="checkbox" name="curso" value="Química 2"> Química 2</label>
-                    <label><input type="checkbox" name="curso" value="Dibujo de Ingeniería"> Dibujo de Ingeniería</label>
-                    <label><input type="checkbox" name="curso" value="Introducción a la Computación"> Introducción a la Computación</label>
-                    <label><input type="checkbox" name="curso" value="Algoritmia y Estructura de Datos"> Algoritmia y Estructura de Datos</label>
-                    <label><input type="checkbox" name="curso" value="Programación Orientada a Objetos"> Programación Orientada a Objetos</label>
-                    <label><input type="checkbox" name="curso" value="Matemática Discreta"> Matemática Discreta</label>
-                    <label><input type="checkbox" name="curso" value="Estadística Aplicada"> Estadística Aplicada</label>
-                </div>
+                    <label><input type="checkbox" name="curso" value="Algoritmia y Estructura de Datos"> Algoritmia</label>
+                    <label><input type="checkbox" name="curso" value="Programación Orientada a Objetos"> Programación OO</label>
+                    </div>
+                <p style="font-size: 0.8rem; color: var(--gray); margin-top: 5px;">Selecciona todos los que apliquen.</p>
             </div>
 
-            <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1rem;">
-                <i class="fas fa-user-plus"></i> Registrarme
+            <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 12px;">
+                Crear Cuenta <i class="fas fa-user-plus" style="margin-left: 8px;"></i>
             </button>
         </form>
 
-        <p class="text-center" style="margin-top: 1.5rem; color: var(--gray);">
-            ¿Ya tienes cuenta? <a href="login.html" style="color: var(--primary); font-weight: 600;">Inicia sesión</a>
+        <p class="text-center" style="margin-top: 2rem; color: var(--gray); font-size: 0.95rem;">
+            ¿Ya tienes cuenta? <a href="login.html" style="color: var(--primary); font-weight: 700; text-decoration: none;">Inicia sesión</a>
         </p>
     </div>
 
