@@ -7,14 +7,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background-color: var(--light); }
-        .header {
-            background: var(--white);
-            padding: 1rem 0;
-            border-bottom: 2px solid #eee;
-        }
+        .header { background: var(--white); padding: 1rem 0; border-bottom: 2px solid #eee; }
         .header .container { display: flex; align-items: center; }
-        
-        /* ¡NUEVOS ESTILOS PARA LAS TARJETAS DE TUTOR! */
         .tutor-card {
             background: var(--white);
             border-radius: 1rem;
@@ -68,24 +62,23 @@
                 <i class="fas fa-spinner fa-spin fa-3x"></i>
                 <p style="margin-top: 20px;">Buscando tutores disponibles...</p>
             </div>
-            </div>
+        </div>
     </main>
 
     <script>
+        const usuario = JSON.parse(localStorage.getItem('usuario'));
+        
         document.addEventListener('DOMContentLoaded', async () => {
-            const container = document.getElementById('lista-de-tutores');
-            const usuario = JSON.parse(localStorage.getItem('usuario'));
-
             if (!usuario) {
                 window.location.href = 'login.html'; // Seguridad
                 return;
             }
-
+            
+            const container = document.getElementById('lista-de-tutores');
+            
             try {
-                // 1. Llamamos a la nueva ruta del backend
                 const res = await fetch('/api/tutores');
                 const tutores = await res.json();
-
                 if (!res.ok) throw new Error('No se pudo cargar la lista de tutores');
 
                 if (tutores.length === 0) {
@@ -93,12 +86,10 @@
                     return;
                 }
 
-                container.innerHTML = ''; // Limpiamos el mensaje de "Cargando..."
+                container.innerHTML = ''; // Limpiamos el "Cargando..."
                 
-                // 2. Creamos una tarjeta por cada tutor
                 tutores.forEach(tutor => {
-                    // Evitamos que el tutor se vea a sí mismo en la lista
-                    if (tutor.id === usuario.id) return;
+                    if (tutor.id === usuario.id) return; // Un tutor no puede solicitarse a sí mismo
 
                     const card = document.createElement('div');
                     card.className = 'tutor-card';
@@ -123,12 +114,31 @@
             }
         });
 
-        // (¡Próximamente!) Función para guardar la solicitud
-        function solicitarTutor(tutorId, tutorNombre) {
+        // --- ¡FUNCIÓN ACTUALIZADA! ---
+        async function solicitarTutor(tutorId, tutorNombre) {
             const curso = prompt(`¿Para qué curso necesitas tutoría con ${tutorNombre}?`);
-            if (curso) {
-                alert(`¡Solicitud para ${curso} enviada (simulación)! \n\nEl siguiente paso será guardar esto en la tabla 'tutorias'.`);
-                // Aquí es donde haríamos un fetch POST a '/api/solicitar-tutoria'
+            
+            if (curso && curso.trim() !== '') {
+                try {
+                    const res = await fetch('/api/solicitar-tutoria', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            estudiante_id: usuario.id, // ID del estudiante logueado
+                            tutor_id: tutorId,       // ID del tutor seleccionado
+                            curso: curso
+                        })
+                    });
+
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.error);
+
+                    alert('✅ ¡Solicitud enviada! El tutor se pondrá en contacto contigo.');
+                
+                } catch (error) {
+                    console.error('Error al solicitar tutoría:', error);
+                    alert(`Error al enviar la solicitud: ${error.message}`);
+                }
             }
         }
     </script>
