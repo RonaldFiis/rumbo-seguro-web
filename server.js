@@ -1,16 +1,15 @@
-// --- Archivo: server.js (VERSIÓN CON SUBIDA DE ARCHIVOS MANUAL) ---
+// --- Archivo: server.js (VERSIÓN CON PERMISOS DE SUBIDA) ---
 const express = require('express');
 const cors = require('cors');
 const supabase = require('./database'); // Importamos Supabase
 const path = require('path');
 require('dotenv').config();
 
-// --- ¡NUEVA HERRAMIENTA PARA SUBIR ARCHIVOS! ---
+// --- Herramientas para subir archivos ---
 const multer = require('multer');
-// Configuramos Multer para guardar el archivo en la memoria temporal
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-// --- FIN DE NUEVAS HERRAMIENTAS ---
+// --- Fin de herramientas ---
 
 console.log("🔑 Verificando API Key de OpenRouter:", process.env.API_KEY ? "¡Encontrada!" : "¡NO ENCONTRADA!");
 console.log("🔑 Verificando SUPABASE_URL:", process.env.SUPABASE_URL ? "¡Encontrada!" : "¡NO ENCONTRADA!");
@@ -20,8 +19,8 @@ const PORT = process.env.PORT || 3000;
 
 // --- Middlewares ---
 app.use(cors());
-app.use(express.json()); // Para leer JSON
-app.use(express.urlencoded({ extended: true })); // Para leer datos de formularios
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // --- SERVIR FRONTEND ESTATICO ---
 app.use(express.static(path.join(__dirname, 'public')));
@@ -120,7 +119,7 @@ app.post('/api/chat', async (req, res) => {
     }
 });
 
-// --- ¡RUTAS DE BIBLIOTECA ACTUALIZADAS! ---
+// --- RUTAS DE BIBLIOTECA ---
 
 // RUTA 7: Obtener lista de recursos
 app.get('/api/biblioteca', async (req, res) => {
@@ -136,37 +135,44 @@ app.get('/api/biblioteca', async (req, res) => {
     }
 });
 
-// RUTA 8: Subir un nuevo recurso (¡LÓGICA MANUAL!)
-// 'archivo' es el nombre del campo en el formulario (lo veremos en el HTML)
+// RUTA 8: Subir un nuevo recurso (¡CON VERIFICACIÓN DE ROL!)
 app.post('/api/recursos', upload.single('archivo'), async (req, res) => {
     try {
-        // Datos del formulario de texto
         const { nombre_archivo, curso, tipo, uploader_id } = req.body;
-        // Datos del archivo (en memoria)
         const file = req.file;
 
         if (!file) return res.status(400).json({ error: 'No se recibió ningún archivo.' });
+        
+        // --- ¡NUEVA VERIFICACIÓN DE SEGURIDAD! ---
+        const { data: usuario, error: userError } = await supabase
+            .from('usuarios')
+            .select('rol')
+            .eq('id', uploader_id)
+            .single();
 
-        // 1. Creamos un nombre único para el archivo
+        if (userError || !usuario) {
+            return res.status(404).json({ error: 'Usuario no encontrado.' });
+        }
+        
+        if (usuario.rol === 'estudiante') {
+            return res.status(403).json({ error: 'No tienes permiso para subir archivos.' });
+        }
+        // --- FIN DE LA VERIFICACIÓN ---
+
         const fileName = `public/${Date.now()}-${file.originalname}`;
 
-        // 2. Subimos el archivo (buffer) a Supabase Storage
         const { data: uploadData, error: uploadError } = await supabase
             .storage
-            .from('recursos_academicos') // El nombre de tu balde
-            .upload(fileName, file.buffer, {
-                contentType: file.mimetype
-            });
+            .from('recursos_academicos')
+            .upload(fileName, file.buffer, { contentType: file.mimetype });
 
         if (uploadError) throw uploadError;
 
-        // 3. Obtenemos la URL pública del archivo que acabamos de subir
         const { data: publicUrlData } = supabase
             .storage
             .from('recursos_academicos')
             .getPublicUrl(fileName);
 
-        // 4. Guardamos la información en nuestra tabla "recursos"
         const { error: dbError } = await supabase
             .from('recursos')
             .insert({
