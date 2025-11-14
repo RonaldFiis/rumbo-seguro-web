@@ -7,11 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Estilo para ocultar el campo de especialidad */
-        #campo-especialidad {
-            display: none; /* Oculto por defecto */
-        }
-        /* ¡NUEVO! Estilo para las casillas */
+        #campo-especialidad { display: none; }
         .checkbox-group {
             max-height: 200px;
             overflow-y: auto;
@@ -21,18 +17,13 @@
             background: #fafafa;
         }
         .checkbox-group label {
-            display: flex;
-            align-items: center;
-            padding: 0.5rem;
-            border-radius: 0.25rem;
-            cursor: pointer;
+            display: flex; align-items: center; padding: 0.5rem;
+            border-radius: 0.25rem; cursor: pointer; font-weight: 500;
         }
-        .checkbox-group label:hover {
-            background-color: #f0f5ff;
-        }
+        .checkbox-group label:hover { background-color: #f0f5ff; }
         .checkbox-group input {
-            margin-right: 0.75rem;
-            width: auto;
+            margin-right: 0.75rem; width: auto;
+            accent-color: var(--primary); transform: scale(1.1);
         }
     </style>
 </head>
@@ -81,13 +72,18 @@
                     <label><input type="checkbox" name="curso" value="Cálculo Multivariable"> Cálculo Multivariable</label>
                     <label><input type="checkbox" name="curso" value="Álgebra Lineal"> Álgebra Lineal</label>
                     <label><input type="checkbox" name="curso" value="Geometría Analítica"> Geometría Analítica</label>
+                    <label><input type="checkbox" name="curso" value="Ecuaciones Diferenciales"> Ecuaciones Diferenciales</label>
+                    <label><input type="checkbox" name="curso" value="Cálculo Numérico"> Cálculo Numérico</label>
                     <label><input type="checkbox" name="curso" value="Física I"> Física I</label>
+                    <label><input type="checkbox" name="curso" value="Física II"> Física II</label>
                     <label><input type="checkbox" name="curso" value="Química I"> Química I</label>
                     <label><input type="checkbox" name="curso" value="Química 2"> Química 2</label>
                     <label><input type="checkbox" name="curso" value="Dibujo de Ingeniería"> Dibujo de Ingeniería</label>
                     <label><input type="checkbox" name="curso" value="Introducción a la Computación"> Introducción a la Computación</label>
                     <label><input type="checkbox" name="curso" value="Algoritmia y Estructura de Datos"> Algoritmia y Estructura de Datos</label>
+                    <label><input type="checkbox" name="curso" value="Programación Orientada a Objetos"> Programación Orientada a Objetos</label>
                     <label><input type="checkbox" name="curso" value="Matemática Discreta"> Matemática Discreta</label>
+                    <label><input type="checkbox" name="curso" value="Estadística Aplicada"> Estadística Aplicada</label>
                 </div>
             </div>
 
@@ -105,12 +101,11 @@
         const rolSelect = document.getElementById('rol');
         const campoEspecialidad = document.getElementById('campo-especialidad');
 
-        // Función para mostrar/ocultar el campo
         rolSelect.addEventListener('change', () => {
             if (rolSelect.value === 'tutor') {
-                campoEspecialidad.style.display = 'block'; // Mostrar
+                campoEspecialidad.style.display = 'block';
             } else {
-                campoEspecialidad.style.display = 'none'; // Ocultar
+                campoEspecialidad.style.display = 'none';
             }
         });
 
@@ -121,8 +116,6 @@
             errorDiv.style.display = 'none'; successDiv.style.display = 'none';
 
             const rol = document.getElementById('rol').value;
-
-            // --- ¡NUEVA LÓGICA PARA LEER CHECKBOXES! ---
             let especialidadesSeleccionadas = [];
             if (rol === 'tutor') {
                 const checkboxes = document.querySelectorAll('#campo-especialidad input[name="curso"]:checked');
@@ -130,9 +123,7 @@
                     especialidadesSeleccionadas.push(checkbox.value);
                 });
             }
-            // Convertimos el array en un solo string separado por comas
             const especialidadString = especialidadesSeleccionadas.join(', ');
-            // --- FIN DE LA NUEVA LÓGICA ---
 
             const datos = {
                 nombres: document.getElementById('nombres').value.trim(),
@@ -150,7 +141,6 @@
                     body: JSON.stringify(datos)
                 });
                 const data = await res.json();
-
                 if (res.ok) {
                     successDiv.textContent = '¡Cuenta creada! Redirigiendo al login...';
                     successDiv.style.display = 'block';
