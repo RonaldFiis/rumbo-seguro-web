@@ -1,4 +1,4 @@
-// --- Archivo: server.js (VERSIÓN CON EDICIÓN DE PERFIL Y ARREGLOS) ---
+// --- Archivo: server.js (VERSIÓN CON GESTIÓN DE TUTORÍAS) ---
 const express = require('express');
 const cors = require('cors');
 const supabase = require('./database'); // Importamos Supabase
@@ -63,15 +63,11 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// --- ¡NUEVA RUTA! OBTENER PERFIL DE USUARIO ---
+// --- RUTA 4: OBTENER PERFIL DE USUARIO (PARA EDITAR) ---
 app.get('/api/usuario/:id', async (req, res) => {
     const { id } = req.params;
     try {
-        const { data, error } = await supabase
-            .from('usuarios')
-            .select('nombres, especialidad') // Solo pedimos lo que necesitamos
-            .eq('id', id)
-            .single();
+        const { data, error } = await supabase.from('usuarios').select('nombres, especialidad').eq('id', id).single();
         if (error) throw error;
         res.json(data);
     } catch (error) {
@@ -80,17 +76,12 @@ app.get('/api/usuario/:id', async (req, res) => {
     }
 });
 
-// --- ¡NUEVA RUTA! ACTUALIZAR PERFIL DE USUARIO ---
+// --- RUTA 5: ACTUALIZAR PERFIL DE USUARIO ---
 app.patch('/api/usuario/:id', async (req, res) => {
     const { id } = req.params;
     const { nombres, especialidad } = req.body;
     try {
-        const { data, error } = await supabase
-            .from('usuarios')
-            .update({ nombres, especialidad })
-            .eq('id', id)
-            .select('nombres, especialidad') // Devolvemos los datos actualizados
-            .single();
+        const { data, error } = await supabase.from('usuarios').update({ nombres, especialidad }).eq('id', id).select('nombres, especialidad').single();
         if (error) throw error;
         res.json(data);
     } catch (error) {
@@ -99,7 +90,7 @@ app.patch('/api/usuario/:id', async (req, res) => {
     }
 });
 
-// --- RUTA 4: Guardar Evaluación (SUPABASE) ---
+// --- RUTA 6: Guardar Evaluación (SUPABASE) ---
 app.post('/api/riesgo', async (req, res) => {
     const { estudiante_id, puntaje } = req.body;
     let nivel = puntaje >= 7 ? 'Crítico' : puntaje >= 5 ? 'Alto' : puntaje >= 3 ? 'Medio' : 'Bajo';
@@ -112,18 +103,16 @@ app.post('/api/riesgo', async (req, res) => {
         res.json({ mensaje: 'Guardado', nivel: data.nivel, puntaje: data.puntaje });
     } catch (error) {
         console.error('Error al guardar riesgo:', error.message);
-        // ¡ARREGLO DEL TYPO!
         res.status(500).json({ error: 'Error al guardar' });
     }
 });
 
-// --- RUTA 5: Obtener Riesgo (SUPABASE) ---
+// --- RUTA 7: Obtener Riesgo (SUPABASE) ---
 app.get('/api/riesgo/:id', async (req, res) => {
     const id = req.params.id;
     try {
         const { data: riesgo, error } = await supabase.from('riesgo').select('*').eq('estudiante_id', id).single();
         if (error || !riesgo) {
-             // ¡ARREGLO DEL TYPO!
             return res.status(404).json({ mensaje: 'Sin evaluación' });
         }
         res.json(riesgo);
@@ -132,7 +121,7 @@ app.get('/api/riesgo/:id', async (req, res) => {
     }
 });
 
-// --- RUTA 6: CHAT CON IA (OPENROUTER) ---
+// --- RUTA 8: CHAT CON IA (OPENROUTER) ---
 app.post('/api/chat', async (req, res) => {
     if (!process.env.API_KEY) return res.status(500).json({ reply: "Error del servidor: La API_KEY no está configurada." });
     const userMessage = req.body.message;
@@ -229,6 +218,52 @@ app.get('/api/solicitudes-tutor/:tutor_id', async (req, res) => {
         res.json({ count: count || 0 });
     } catch (error) {
         console.error('Error al contar solicitudes:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// --- ¡NUEVA RUTA! OBTENER DETALLE DE SOLICITUDES ---
+app.get('/api/solicitudes-detalle/:tutor_id', async (req, res) => {
+    const { tutor_id } = req.params;
+    try {
+        // Pedimos las tutorías Y la información del estudiante que la pidió
+        const { data, error } = await supabase
+            .from('tutorias')
+            .select(`
+                id,
+                created_at,
+                curso,
+                estado,
+                usuarios ( nombres, email ) 
+            `)
+            .eq('tutor_id', tutor_id)
+            .eq('estado', 'solicitada'); // Solo las pendientes
+
+        if (error) throw error;
+        res.json(data);
+    } catch (error) {
+        console.error('Error al obtener detalle de solicitudes:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// --- ¡NUEVA RUTA! ACEPTAR/RECHAZAR SOLICITUD ---
+app.patch('/api/tutorias/:id', async (req, res) => {
+    const { id } = req.params;
+    const { nuevo_estado } = req.body; // 'aceptada' o 'rechazada'
+
+    try {
+        const { data, error } = await supabase
+            .from('tutorias')
+            .update({ estado: nuevo_estado })
+            .eq('id', id)
+            .select()
+            .single();
+            
+        if (error) throw error;
+        res.json({ mensaje: `Solicitud ${nuevo_estado}`, data });
+    } catch (error) {
+        console.error('Error al actualizar tutoría:', error.message);
         res.status(500).json({ error: error.message });
     }
 });
