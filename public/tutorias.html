@@ -7,8 +7,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background-color: var(--light); }
-        .header { background: var(--white); padding: 1rem 0; border-bottom: 2px solid #eee; }
+        .header {
+            background: var(--white);
+            padding: 1rem 0;
+            border-bottom: 2px solid #eee;
+        }
         .header .container { display: flex; align-items: center; }
+        
+        /* ¡NUEVOS ESTILOS PARA LAS TARJETAS DE TUTOR! */
         .tutor-card {
             background: var(--white);
             border-radius: 1rem;
@@ -51,9 +57,11 @@
         </div>
     </header>
 
-    <main class="container" style="margin-top: 2rem;">
+    <main class="container" style="margin-top: 2rem; max-width: 900px;">
         <h2 style="margin-bottom: 1.5rem;">👨‍🏫 Encuentra un Tutor</h2>
-        <p style="color: var(--gray); margin-bottom: 2rem;">Estos son los tutores y docentes registrados. Contáctalos para coordinar una sesión.</p>
+        <p style="color: var(--gray); margin-bottom: 2rem;">
+            Estos son los tutores y docentes que se han registrado para ayudar. Contáctalos para coordinar una sesión personalizada.
+        </p>
         
         <div id="lista-de-tutores">
             <div class="text-center" style="padding: 50px; color: var(--gray);">
@@ -66,14 +74,22 @@
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const container = document.getElementById('lista-de-tutores');
-            
+            const usuario = JSON.parse(localStorage.getItem('usuario'));
+
+            if (!usuario) {
+                window.location.href = 'login.html'; // Seguridad
+                return;
+            }
+
             try {
                 // 1. Llamamos a la nueva ruta del backend
                 const res = await fetch('/api/tutores');
                 const tutores = await res.json();
 
+                if (!res.ok) throw new Error('No se pudo cargar la lista de tutores');
+
                 if (tutores.length === 0) {
-                    container.innerHTML = '<p style="color: var(--gray);">No hay tutores registrados por el momento.</p>';
+                    container.innerHTML = '<div class="card text-center"><p>No hay tutores registrados por el momento. ¡Vuelve pronto!</p></div>';
                     return;
                 }
 
@@ -81,6 +97,9 @@
                 
                 // 2. Creamos una tarjeta por cada tutor
                 tutores.forEach(tutor => {
+                    // Evitamos que el tutor se vea a sí mismo en la lista
+                    if (tutor.id === usuario.id) return;
+
                     const card = document.createElement('div');
                     card.className = 'tutor-card';
                     card.innerHTML = `
@@ -91,7 +110,7 @@
                                 <p>Especialidad: <span class="specialty">${tutor.especialidad || 'General'}</span></p>
                             </div>
                         </div>
-                        <button class="btn btn-primary" onclick="solicitarTutor(${tutor.id})">
+                        <button class="btn btn-primary" onclick="solicitarTutor(${tutor.id}, '${tutor.nombres}')">
                             <i class="fas fa-calendar-plus"></i> Solicitar Tutoría
                         </button>
                     `;
@@ -100,14 +119,17 @@
 
             } catch (error) {
                 console.error('Error al cargar tutores:', error);
-                container.innerHTML = '<p style="color: var(--danger);">Error al cargar la lista de tutores.</p>';
+                container.innerHTML = '<div class="card card-red"><p>Error al cargar la lista de tutores.</p></div>';
             }
         });
 
         // (¡Próximamente!) Función para guardar la solicitud
-        function solicitarTutor(tutorId) {
-            alert('¡Función en desarrollo! El siguiente paso será guardar esta solicitud en la tabla "tutorias". ID del Tutor: ' + tutorId);
-            // Aquí es donde haríamos un fetch POST a '/api/solicitar-tutoria'
+        function solicitarTutor(tutorId, tutorNombre) {
+            const curso = prompt(`¿Para qué curso necesitas tutoría con ${tutorNombre}?`);
+            if (curso) {
+                alert(`¡Solicitud para ${curso} enviada (simulación)! \n\nEl siguiente paso será guardar esto en la tabla 'tutorias'.`);
+                // Aquí es donde haríamos un fetch POST a '/api/solicitar-tutoria'
+            }
         }
     </script>
 </body>
