@@ -2,170 +2,204 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Panel del Estudiante - Rumbo Seguro</title>
+    <title>Mi Espacio - Rumbo Seguro</title>
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Ajustes locales para igualar tu captura */
+        body { background-color: #fff; } /* Fondo blanco limpio como en tu foto */
+        .dashboard-container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+        
+        /* Tarjeta de Estado (La Azul de tu foto) */
+        .status-card {
+            background: #e3f2fd; /* Azul claro exacto */
+            border-left: 6px solid var(--primary);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+        }
+        .status-title { display: flex; align-items: center; gap: 10px; color: var(--dark); font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; }
+        
+        /* Grid de Herramientas (Para que no se vea vacío) */
+        .tools-section h3 { margin-bottom: 1.5rem; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        .tools-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        .tool-box {
+            background: white; border: 1px solid #eee;
+            border-radius: 12px; padding: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; justify-content: space-between; height: 100%;
+        }
+        .tool-box:hover { transform: translateY(-3px); box-shadow: 0 10px 15px rgba(0,0,0,0.08); border-color: var(--primary); }
+        .tool-icon { font-size: 2rem; margin-bottom: 1rem; color: var(--primary); }
+        .tool-title { font-weight: 700; margin-bottom: 0.5rem; font-size: 1.1rem; }
+        .tool-desc { font-size: 0.9rem; color: var(--gray); margin-bottom: 1.5rem; }
+    </style>
 </head>
 <body>
 
-    <header class="uni-header">
+    <header class="app-header">
         <div class="container">
-            <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
                 <a href="index.html" class="nav-logo">
                     <img src="images/logo.svg" alt="Logo">
+                    <span>RUMBO SEGURO</span>
                 </a>
-                <span style="font-size: 1.2rem; font-weight: 700; color: var(--dark);">RUMBO SEGURO</span>
-            </div>
-
-            <div class="uni-user-menu">
-                <div style="position: relative; cursor: pointer;">
-                    <i class="far fa-bell" style="font-size: 1.2rem; color: var(--gray);"></i>
-                    <span style="position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px;">2</span>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <span class="user-info">Hola, <strong id="nombre-usuario">...</strong></span>
+                    <button id="btn-logout" class="btn btn-danger" style="padding: 8px 15px; font-size: 0.9rem;">Cerrar Sesión</button>
                 </div>
-                
-                <div style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                    <div class="text-right" style="text-align: right;">
-                        <div style="font-weight: 600; font-size: 0.9rem;" id="nombre-usuario">Cargando...</div>
-                        <div style="font-size: 0.8rem; color: var(--gray);">Estudiante</div>
-                    </div>
-                    <div class="uni-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <i class="fas fa-chevron-down" style="font-size: 0.8rem; color: var(--gray);"></i>
-                </div>
-                
-                <button id="btn-logout" style="background: none; border: none; color: var(--danger); cursor: pointer; font-size: 1.2rem;" title="Cerrar Sesión">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
             </div>
         </div>
     </header>
 
-    <main class="container" id="panel-contenido">
-        <div style="margin-bottom: 2rem;">
-            <h1 style="font-size: 2rem;">¡Hola, <span id="nombre-saludo">Estudiante</span>!</h1>
-            <p style="color: var(--gray);">Bienvenido a tu panel de Rumbo Seguro. Aquí tienes tus herramientas de apoyo.</p>
+    <main class="dashboard-container" id="panel-contenido">
+        <div class="text-center" style="padding: 50px; color: var(--gray);">
+            <i class="fas fa-spinner fa-spin fa-3x"></i>
+            <p>Cargando tu espacio...</p>
         </div>
-
-        <div class="tools-grid">
-            
-            <div class="tool-card">
-                <div class="card-header-bg bg-riesgo">
-                    <span class="card-tag">Diagnóstico</span>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title">Mi Estado Académico</h3>
-                    <div id="estado-riesgo-container">
-                        <p style="font-size: 0.9rem; color: var(--gray);">Cargando estado...</p>
-                    </div>
-                    <div style="margin-top: auto; padding-top: 1rem;">
-                        <a href="evaluacion.html" class="btn btn-secondary" style="width: 100%; font-size: 0.9rem;">
-                            <i class="fas fa-clipboard-check"></i> Realizar Test IMRA
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tool-card">
-                <div class="card-header-bg bg-tutor">
-                    <span class="card-tag">Acompañamiento</span>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title">Solicitar Tutoría</h3>
-                    <p class="card-desc">Conecta con compañeros de ciclos superiores para reforzar tus cursos.</p>
-                    <div style="margin-top: auto;">
-                        <a href="tutorias.html" class="btn btn-secondary" style="width: 100%; font-size: 0.9rem;">
-                            <i class="fas fa-chalkboard-teacher"></i> Ver Tutores
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tool-card">
-                <div class="card-header-bg bg-biblio">
-                    <span class="card-tag">Recursos</span>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title">Biblioteca Digital</h3>
-                    <p class="card-desc">Accede a exámenes pasados, prácticas y solucionarios compartidos.</p>
-                    <div style="margin-top: auto;">
-                        <a href="biblioteca.html" class="btn btn-secondary" style="width: 100%; font-size: 0.9rem;">
-                            <i class="fas fa-book"></i> Ir a Biblioteca
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="ai-footer-banner">
-            <div style="flex: 1;">
-                <h3 style="margin: 0 0 5px 0; font-size: 1.5rem;">¿Tienes dudas académicas?</h3>
-                <p style="margin: 0; opacity: 0.9;">Nuestro asistente virtual está disponible 24/7 para ayudarte.</p>
-            </div>
-            <div>
-                <a href="asistente.html" class="btn" style="background: white; color: var(--primary); font-weight: 700; padding: 12px 30px;">
-                    <i class="fas fa-robot"></i> Preguntar a la IA
-                </a>
-            </div>
-        </div>
-
-        <div style="height: 50px;"></div> </main>
+    </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const usuario = JSON.parse(localStorage.getItem('usuario'));
             if (!usuario) return window.location.href = 'login.html';
 
-            const primerNombre = usuario.nombres.split(' ')[0];
-            document.getElementById('nombre-usuario').textContent = usuario.nombres;
-            document.getElementById('nombre-saludo').textContent = primerNombre;
+            document.getElementById('nombre-usuario').textContent = usuario.nombres.split(' ')[0];
 
             document.getElementById('btn-logout').addEventListener('click', () => {
                 localStorage.removeItem('usuario');
                 window.location.href = 'index.html';
             });
 
-            // Lógica específica para estudiante (Cargar Riesgo)
             if (usuario.rol === 'estudiante') {
-                cargarEstadoRiesgo(usuario.id);
+                renderEstudiante(panel, usuario);
+            } else if (usuario.rol === 'tutor') {
+                renderTutor(panel, usuario);
             } else {
-                // Si es tutor/psicólogo, podrías redirigir o mostrar otro panel
-                // Por ahora, dejamos que vean este diseño limpio
+                // Psicólogo u otros
+                document.getElementById('panel-contenido').innerHTML = `<h2>Bienvenido, ${usuario.rol}</h2>`;
             }
         });
 
-        async function cargarEstadoRiesgo(userId) {
-            const container = document.getElementById('estado-riesgo-container');
+        const panel = document.getElementById('panel-contenido');
+
+        async function renderEstudiante(panel, usuario) {
+            let riesgoHTML = '<span class="risk-badge bg-Pendiente">Pendiente de evaluación</span>';
+            let msgRiesgo = 'Aún no has realizado tu autoevaluación inicial.';
+            let btnTexto = 'Realizar Autoevaluación IMRA';
+
             try {
-                const res = await fetch(`/api/riesgo/${userId}`);
+                const res = await fetch(`/api/riesgo/${usuario.id}`);
                 if (res.ok) {
                     const r = await res.json();
-                    const colorMap = {
-                        'Bajo': 'bg-Bajo', 'Medio': 'bg-Medio', 
-                        'Alto': 'bg-Alto', 'Crítico': 'bg-Crítico'
-                    };
-                    container.innerHTML = `
-                        <div style="margin-bottom: 10px;">
-                            <span class="risk-badge ${colorMap[r.nivel]}">${r.nivel.toUpperCase()}</span>
-                        </div>
-                        <p style="font-size: 0.85rem; color: var(--gray);">
-                            Última evaluación: ${new Date(r.fecha_evaluacion).toLocaleDateString()}
-                        </p>
-                    `;
-                } else {
-                    container.innerHTML = `
-                        <div style="margin-bottom: 10px;">
-                            <span class="risk-badge bg-Pendiente">PENDIENTE</span>
-                        </div>
-                        <p style="font-size: 0.85rem; color: var(--gray);">
-                            Aún no has realizado tu evaluación inicial.
-                        </p>
-                    `;
+                    const colorMap = { 'Bajo': 'bg-Bajo', 'Medio': 'bg-Medio', 'Alto': 'bg-Alto', 'Crítico': 'bg-Crítico' };
+                    riesgoHTML = `<span class="risk-badge ${colorMap[r.nivel]}">${r.nivel.toUpperCase()}</span>`;
+                    msgRiesgo = `Última evaluación: ${new Date(r.fecha_evaluacion).toLocaleDateString()}`;
+                    btnTexto = 'Volver a Evaluar';
                 }
-            } catch (e) {
-                container.innerHTML = '<p style="font-size: 0.8rem; color: red;">Error al cargar estado.</p>';
-            }
+            } catch (e) {}
+
+            panel.innerHTML = `
+                <h1 style="margin-bottom: 2rem;">👋 Bienvenido a tu espacio personal</h1>
+                
+                <div class="status-card">
+                    <div class="status-title"><i class="fas fa-chart-bar"></i> Tu Estado Actual</div>
+                    <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">
+                        <strong>Nivel de Riesgo:</strong> ${riesgoHTML}
+                    </p>
+                    <p style="color: var(--gray); margin-bottom: 1.5rem;">${msgRiesgo}</p>
+                    <a href="evaluacion.html" class="btn btn-success">
+                        <i class="fas fa-clipboard-check"></i> ${btnTexto}
+                    </a>
+                </div>
+
+                <div class="tools-section">
+                    <h3><i class="fas fa-tools"></i> Tus Herramientas</h3>
+                    <div class="tools-row">
+                        
+                        <div class="tool-box">
+                            <div>
+                                <div class="tool-icon"><i class="fas fa-robot"></i></div>
+                                <h4 class="tool-title">Asistente Virtual</h4>
+                                <p class="tool-desc">¿Tienes dudas sobre algún curso o trámite? Tu asistente está listo 24/7.</p>
+                            </div>
+                            <a href="asistente.html" class="btn btn-primary" style="width: 100%;">Hablar con IA</a>
+                        </div>
+
+                        <div class="tool-box">
+                            <div>
+                                <div class="tool-icon" style="color: var(--accent);"><i class="fas fa-chalkboard-teacher"></i></div>
+                                <h4 class="tool-title">Solicitar Tutoría</h4>
+                                <p class="tool-desc">Conecta con compañeros de ciclos superiores para reforzar tus cursos.</p>
+                            </div>
+                            <a href="tutorias.html" class="btn btn-outline" style="width: 100%;">Ver Tutores</a>
+                        </div>
+
+                        <div class="tool-box">
+                            <div>
+                                <div class="tool-icon" style="color: var(--secondary);"><i class="fas fa-book"></i></div>
+                                <h4 class="tool-title">Biblioteca Digital</h4>
+                                <p class="tool-desc">Accede a exámenes pasados, prácticas y solucionarios.</p>
+                            </div>
+                            <a href="biblioteca.html" class="btn btn-secondary" style="width: 100%;">Ir a Biblioteca</a>
+                        </div>
+
+                    </div>
+                </div>
+            `;
+        }
+
+        async function renderTutor(panel, usuario) {
+            // Reutilizamos la lógica del tutor que ya funcionaba (conteo y perfil)
+            let especialidad = 'No definida';
+            let conteoSolicitudes = 0;
+            let badgeHTML = '';
+
+            try {
+                const userRes = await fetch(`/api/usuario/${usuario.id}`);
+                const userData = await userRes.json();
+                if (userData && userData.especialidad) especialidad = userData.especialidad;
+                
+                const countRes = await fetch(`/api/solicitudes-tutor/${usuario.id}`);
+                const data = await countRes.json();
+                conteoSolicitudes = data.count;
+                if (conteoSolicitudes > 0) badgeHTML = `<span class="notification-badge">${conteoSolicitudes}</span>`;
+            } catch(e) {}
+
+            panel.innerHTML = `
+                <h1 style="margin-bottom: 2rem;">👨‍🏫 Panel de Docente Tutor</h1>
+                <div class="status-card" style="border-left-color: var(--accent); background: #fff5f5;">
+                    <div class="status-title" style="color: var(--accent);"><i class="fas fa-chalkboard"></i> Mis Especialidades</div>
+                    <p style="margin-bottom: 1rem; font-size: 1.1rem;">${especialidad}</p>
+                    <a href="perfil.html" class="btn btn-outline">Editar Perfil</a>
+                </div>
+
+                <div class="tools-row">
+                    <div class="tool-box">
+                        <div>
+                            <div class="tool-icon" style="color: var(--accent);"><i class="fas fa-users"></i></div>
+                            <h4 class="tool-title">Solicitudes ${badgeHTML}</h4>
+                            <p class="tool-desc">Tienes <strong>${conteoSolicitudes}</strong> solicitudes pendientes.</p>
+                        </div>
+                        <a href="solicitudes.html" class="btn btn-primary" style="width: 100%;">Ver Solicitudes</a>
+                    </div>
+                    
+                    <div class="tool-box">
+                        <div>
+                            <div class="tool-icon" style="color: var(--secondary);"><i class="fas fa-book"></i></div>
+                            <h4 class="tool-title">Aportar a la Biblioteca</h4>
+                            <p class="tool-desc">Sube exámenes o material para los estudiantes.</p>
+                        </div>
+                        <a href="biblioteca.html" class="btn btn-secondary" style="width: 100%;">Ir a Biblioteca</a>
+                    </div>
+                </div>
+            `;
         }
     </script>
 </body>
