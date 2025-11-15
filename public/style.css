@@ -1,291 +1,106 @@
-/* --- public/style.css (VERSIÓN UNIFICADA Y CORREGIDA) --- */
+/* --- public/style.css (CORRECCIÓN FINAL: LOGO DASHBOARD) --- */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-    --primary: #005A9C;       /* Azul Institucional UNI */
-    --primary-dark: #003d6b;
-    --secondary: #4CAF50;     /* Verde de acción */
-    --accent: #8a1c27;        /* Rojo Guinda UNI */
-    --danger: #ef4444;        /* Rojo para errores/alertas */
-    --dark: #111827;          /* Texto principal oscuro */
-    --gray: #4b5563;          /* Texto secundario gris */
-    --light: #f3f4f6;         /* Fondo claro */
-    --white: #ffffff;         /* Blanco */
-    --shadow: 0 10px 15px -3px rgba(0,0,0,0.1); /* Sombra estándar */
-    --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05); /* Sombra pequeña */
+    --primary: #005A9C; --primary-dark: #003d6b; --secondary: #4CAF50; --accent: #8a1c27;
+    --dark: #111827; --gray: #4b5563; --light: #f3f4f6; --white: #ffffff;
+    --shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
 }
 
-/* --- ESTILOS BASE Y GLOBALES --- */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Inter', sans-serif; color: var(--dark); line-height: 1.6; background-color: var(--light); }
-a { text-decoration: none; color: inherit; transition: 0.3s ease; }
+a { text-decoration: none; color: inherit; transition: 0.3s; }
 ul { list-style: none; }
 
-/* --- UTILIDADES DE LAYOUT --- */
+/* --- UTILIDADES --- */
 .container { width: 90%; max-width: 1200px; margin: 0 auto; }
 .text-center { text-align: center; }
-.section-padding { padding: 80px 0; } /* Espacio para secciones */
+.section-padding { padding: 80px 0; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
 .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+@media (max-width: 768px) { .grid-2, .grid-3, .dashboard-grid { grid-template-columns: 1fr; } .hero h1 { font-size: 2.5rem; } }
 
-/* Responsive para grids */
-@media (max-width: 768px) {
-    .grid-2, .grid-3 { grid-template-columns: 1fr; gap: 2rem; }
-    .hero h1 { font-size: 2.5rem; } /* Ajuste de título en móvil */
-}
-
-/* --- BOTONES GLOBALES --- */
-.btn {
-    display: inline-flex; align-items: center; justify-content: center;
-    padding: 10px 25px; border-radius: 50px; font-weight: 600; cursor: pointer;
-    border: none; transition: transform 0.2s ease, box-shadow 0.2s ease;
-    gap: 8px; text-decoration: none; /* Asegurar que no haya subrayado */
-}
+/* --- BOTONES --- */
+.btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 25px; border-radius: 50px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; gap: 8px; text-decoration: none; }
 .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
 .btn-primary { background: var(--primary); color: white; }
 .btn-secondary { background: white; color: var(--primary); border: 1px solid #eee; }
-.btn-danger { background: var(--danger); color: white; }
+.btn-danger { background: #ef4444; color: white; }
 .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
-.btn-outline:hover { background: var(--primary); color: white; }
 
-/* ============================================== */
-/* --- ESTILOS ESPECÍFICOS DE LA PÁGINA PRINCIPAL (index.html) --- */
-/* ============================================== */
+/* --- NAVBAR (GENERAL) --- */
+.navbar { background: var(--white); box-shadow: var(--shadow); position: sticky; top: 0; z-index: 1000; padding: 15px 0; }
+.nav-logo { display: flex; align-items: center; gap: 12px; font-size: 1.4rem; font-weight: 800; color: var(--primary); line-height: 1; text-decoration: none; }
+.nav-logo img { height: 40px; display: block; } /* Tamaño estándar */
+.nav-links { display: flex; gap: 15px; }
 
-/* --- Navbar de la Portada --- */
-.navbar {
-    background: var(--white); box-shadow: var(--shadow-sm);
-    position: sticky; top: 0; z-index: 1000; padding: 15px 0;
-}
-.nav-container {
-    display: flex; justify-content: space-between; align-items: center;
-}
-.navbar .nav-logo { /* Usa el mismo nav-logo que el dashboard para consistencia */
-    display: flex; align-items: center; gap: 12px;
-    font-size: 1.4rem; font-weight: 800; color: var(--primary);
-    line-height: 1;
-}
-.navbar .nav-logo img { height: 40px; display: block; } /* Logo más grande en la barra */
-.nav-links {
-    display: flex; gap: 15px; /* Espacio entre los botones */
-}
-
-/* --- Hero Section (Portada principal) --- */
-.hero {
-    background: linear-gradient(rgba(0, 40, 85, 0.85), rgba(0, 40, 85, 0.7)), url('images/fiis-portada.jpg');
-    background-size: cover; background-position: center; background-attachment: fixed;
-    min-height: 80vh; /* Ajustado a min-height para flexibilidad */
-    display: flex; align-items: center; color: white;
-    padding: 60px 0; /* Padding para que el contenido no pegue a los bordes */
-}
-.hero-content { /* Contenedor del texto del hero */
-    max-width: 800px;
-    margin: 0 auto;
-    text-align: center;
-}
-.hero h1 { font-size: 3.5rem; font-weight: 800; margin-bottom: 1.5rem; color: white; }
-.hero p { font-size: 1.25rem; margin-bottom: 2rem; opacity: 0.9; color: white; }
-.section-subtitle { /* Para "Nuestra Misión" */
-    display: block; font-size: 1.1rem; color: var(--primary); font-weight: 600; margin-bottom: 10px;
-}
-
-/* --- Sección de Servicios --- */
-.service-card {
-    background: white; padding: 40px; border-radius: 15px;
-    box-shadow: var(--shadow-sm); text-align: center;
-    transition: 0.3s ease; border-top: 5px solid transparent;
-}
-.service-card:hover { transform: translateY(-10px); border-top-color: var(--primary); box-shadow: var(--shadow); }
-.icon-box { font-size: 2.5rem; color: var(--primary); margin-bottom: 20px; }
-
-/* --- Sección con Imagen Lateral --- */
-.section-image-left, .section-image-right {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
-}
-.section-image-left img, .section-image-right img {
-    width: 100%; border-radius: 20px; box-shadow: var(--shadow);
-}
-@media (max-width: 768px) {
-    .section-image-left, .section-image-right { grid-template-columns: 1fr; }
-    .section-image-right img { order: -1; } /* Imagen primero en móvil si está a la derecha */
-}
-
-/* --- CTA (Call to Action - Edificio) --- */
-.cta-box {
-    background: var(--primary); border-radius: 20px; overflow: hidden;
-    display: flex; box-shadow: var(--shadow); margin-top: 4rem;
-}
-.cta-content { padding: 60px; flex: 1; color: white; }
-.cta-image {
-    flex: 1; background: url('images/edificio.jpg') center/cover;
-    min-height: 300px; /* Asegura que la imagen sea visible */
-}
-@media (max-width: 768px) {
-    .cta-box { flex-direction: column; }
-    .cta-image { min-height: 200px; }
-    .cta-content { padding: 40px; }
-}
-
-/* --- Footer de la Portada --- */
-.footer {
-    background: #1a1a1a; color: #e5e5e5; padding: 60px 0 20px;
-    border-top: 5px solid var(--accent); margin-top: 4rem;
-}
-.footer-grid {
-    display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 3rem; margin-bottom: 40px;
-}
-.footer h4 { font-size: 1.2rem; margin-bottom: 1.5rem; color: var(--secondary); }
-.footer-links li { margin-bottom: 10px; }
-.footer-links a { color: #a3a3a3; font-size: 0.95rem; }
-.footer-links a:hover { color: white; text-decoration: underline; }
-.footer-bottom {
-    border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;
-    text-align: center; color: #718096; font-size: 0.85rem;
-}
-.footer .nav-logo img { filter: brightness(0) invert(1); } /* Logo blanco en footer oscuro */
-
-
-/* ============================================== */
-/* --- ESTILOS ESPECÍFICOS DE LOGIN / REGISTRO (NO TOCAR SI YA ESTÁ BIEN) --- */
-/* ============================================== */
-
-.auth-wrapper {
-    min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem;
-    background: linear-gradient(rgba(0, 40, 85, 0.85), rgba(0, 40, 85, 0.9)), url('images/fiis-portada.jpg');
-    background-size: cover; background-position: center;
-}
-.auth-card {
-    width: 100%; max-width: 400px; background: white; padding: 2.5rem; border-radius: 1rem;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-}
-.auth-brand { /* Logo y texto combinado para login/registro */
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    margin-bottom: 1.5rem; text-decoration: none;
-}
-.auth-brand img { height: 35px; width: auto; } /* Tamaño del logo en login/registro */
+/* --- LOGIN/REGISTRO --- */
+.auth-wrapper { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; background: linear-gradient(rgba(0, 40, 85, 0.85), rgba(0, 40, 85, 0.9)), url('images/fiis-portada.jpg') center/cover; }
+.auth-card { width: 100%; max-width: 400px; background: white; padding: 2.5rem; border-radius: 1rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); }
+.auth-brand { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 1.5rem; text-decoration: none; }
+.auth-brand img { height: 35px; width: auto; }
 .auth-brand span { font-size: 1.4rem; font-weight: 800; color: var(--primary); line-height: 1; }
-.form-label { display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--gray); font-size: 0.9rem; }
-.form-input { width: 100%; padding: 0.8rem; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; }
-.form-input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px rgba(0,90,156,0.1); }
-.google-btn {
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    background: white; border: 1px solid #ddd; color: var(--gray);
-    padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer;
-    width: 100%; margin-bottom: 1rem; transition: 0.2s ease;
-}
-.google-btn:hover { background: #f9fafb; border-color: #ccc; }
+.form-input { width: 100%; padding: 0.8rem; border: 1px solid #ccc; border-radius: 6px; }
+.google-btn { display: flex; align-items: center; justify-content: center; gap: 10px; background: white; border: 1px solid #ddd; color: var(--gray); padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; width: 100%; margin-bottom: 1rem; transition: 0.2s; }
 .google-btn img { width: 20px; height: 20px; }
-.checkbox-group { max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 6px; }
 
-/* ============================================== */
-/* --- ESTILOS ESPECÍFICOS DEL DASHBOARD DEL ESTUDIANTE (NO TOCAR SI YA ESTÁ BIEN) --- */
-/* ============================================== */
+/* --- DASHBOARD HEADER (CORRECCIÓN DE LOGO) --- */
+.app-header { background: white; padding: 0.8rem 0; border-bottom: 1px solid #eee; margin-bottom: 2rem; }
+.app-header .nav-logo { font-size: 1.2rem; gap: 10px; }
+/* ¡ESTA REGLA EVITA QUE EL LOGO SE HAGA GIGANTE EN EL DASHBOARD! */
+.app-header .nav-logo img { height: 35px; width: auto; } 
 
-/* Header del Dashboard */
-.uni-header {
-    background: var(--white); padding: 0.8rem 0;
-    box-shadow: var(--shadow-sm); /* Sombra ligera */
-    margin-bottom: 2rem; /* Espacio debajo del header */
-}
-.uni-header .container {
-    display: flex; justify-content: space-between; align-items: center;
-}
-.uni-user-menu {
-    display: flex; align-items: center; gap: 15px;
-}
-.uni-avatar {
-    width: 40px; height: 40px; background: #e2e8f0;
-    border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    color: var(--gray); font-size: 1.2rem;
-}
+.app-header .nav-link { display: flex; align-items: center; gap: 0.5rem; color: var(--gray); font-weight: 600; }
+.app-header .user-info { font-weight: 500; color: var(--gray); }
+.app-header .user-info strong { color: var(--dark); }
 
-/* Grid de Tarjetas de Herramientas (Dashboard) */
-.tools-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* 300px mínimo */
-    gap: 2rem;
-    margin-bottom: 3rem;
-}
-.tool-card {
-    background: var(--white); border: 1px solid #e5e7eb; border-radius: 8px;
-    overflow: hidden; transition: transform 0.2s ease, box-shadow 0.2s ease;
-    display: flex; flex-direction: column; /* Para que el botón vaya al final */
-}
-.tool-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
-
-/* Encabezados de Tarjetas de Herramientas */
-.card-header-bg {
-    height: 100px; background-size: cover; background-position: center;
-    position: relative;
-}
-/* Colores/Gradientes para cada herramienta (dashboard) */
-.bg-riesgo { background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%); } /* Rojo */
-.bg-tutor { background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%); } /* Naranja */
-.bg-biblio { background: linear-gradient(135deg, #10b981 0%, #047857 100%); } /* Verde */
-.bg-ia { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); } /* Azul claro */
-
-.card-tag { /* Etiqueta en la esquina de la tarjeta */
-    position: absolute; top: 10px; left: 10px;
-    background: rgba(0,0,0,0.5); color: white;
-    padding: 2px 8px; border-radius: 12px;
-    font-size: 0.7rem; font-weight: 600;
-}
-.card-body { padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column; }
-.card-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem; }
-.card-desc { font-size: 0.9rem; color: var(--gray); margin-bottom: 1.5rem; flex-grow: 1; }
-
-/* Pie de página IA (Dashboard) */
-.ai-footer-banner {
-    background: linear-gradient(to right, var(--primary), var(--primary-dark));
-    color: white; padding: 2rem; border-radius: 1rem;
-    display: flex; align-items: center; justify-content: space-between;
-    box-shadow: var(--shadow); /* Sombra para que destaque */
-}
-@media (max-width: 768px) {
-    .ai-footer-banner { flex-direction: column; text-align: center; gap: 1rem; }
-}
-
-/* Badges para estado de riesgo (Dashboard) */
-.risk-badge { padding: 4px 10px; border-radius: 15px; font-weight: 700; font-size: 0.8rem; display: inline-block; }
+/* --- ESTILOS INTERNOS (No tocar) --- */
+.hero h1 { font-size: 3.5rem; font-weight: 800; margin-bottom: 1.5rem; color: white; } /* Estilo para texto hero index restaurado */
+.section-title { font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem; font-weight: 800; }
+.check-list li { margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+.check-list i { color: var(--secondary); }
+.service-card { background: white; padding: 40px; border-radius: 15px; box-shadow: var(--shadow); text-align: center; transition: 0.3s; border-top: 5px solid transparent; }
+.service-card:hover { transform: translateY(-10px); border-top-color: var(--primary); }
+.icon-box { font-size: 2.5rem; color: var(--primary); margin-bottom: 20px; }
+.checkbox-group { max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; }
+#campo-especialidad { display: none; }
+.welcome-banner { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 2rem; border-radius: 1rem; margin-bottom: 2rem; }
+.welcome-banner h2 { color: white; }
+.dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; }
+.card { background: white; padding: 2rem; border-radius: 1rem; box-shadow: var(--shadow); margin-bottom: 1.5rem; }
+.card-blue { border-left: 5px solid var(--primary); background: #f0f9ff; }
+.card-orange { border-left: 5px solid #f59e0b; background: #fffbeb; }
+.card-red { border-left: 5px solid #ef4444; background: #fef2f2; }
+.risk-badge { padding: 5px 12px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; }
 .bg-Pendiente { background: #e5e7eb; color: #374151; }
 .bg-Bajo { background: #d1fae5; color: #065f46; }
 .bg-Medio { background: #fef3c7; color: #92400e; }
 .bg-Alto { background: #fee2e2; color: #991b1b; }
 .bg-Crítico { background: #7f1d1d; color: #fecaca; }
-
-/* Otros estilos para módulos internos (chat, tutoria, etc.) */
-.tutor-card, .file-list-item, .solicitud-card {
-    background: white; border-radius: 1rem; box-shadow: var(--shadow-sm);
-    margin-bottom: 1.5rem; padding: 1.5rem;
-    display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee;
-}
-.tutor-avatar {
-    font-size: 2rem; color: var(--primary); background: #e0f2fe;
-    width: 60px; height: 60px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center; margin-right: 1rem;
-}
-.chat-container {
-    max-width: 800px; margin: 2rem auto; background: white; border-radius: 1.5rem;
-    box-shadow: var(--shadow); overflow: hidden; height: 70vh; display: flex; flex-direction: column;
-}
-.chat-header {
-    padding: 1.5rem; border-bottom: 1px solid #eee; display: flex; align-items: center;
-    gap: 1rem; background: #fafafa;
-}
+.notification-badge { background: var(--danger); color: white; font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
+.tutor-card, .file-list-item, .solicitud-card { background: white; border-radius: 1rem; box-shadow: var(--shadow); margin-bottom: 1.5rem; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; }
+.tutor-avatar { font-size: 2rem; color: var(--primary); background: #e0f2fe; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1rem; }
+.file-info .curso { font-size: 0.8rem; font-weight: 600; color: var(--primary); background: #e0f2fe; padding: 2px 10px; border-radius: 10px; }
+.chat-container { max-width: 800px; margin: 2rem auto; background: white; border-radius: 1.5rem; box-shadow: var(--shadow); overflow: hidden; height: 70vh; display: flex; flex-direction: column; }
+.chat-header { padding: 1.5rem; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 1rem; background: #fafafa; }
 .chat-messages { flex: 1; padding: 1.5rem; overflow-y: auto; background: #fff; }
 .message { display: flex; margin-bottom: 1rem; }
 .message.user { justify-content: flex-end; }
-.message-bubble {
-    padding: 10px 15px; border-radius: 15px; max-width: 70%; line-height: 1.5;
-}
+.message-bubble { padding: 10px 15px; border-radius: 15px; max-width: 70%; line-height: 1.5; }
 .message.user .message-bubble { background: var(--primary); color: white; border-bottom-right-radius: 2px; }
 .message.assistant .message-bubble { background: #f3f4f6; color: var(--dark); border-bottom-left-radius: 2px; }
 .chat-input { padding: 1.5rem; border-top: 1px solid #eee; background: #fafafa; }
 .chat-input form { display: flex; gap: 10px; }
-.modal-backdrop {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5); z-index: 2000; display: none; align-items: center; justify-content: center;
-}
-.modal-content {
-    background: white; padding: 2rem; border-radius: 1.5rem; width: 90%; max-width: 500px; box-shadow: var(--shadow);
-}
+.modal-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: none; align-items: center; justify-content: center; }
+.modal-content { background: white; padding: 2rem; border-radius: 1.5rem; width: 90%; max-width: 500px; box-shadow: var(--shadow); }
+.modal-header { display: flex; justify-content: space-between; margin-bottom: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 1rem; }
+.modal-body label { display: block; padding: 10px; border: 1px solid #eee; margin-bottom: 5px; border-radius: 5px; cursor: pointer; }
+.modal-body label:hover { background: #f9fafb; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+.footer { background: #1a1a1a; color: #e5e5e5; padding: 60px 0 0; border-top: 5px solid var(--accent); margin-top: 4rem; }
+.footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 3rem; margin-bottom: 40px; }
+.footer h4 { font-size: 1.2rem; margin-bottom: 1.5rem; color: var(--secondary); }
+.footer-links li { margin-bottom: 10px; }
+.footer-links a { color: #a3a3a3; font-size: 0.95rem; }
+.footer-links a:hover { color: white; }
+.footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; text-align: center; color: #718096; }
