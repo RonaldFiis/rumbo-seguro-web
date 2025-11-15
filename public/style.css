@@ -1,11 +1,11 @@
-/* --- public/style.css (VERSIÓN MAESTRA FINAL - PORTADA + APP) --- */
+/* --- public/style.css (VERSIÓN FINAL CON FOTO NUEVA) --- */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-    --primary: #005A9C;       /* Azul UNI */
+    --primary: #005A9C;
     --primary-dark: #003d6b;
-    --secondary: #4CAF50;     /* Verde Éxito */
-    --accent: #8a1c27;        /* Rojo Guinda Institucional */
+    --secondary: #4CAF50;
+    --accent: #8a1c27;
     --danger: #ef4444;
     --dark: #111827;
     --gray: #4b5563;
@@ -59,7 +59,9 @@ ul { list-style: none; }
 .hero p { font-size: 1.25rem; margin-bottom: 2rem; opacity: 0.9; color: white; }
 
 .about-container {
-    background-image: url('images/estudiantes.png');
+    /* ¡AQUÍ ESTÁ EL CAMBIO PARA TU NUEVA FOTO! */
+    background-image: url('images/nosotros-uni-fiis.png');
+    
     background-size: cover; background-position: center;
     border-radius: 20px; box-shadow: var(--shadow); position: relative; overflow: hidden; min-height: 400px;
 }
@@ -122,7 +124,7 @@ ul { list-style: none; }
 .bg-Crítico { background: #7f1d1d; color: #fecaca; }
 .notification-badge { background: var(--danger); color: white; font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
 
-/* --- ESTILOS PARA LISTAS Y TARJETAS INTERNAS (Lo que faltaba) --- */
+/* --- ESTILOS PARA LISTAS Y TARJETAS INTERNAS --- */
 .tutor-card, .file-list-item, .solicitud-card {
     background: white; border-radius: 1rem; box-shadow: var(--shadow-sm);
     margin-bottom: 1.5rem; padding: 1.5rem; display: flex; align-items: center;
