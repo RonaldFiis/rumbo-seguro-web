@@ -3,51 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión - Rumbo Seguro</title>
+    <title>Acceder - Rumbo Seguro</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="auth-wrapper">
 
     <div class="auth-card">
-        <div class="text-center" style="margin-bottom: 2rem;">
-            <a href="index.html" class="nav-logo" style="justify-content: center; margin-bottom: 1.5rem; text-decoration: none;">
-                <img src="images/logo.svg" alt="Rumbo Seguro Logo" style="height: 60px;">
-                <span style="font-size: 1.8rem;">RUMBO SEGURO</span>
-            </a>
-            <h2 style="color: var(--dark); font-weight: 700; margin-bottom: 0.5rem;">¡Hola de nuevo! 👋</h2>
-            <p style="color: var(--gray);">Ingresa a tu panel personal</p>
+        
+        <div class="text-center">
+            <img src="images/logo.svg" alt="Logo" class="login-logo">
         </div>
 
-        <div id="msg-error" style="display: none; background: #ffebee; color: #c62828; padding: 12px; border-radius: 0.5rem; margin-bottom: 1.5rem; text-align: center; font-size: 0.9rem; border: 1px solid #ef9a9a;"></div>
+        <div id="msg-error" style="display: none; background: #ffebee; color: #c62828; padding: 10px; border-radius: 4px; margin-bottom: 15px; text-align: center; font-size: 0.9rem; border: 1px solid #ef9a9a;"></div>
 
         <form id="login-form">
-            <div style="margin-bottom: 1.2rem;">
-                <label for="email" class="form-label">Correo Institucional</label>
-                <div style="position: relative;">
-                    <i class="fas fa-envelope" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--gray);"></i>
-                    <input type="email" id="email" class="form-input" style="padding-left: 40px;" required placeholder="usuario@uni.edu.pe">
-                </div>
+            <div style="margin-bottom: 1rem;">
+                <input type="email" id="email" class="form-input" required placeholder="Nombre de usuario o correo electrónico">
+            </div>
+            <div style="margin-bottom: 1.5rem;">
+                <input type="password" id="password" class="form-input" required placeholder="Contraseña">
             </div>
             
-            <div style="margin-bottom: 2rem;">
-                <label for="password" class="form-label">Contraseña</label>
-                <div style="position: relative;">
-                    <i class="fas fa-lock" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--gray);"></i>
-                    <input type="password" id="password" class="form-input" style="padding-left: 40px;" required placeholder="••••••••">
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 12px;">
-                Ingresar a mi Panel <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 1.1rem; margin-bottom: 1.5rem;">
+                Acceder
             </button>
         </form>
 
-        <p class="text-center" style="margin-top: 2rem; color: var(--gray); font-size: 0.95rem;">
-            ¿Aún no tienes cuenta? <a href="registro.html" style="color: var(--primary); font-weight: 700; text-decoration: none;">Regístrate gratis</a>
-        </p>
+        <div class="text-center" style="margin-bottom: 2rem;">
+            <a href="#" class="forgot-link" onclick="alert('Contacta a soporte para recuperar tu clave.')">¿Olvidó su contraseña?</a>
+            <br>
+            <span style="color: var(--gray); font-size: 0.9rem;">¿No tiene cuenta? </span>
+            <a href="registro.html" style="color: var(--primary); font-weight: 600; text-decoration: none;">Crear nueva cuenta</a>
+        </div>
+
+        <div style="display: flex; align-items: center; margin-bottom: 1.5rem;">
+            <div style="flex: 1; height: 1px; background: #eee;"></div>
+            <span style="padding: 0 10px; color: var(--gray); font-size: 0.9rem;">Ingresar con</span>
+            <div style="flex: 1; height: 1px; background: #eee;"></div>
+        </div>
+
+        <button class="google-btn" onclick="loginGoogle()">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="G" style="width: 20px;">
+            Google
+        </button>
+
+        <div class="text-center" style="margin-top: 2rem;">
+            <button class="cookies-btn" onclick="alert('Cookies activas.')">
+                <i class="fas fa-question-circle"></i> Aviso de Cookies
+            </button>
+        </div>
+
     </div>
 
     <script src="script.js"></script>
+    <script>
+        function loginGoogle() {
+            alert('⚠️ MODO PROTOTIPO:\n\nSimulación de autenticación con Google Workspace (UNI).');
+        }
+    </script>
 </body>
 </html>
