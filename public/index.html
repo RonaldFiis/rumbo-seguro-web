@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rumbo Seguro - Tu éxito académico en la FIIS UNI</title>
+    <title>Rumbo Seguro - FIIS UNI</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
     <nav class="navbar">
-        <div class="container nav-container">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
             <a href="#" class="nav-logo">
-                <img src="images/logo.svg" alt="Logo Rumbo Seguro">
+                <img src="images/logo.svg" alt="Logo">
                 <span>RUMBO SEGURO</span>
             </a>
-            <div class="nav-links">
-                <a href="login.html" class="btn btn-secondary">Iniciar Sesión</a>
-                <a href="registro.html" class="btn btn-primary">Comenzar Ahora</a>
+            <div style="display: flex; gap: 15px;">
+                <a href="login.html" class="btn btn-secondary">Intranet</a>
+                <a href="registro.html" class="btn btn-primary">Registrarse</a>
             </div>
         </div>
     </nav>
@@ -25,36 +25,32 @@
     <header class="hero">
         <div class="container">
             <div class="hero-content">
-                <span style="background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; margin-bottom: 20px; display: inline-block;">Innovación FIIS UNI</span>
-                <h1>Tu compañero integral para el éxito académico en la FIIS</h1>
-                <p>No estás solo en este camino. Recibe tutorías personalizadas, apoyo emocional y asistencia inteligente 24/7 para alcanzar tus metas.</p>
-                <div style="display: flex; gap: 15px;">
-                    <a href="registro.html" class="btn btn-primary"><i class="fas fa-user-plus"></i> Crear cuenta estudiante</a>
-                    <a href="#nosotros" class="btn btn-secondary"><i class="fas fa-info-circle"></i> Ver cómo funciona</a>
-                </div>
+                <span style="background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; margin-bottom: 20px; display: inline-block;">Facultad de Ingeniería Industrial y de Sistemas</span>
+                <h1>Sistema de Apoyo Académico Integral</h1>
+                <p>Una plataforma oficial para fortalecer el rendimiento académico y el bienestar de la comunidad estudiantil de la FIIS.</p>
+                <a href="registro.html" class="btn btn-primary">Ingresar a la Plataforma</a>
             </div>
         </div>
     </header>
 
-    <section id="nosotros" class="section-padding">
+    <section class="section-padding">
         <div class="container">
             <div class="grid-2">
-                <div>
-                    <img src="images/estudiantes.jpg" alt="Estudiantes FIIS" class="about-img" onerror="this.src='https://via.placeholder.com/800x400?text=Imagen+de+Estudiantes'">
+                <div class="about-container">
+                    <div class="about-overlay"></div>
                 </div>
+                
                 <div>
-                    <span class="section-subtitle">Nuestra Misión</span>
+                    <span class="section-subtitle">Nuestro Propósito</span>
                     <h2 class="section-title">¿Por qué Rumbo Seguro?</h2>
-                    <p style="margin-bottom: 20px; color: var(--gray); font-size: 1.1rem;">
-                        La Facultad de Ingeniería Industrial y de Sistemas enfrenta desafíos académicos únicos. "Rumbo Seguro" nace como una respuesta sistémica para reducir la deserción y potenciar el talento de cada alumno.
+                    <p style="margin-bottom: 20px; color: var(--gray);">
+                        La FIIS enfrenta desafíos únicos. Este proyecto nace como respuesta sistémica para brindar acompañamiento real y efectivo a cada estudiante.
                     </p>
-                    <ul style="margin-bottom: 30px;">
-                        <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color: var(--secondary);"></i> Detección temprana de riesgos académicos.</li>
-                        <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color: var(--secondary);"></i> Conexión con tutores especializados.</li>
-                        <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color: var(--secondary);"></i> Apoyo psicológico y emocional.</li>
-                        <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color: var(--secondary);"></i> Biblioteca de recursos académica.</li>
+                    <ul class="check-list">
+                        <li><i class="fas fa-check-circle"></i> Detección temprana de riesgo académico.</li>
+                        <li><i class="fas fa-check-circle"></i> Tutorías con alumnos de ciclos superiores.</li>
+                        <li><i class="fas fa-check-circle"></i> Biblioteca digital colaborativa.</li>
                     </ul>
-                    <a href="registro.html" class="btn btn-primary"><i class="fas fa-graduation-cap"></i> Únete como Alumno</a>
                 </div>
             </div>
         </div>
@@ -64,16 +60,16 @@
         <div class="container">
             <div class="grid-3 text-center">
                 <div class="stat-item">
-                    <h3>+50</h3>
-                    <p>Tutores Voluntarios</p>
+                    <h3>Activos</h3>
+                    <p>Tutores y Docentes</p>
                 </div>
                 <div class="stat-item">
                     <h3>24/7</h3>
-                    <p>Asistencia con IA</p>
+                    <p>Soporte con IA</p>
                 </div>
                 <div class="stat-item">
-                    <h3>100%</h3>
-                    <p>Compromiso FIIS</p>
+                    <h3>FIIS</h3>
+                    <p>Proyecto Institucional</p>
                 </div>
             </div>
         </div>
@@ -82,26 +78,24 @@
     <section class="section-padding" style="background-color: #f8f9fa;">
         <div class="container">
             <div class="text-center" style="max-width: 700px; margin: 0 auto 60px;">
-                <span class="section-subtitle">Nuestras Herramientas</span>
-                <h2 class="section-title">Tres pilares para tu éxito</h2>
-                <p style="color: var(--gray);">Una metodología validada que combina tecnología y factor humano para acompañarte en cada paso de tu carrera.</p>
+                <h2 class="section-title">Herramientas para el Estudiante</h2>
+                <p style="color: var(--gray);">Un ecosistema digital diseñado para tu éxito.</p>
             </div>
-
             <div class="grid-3">
                 <div class="service-card">
                     <div class="icon-box"><i class="fas fa-brain"></i></div>
-                    <h3>Detección Temprana</h3>
-                    <p style="color: var(--gray);">Nuestro algoritmo inteligente identifica tus necesidades antes de que se conviertan en problemas.</p>
+                    <h3>Diagnóstico</h3>
+                    <p style="font-size: 0.9rem; color: var(--gray);">Evalúa tu situación académica con indicadores precisos.</p>
                 </div>
                 <div class="service-card">
-                    <div class="icon-box"><i class="fas fa-chalkboard-teacher"></i></div>
-                    <h3>Tutoría Especializada</h3>
-                    <p style="color: var(--gray);">Conecta con compañeros de ciclos superiores que ya superaron los retos que tú enfrentas ahora.</p>
+                    <div class="icon-box"><i class="fas fa-users"></i></div>
+                    <h3>Tutorías</h3>
+                    <p style="font-size: 0.9rem; color: var(--gray);">Agenda sesiones con compañeros que dominan los cursos.</p>
                 </div>
                 <div class="service-card">
-                    <div class="icon-box"><i class="fas fa-heartbeat"></i></div>
-                    <h3>Soporte Emocional</h3>
-                    <p style="color: var(--gray);">Un espacio seguro con profesionales listos para escucharte y darte herramientas de manejo de estrés.</p>
+                    <div class="icon-box"><i class="fas fa-robot"></i></div>
+                    <h3>Asistente IA</h3>
+                    <p style="font-size: 0.9rem; color: var(--gray);">Resuelve dudas administrativas y académicas al instante.</p>
                 </div>
             </div>
         </div>
@@ -109,6 +103,56 @@
 
     <section class="section-padding">
         <div class="container">
-            <div style="background: var(--primary); border-radius: 30px; overflow: hidden; display: flex; box-shadow: var(--shadow-lg);">
-                <div style="padding: 60px; flex: 1; color: white; display: flex; flex-direction: column; justify-content: center;">
-                    <h2 style="font-size: 2.5rem; margin-bottom: 20px; color: white
+            <div class="cta-box">
+                <div class="cta-content">
+                    <h2 style="font-size: 2rem; margin-bottom: 20px;">Únete a la comunidad</h2>
+                    <p style="margin-bottom: 30px; opacity: 0.9;">Forma parte del cambio y mejora tu rendimiento académico.</p>
+                    <a href="registro.html" class="btn btn-secondary" style="border: none;">Crear Cuenta</a>
+                </div>
+                <div class="cta-image"></div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; color: white; font-weight: 800; font-size: 1.2rem;">
+                        <img src="images/logo.svg" alt="Logo" style="height: 40px; filter: brightness(0) invert(1);">
+                        RUMBO SEGURO
+                    </div>
+                    <div class="footer-info">
+                        <p>Facultad de Ingeniería Industrial y de Sistemas</p>
+                        <p>Universidad Nacional de Ingeniería</p>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="footer-title">Contacto</h4>
+                    <div class="footer-info">
+                        <p><i class="fas fa-map-marker-alt"></i> Av. Túpac Amaru 210, Rímac</p>
+                        <p><i class="fas fa-phone"></i> (01) 481-1070</p>
+                        <p><i class="fas fa-envelope"></i> rumboseguro@uni.edu.pe</p>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="footer-title">Enlaces de Interés</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.fiis.uni.edu.pe/">Web FIIS</a></li>
+                        <li><a href="https://www.uni.edu.pe/">Web UNI</a></li>
+                        <li><a href="#">ORCE</a></li>
+                        <li><a href="#">Aula Virtual</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Rumbo Seguro - FIIS UNI. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
