@@ -2,170 +2,171 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard - Rumbo Seguro</title>
+    <title>Panel del Estudiante - Rumbo Seguro</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-    <header class="app-header">
-        <div class="container header-content">
-            <a href="index.html" class="nav-logo">
-                <img src="images/logo.svg" alt="Logo">
-                <span>RUMBO SEGURO</span>
-            </a>
+    <header class="uni-header">
+        <div class="container">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <a href="index.html" class="nav-logo">
+                    <img src="images/logo.svg" alt="Logo">
+                </a>
+                <span style="font-size: 1.2rem; font-weight: 700; color: var(--dark);">RUMBO SEGURO</span>
+            </div>
 
-            <div class="header-actions">
-                <button class="icon-btn" title="Notificaciones">
-                    <i class="far fa-bell"></i>
-                    <span class="badge-count">61</span> </button>
-                <button class="icon-btn" title="Mensajes">
-                    <i class="far fa-comment-alt"></i>
-                </button>
+            <div class="uni-user-menu">
+                <div style="position: relative; cursor: pointer;">
+                    <i class="far fa-bell" style="font-size: 1.2rem; color: var(--gray);"></i>
+                    <span style="position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px;">2</span>
+                </div>
                 
-                <div class="user-menu-trigger" onclick="toggleMenu()">
-                    <div class="user-avatar-small">
+                <div style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <div class="text-right" style="text-align: right;">
+                        <div style="font-weight: 600; font-size: 0.9rem;" id="nombre-usuario">Cargando...</div>
+                        <div style="font-size: 0.8rem; color: var(--gray);">Estudiante</div>
+                    </div>
+                    <div class="uni-avatar">
                         <i class="fas fa-user"></i>
                     </div>
-                    <i class="fas fa-chevron-down user-arrow"></i>
+                    <i class="fas fa-chevron-down" style="font-size: 0.8rem; color: var(--gray);"></i>
                 </div>
+                
+                <button id="btn-logout" style="background: none; border: none; color: var(--danger); cursor: pointer; font-size: 1.2rem;" title="Cerrar Sesión">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
             </div>
         </div>
     </header>
 
-    <div class="container dashboard-layout">
-        
-        <aside class="sidebar-menu">
-            <a href="#" class="menu-item active"><i class="fas fa-tachometer-alt"></i> Página Principal</a>
-            <a href="#" class="menu-item"><i class="fas fa-user"></i> Área Personal</a>
-            <a href="biblioteca.html" class="menu-item"><i class="fas fa-book"></i> Biblioteca de Recursos</a>
-            <a href="#" class="menu-item"><i class="fas fa-calendar-alt"></i> Calendario</a>
-            <a href="asistente.html" class="menu-item" style="color: var(--accent);"><i class="fas fa-robot"></i> Asistente IA</a>
-            <hr style="border: 0; border-top: 1px solid #eee; margin: 10px 0;">
-            <a href="#" id="btn-logout-sidebar" class="menu-item"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
-        </aside>
+    <main class="container" id="panel-contenido">
+        <div style="margin-bottom: 2rem;">
+            <h1 style="font-size: 2rem;">¡Hola, <span id="nombre-saludo">Estudiante</span>!</h1>
+            <p style="color: var(--gray);">Bienvenido a tu panel de Rumbo Seguro. Aquí tienes tus herramientas de apoyo.</p>
+        </div>
 
-        <main id="panel-contenido">
-            <div class="text-center" style="padding: 50px; color: var(--gray);">
-                <i class="fas fa-spinner fa-spin fa-3x"></i>
-                <p>Cargando tus cursos...</p>
+        <div class="tools-grid">
+            
+            <div class="tool-card">
+                <div class="card-header-bg bg-riesgo">
+                    <span class="card-tag">Diagnóstico</span>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title">Mi Estado Académico</h3>
+                    <div id="estado-riesgo-container">
+                        <p style="font-size: 0.9rem; color: var(--gray);">Cargando estado...</p>
+                    </div>
+                    <div style="margin-top: auto; padding-top: 1rem;">
+                        <a href="evaluacion.html" class="btn btn-secondary" style="width: 100%; font-size: 0.9rem;">
+                            <i class="fas fa-clipboard-check"></i> Realizar Test IMRA
+                        </a>
+                    </div>
+                </div>
             </div>
-        </main>
 
-    </div>
+            <div class="tool-card">
+                <div class="card-header-bg bg-tutor">
+                    <span class="card-tag">Acompañamiento</span>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title">Solicitar Tutoría</h3>
+                    <p class="card-desc">Conecta con compañeros de ciclos superiores para reforzar tus cursos.</p>
+                    <div style="margin-top: auto;">
+                        <a href="tutorias.html" class="btn btn-secondary" style="width: 100%; font-size: 0.9rem;">
+                            <i class="fas fa-chalkboard-teacher"></i> Ver Tutores
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tool-card">
+                <div class="card-header-bg bg-biblio">
+                    <span class="card-tag">Recursos</span>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title">Biblioteca Digital</h3>
+                    <p class="card-desc">Accede a exámenes pasados, prácticas y solucionarios compartidos.</p>
+                    <div style="margin-top: auto;">
+                        <a href="biblioteca.html" class="btn btn-secondary" style="width: 100%; font-size: 0.9rem;">
+                            <i class="fas fa-book"></i> Ir a Biblioteca
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="ai-footer-banner">
+            <div style="flex: 1;">
+                <h3 style="margin: 0 0 5px 0; font-size: 1.5rem;">¿Tienes dudas académicas?</h3>
+                <p style="margin: 0; opacity: 0.9;">Nuestro asistente virtual está disponible 24/7 para ayudarte.</p>
+            </div>
+            <div>
+                <a href="asistente.html" class="btn" style="background: white; color: var(--primary); font-weight: 700; padding: 12px 30px;">
+                    <i class="fas fa-robot"></i> Preguntar a la IA
+                </a>
+            </div>
+        </div>
+
+        <div style="height: 50px;"></div> </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const usuario = JSON.parse(localStorage.getItem('usuario'));
             if (!usuario) return window.location.href = 'login.html';
 
-            // Configurar botón de cerrar sesión
-            document.getElementById('btn-logout-sidebar').addEventListener('click', () => {
+            const primerNombre = usuario.nombres.split(' ')[0];
+            document.getElementById('nombre-usuario').textContent = usuario.nombres;
+            document.getElementById('nombre-saludo').textContent = primerNombre;
+
+            document.getElementById('btn-logout').addEventListener('click', () => {
                 localStorage.removeItem('usuario');
                 window.location.href = 'index.html';
             });
 
-            const panel = document.getElementById('panel-contenido');
-
+            // Lógica específica para estudiante (Cargar Riesgo)
             if (usuario.rol === 'estudiante') {
-                renderEstudiante(panel, usuario);
-            } else if (usuario.rol === 'tutor') {
-                renderTutor(panel, usuario);
+                cargarEstadoRiesgo(usuario.id);
+            } else {
+                // Si es tutor/psicólogo, podrías redirigir o mostrar otro panel
+                // Por ahora, dejamos que vean este diseño limpio
             }
-            // ... otros roles ...
         });
 
-        function toggleMenu() {
-            alert("Aquí se desplegaría el menú de Perfil, Calificaciones, etc.");
-        }
-
-        async function renderEstudiante(panel, usuario) {
-            // Obtenemos el riesgo real
-            let nivelRiesgo = 'Pendiente';
+        async function cargarEstadoRiesgo(userId) {
+            const container = document.getElementById('estado-riesgo-container');
             try {
-                const res = await fetch(`/api/riesgo/${usuario.id}`);
+                const res = await fetch(`/api/riesgo/${userId}`);
                 if (res.ok) {
                     const r = await res.json();
-                    nivelRiesgo = r.nivel; // Bajo, Medio, Alto, Crítico
+                    const colorMap = {
+                        'Bajo': 'bg-Bajo', 'Medio': 'bg-Medio', 
+                        'Alto': 'bg-Alto', 'Crítico': 'bg-Crítico'
+                    };
+                    container.innerHTML = `
+                        <div style="margin-bottom: 10px;">
+                            <span class="risk-badge ${colorMap[r.nivel]}">${r.nivel.toUpperCase()}</span>
+                        </div>
+                        <p style="font-size: 0.85rem; color: var(--gray);">
+                            Última evaluación: ${new Date(r.fecha_evaluacion).toLocaleDateString()}
+                        </p>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div style="margin-bottom: 10px;">
+                            <span class="risk-badge bg-Pendiente">PENDIENTE</span>
+                        </div>
+                        <p style="font-size: 0.85rem; color: var(--gray);">
+                            Aún no has realizado tu evaluación inicial.
+                        </p>
+                    `;
                 }
-            } catch(e) {}
-
-            // SIMULACIÓN DE CURSOS PARA EL PROTOTIPO
-            // (Esto hace que se vea lleno como en la foto)
-            const cursosSimulados = [
-                { nombre: "BMA03V Álgebra Lineal", profe: "ALEJANDRO HUAMAN", riesgo: "Alto", color: "#ef4444" },
-                { nombre: "BMA02U Cálculo Integral", profe: "CARLOS ARÁMBULO", riesgo: "Medio", color: "#f59e0b" },
-                { nombre: "BEF01X Ética y Filosofía", profe: "ELOY AYALA", riesgo: "Bajo", color: "#10b981" },
-                { nombre: "BFI01V Física I", profe: "WALTER ESTRADA", riesgo: "Pendiente", color: "#6b7280" }
-            ];
-
-            let cursosHTML = '';
-            cursosSimulados.forEach(curso => {
-                cursosHTML += `
-                <div class="course-card">
-                    <div class="course-header">
-                        <span style="background: rgba(0,0,0,0.6); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem;">FIIS - 2025-I</span>
-                    </div>
-                    <div class="course-body">
-                        <span class="course-tag">Obligatorio</span>
-                        <a href="#" class="course-title">${curso.nombre}</a>
-                        
-                        <div style="margin-top: 10px; font-size: 0.85rem; color: ${curso.color}; font-weight: 600;">
-                            <span class="risk-dot" style="background: ${curso.color};"></span>
-                            Riesgo: ${curso.riesgo}
-                        </div>
-
-                        <div class="course-teacher">
-                            <div class="teacher-avatar"><i class="fas fa-user"></i></div>
-                            <span class="teacher-name">${curso.profe}</span>
-                        </div>
-                        
-                        <div style="margin-top: 15px; display: flex; gap: 5px;">
-                            <button onclick="alert('Buscando tutores para ${curso.nombre}...')" class="btn-outline" style="padding: 5px 10px; font-size: 0.8rem; width: 100%;">
-                                <i class="fas fa-chalkboard-teacher"></i> Tutoría
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                `;
-            });
-
-            panel.innerHTML = `
-                <div class="welcome-section">
-                    <h1>¡Hola, ${usuario.nombres.split(' ')[0]}!</h1>
-                    <p style="color: var(--gray);">Bienvenido a tu panel de Rumbo Seguro. Aquí tienes el estado de tus cursos.</p>
-                </div>
-                
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                    <h2 style="font-size: 1.5rem; margin: 0;">Mis cursos</h2>
-                    
-                    <a href="evaluacion.html" class="btn btn-primary" style="font-size: 0.9rem;">
-                        <i class="fas fa-clipboard-check"></i> Actualizar mi Diagnóstico
-                    </a>
-                </div>
-
-                <div class="courses-grid">
-                    ${cursosHTML}
-                </div>
-                
-                <div style="background: linear-gradient(to right, #005A9C, #42a5f5); color: white; padding: 2rem; border-radius: 1rem; display: flex; align-items: center; justify-content: space-between; margin-bottom: 3rem;">
-                    <div>
-                        <h3 style="margin: 0 0 10px 0;">¿Tienes dudas académicas?</h3>
-                        <p style="margin: 0; opacity: 0.9;">Nuestro asistente virtual está disponible 24/7 para ayudarte.</p>
-                    </div>
-                    <a href="asistente.html" class="btn" style="background: white; color: var(--primary);">
-                        <i class="fas fa-robot"></i> Preguntar a la IA
-                    </a>
-                </div>
-            `;
-        }
-
-        async function renderTutor(panel, usuario) {
-            // ... (Puedes dejar la función renderTutor anterior aquí, 
-            // o simplemente copiar el HTML del estudiante si solo vas a mostrar la vista de estudiante en el video) ...
-             panel.innerHTML = `<div class="welcome-section"><h1>Panel de Tutor</h1><p>Vista simplificada para el prototipo.</p></div>`;
+            } catch (e) {
+                container.innerHTML = '<p style="font-size: 0.8rem; color: red;">Error al cargar estado.</p>';
+            }
         }
     </script>
-
 </body>
 </html>
