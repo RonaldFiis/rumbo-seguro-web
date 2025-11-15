@@ -11,15 +11,20 @@
 
     <div class="auth-card">
         
-        <div class="text-center">
-            <img src="images/logo.svg" alt="Logo" class="login-logo">
+        <a href="index.html" class="auth-brand">
+            <img src="images/logo.svg" alt="Logo">
+            <span>RUMBO SEGURO</span>
+        </a>
+        
+        <div class="text-center" style="margin-bottom: 1.5rem;">
+            <p style="color: var(--gray);">Ingresa tus credenciales</p>
         </div>
 
         <div id="msg-error" style="display: none; background: #ffebee; color: #c62828; padding: 10px; border-radius: 4px; margin-bottom: 15px; text-align: center; font-size: 0.9rem; border: 1px solid #ef9a9a;"></div>
 
         <form id="login-form">
             <div style="margin-bottom: 1rem;">
-                <input type="email" id="email" class="form-input" required placeholder="Nombre de usuario o correo electrónico">
+                <input type="email" id="email" class="form-input" required placeholder="Correo institucional">
             </div>
             <div style="margin-bottom: 1.5rem;">
                 <input type="password" id="password" class="form-input" required placeholder="Contraseña">
@@ -34,7 +39,7 @@
             <a href="#" class="forgot-link" onclick="alert('Contacta a soporte para recuperar tu clave.')">¿Olvidó su contraseña?</a>
             <br>
             <span style="color: var(--gray); font-size: 0.9rem;">¿No tiene cuenta? </span>
-            <a href="registro.html" style="color: var(--primary); font-weight: 600; text-decoration: none;">Crear nueva cuenta</a>
+            <a href="registro.html" style="color: var(--primary); font-weight: 600; text-decoration: none;">Registrarse</a>
         </div>
 
         <div style="display: flex; align-items: center; margin-bottom: 1.5rem;">
@@ -58,3 +63,4 @@
     </script>
 </body>
 </html>
+
