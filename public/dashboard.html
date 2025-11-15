@@ -2,183 +2,170 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Panel - Rumbo Seguro</title>
+    <title>Dashboard - Rumbo Seguro</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { background-color: var(--light); }
-        .app-header {
-            background: var(--white); padding: 1rem 0; border-bottom: 2px solid #eee; margin-bottom: 2rem;
-        }
-        .app-header .container { display: flex; justify-content: space-between; align-items: center; }
-        .app-header .nav-logo { font-size: 1.2rem; gap: 10px; }
-        .app-header .nav-logo img { height: 40px; }
-        .app-header .user-controls { display: flex; align-items: center; gap: 1rem; }
-        .app-header .nav-link { font-weight: 600; color: var(--gray); display: flex; align-items: center; gap: 0.5rem; }
-        .app-header .nav-link:hover { color: var(--primary); }
-        .app-header .user-info { font-weight: 500; color: var(--gray); }
-        .app-header .user-info strong { color: var(--dark); }
-        .notification-badge {
-            background: var(--danger); color: white; font-size: 0.8rem;
-            padding: 2px 8px; border-radius: 1rem; margin-left: 8px;
-        }
-        .welcome-banner {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: var(--white); padding: 2.5rem; border-radius: 1.5rem;
-            margin-bottom: 2rem; box-shadow: var(--shadow-lg);
-        }
-        .welcome-banner h2 { color: var(--white); font-size: 2rem; }
-        .welcome-banner p { color: rgba(255,255,255,0.8); }
-        .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; }
-        @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
-    </style>
 </head>
 <body>
+
     <header class="app-header">
-        <div class="container">
+        <div class="container header-content">
             <a href="index.html" class="nav-logo">
-                <img src="images/logo.svg" alt="Rumbo Seguro Logo">
+                <img src="images/logo.svg" alt="Logo">
                 <span>RUMBO SEGURO</span>
             </a>
-            <div class="user-controls">
-                <a href="biblioteca.html" class="nav-link">
-                    <i class="fas fa-book"></i> Biblioteca
-                </a>
-                <span class="user-info">Hola, <strong id="nombre-usuario">...</strong></span>
-                <button id="btn-logout" class="btn btn-danger" style="padding: 0.5rem 1rem;">
-                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+
+            <div class="header-actions">
+                <button class="icon-btn" title="Notificaciones">
+                    <i class="far fa-bell"></i>
+                    <span class="badge-count">61</span> </button>
+                <button class="icon-btn" title="Mensajes">
+                    <i class="far fa-comment-alt"></i>
                 </button>
+                
+                <div class="user-menu-trigger" onclick="toggleMenu()">
+                    <div class="user-avatar-small">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <i class="fas fa-chevron-down user-arrow"></i>
+                </div>
             </div>
         </div>
     </header>
 
-    <main class="container" id="panel-contenido">
-        <div class="text-center" style="padding: 50px; color: var(--gray);">
-            <i class="fas fa-spinner fa-spin fa-3x"></i>
-        </div>
-    </main>
+    <div class="container dashboard-layout">
+        
+        <aside class="sidebar-menu">
+            <a href="#" class="menu-item active"><i class="fas fa-tachometer-alt"></i> Página Principal</a>
+            <a href="#" class="menu-item"><i class="fas fa-user"></i> Área Personal</a>
+            <a href="biblioteca.html" class="menu-item"><i class="fas fa-book"></i> Biblioteca de Recursos</a>
+            <a href="#" class="menu-item"><i class="fas fa-calendar-alt"></i> Calendario</a>
+            <a href="asistente.html" class="menu-item" style="color: var(--accent);"><i class="fas fa-robot"></i> Asistente IA</a>
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 10px 0;">
+            <a href="#" id="btn-logout-sidebar" class="menu-item"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+        </aside>
+
+        <main id="panel-contenido">
+            <div class="text-center" style="padding: 50px; color: var(--gray);">
+                <i class="fas fa-spinner fa-spin fa-3x"></i>
+                <p>Cargando tus cursos...</p>
+            </div>
+        </main>
+
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const usuario = JSON.parse(localStorage.getItem('usuario'));
             if (!usuario) return window.location.href = 'login.html';
 
-            document.getElementById('nombre-usuario').textContent = usuario.nombres.split(' ')[0];
-            const panel = document.getElementById('panel-contenido');
-
-            document.getElementById('btn-logout').addEventListener('click', () => {
+            // Configurar botón de cerrar sesión
+            document.getElementById('btn-logout-sidebar').addEventListener('click', () => {
                 localStorage.removeItem('usuario');
                 window.location.href = 'index.html';
             });
+
+            const panel = document.getElementById('panel-contenido');
 
             if (usuario.rol === 'estudiante') {
                 renderEstudiante(panel, usuario);
             } else if (usuario.rol === 'tutor') {
                 renderTutor(panel, usuario);
-            } else if (usuario.rol === 'psicologo') {
-                renderPsicologo(panel);
             }
+            // ... otros roles ...
         });
 
+        function toggleMenu() {
+            alert("Aquí se desplegaría el menú de Perfil, Calificaciones, etc.");
+        }
+
         async function renderEstudiante(panel, usuario) {
-            let riesgoHTML = '<span class="risk-badge bg-Pendiente">Pendiente</span>';
-            let msgRiesgo = 'No has realizado tu evaluación inicial.';
-            let colorClase = 'card-blue';
+            // Obtenemos el riesgo real
+            let nivelRiesgo = 'Pendiente';
             try {
                 const res = await fetch(`/api/riesgo/${usuario.id}`);
                 if (res.ok) {
                     const r = await res.json();
-                    riesgoHTML = `<span class="risk-badge bg-${r.nivel}">${r.nivel.toUpperCase()}</span>`;
-                    msgRiesgo = `Evaluado el: ${new Date(r.fecha_evaluacion).toLocaleDateString()}`;
-                    if (r.nivel === 'Crítico') colorClase = 'card-red';
-                    else if (r.nivel === 'Alto' || r.nivel === 'Medio') colorClase = 'card-orange';
-                    else if (r.nivel === 'Bajo') colorClase = 'card-green';
+                    nivelRiesgo = r.nivel; // Bajo, Medio, Alto, Crítico
                 }
-            } catch (e) {}
-            panel.innerHTML = `
-                <div class="welcome-banner">
-                    <h2>👋 ¡Hola de nuevo, ${usuario.nombres.split(' ')[0]}!</h2>
-                    <p>Revisa tu estado y accede a tus herramientas de apoyo.</p>
-                </div>
-                <div class="dashboard-grid">
-                    <div class="main-content">
-                        <div class="card ${colorClase}">
-                            <h3 style="margin-bottom: 1rem;"><i class="fas fa-chart-line"></i> Tu Estado Actual</h3>
-                            <p style="font-size: 1.5rem; font-weight: 600;">Nivel de Riesgo: ${riesgoHTML}</p>
-                            <p style="color: var(--gray); font-size: 1rem; margin: 0.5rem 0 1.5rem;">${msgRiesgo}</p>
-                            <a href="evaluacion.html" class="btn btn-success" style="font-size: 1rem;">
-                                <i class="fas fa-clipboard-list"></i> ${riesgoHTML.includes('Pendiente') ? 'Realizar Evaluación' : 'Volver a Evaluar'}
-                            </a>
+            } catch(e) {}
+
+            // SIMULACIÓN DE CURSOS PARA EL PROTOTIPO
+            // (Esto hace que se vea lleno como en la foto)
+            const cursosSimulados = [
+                { nombre: "BMA03V Álgebra Lineal", profe: "ALEJANDRO HUAMAN", riesgo: "Alto", color: "#ef4444" },
+                { nombre: "BMA02U Cálculo Integral", profe: "CARLOS ARÁMBULO", riesgo: "Medio", color: "#f59e0b" },
+                { nombre: "BEF01X Ética y Filosofía", profe: "ELOY AYALA", riesgo: "Bajo", color: "#10b981" },
+                { nombre: "BFI01V Física I", profe: "WALTER ESTRADA", riesgo: "Pendiente", color: "#6b7280" }
+            ];
+
+            let cursosHTML = '';
+            cursosSimulados.forEach(curso => {
+                cursosHTML += `
+                <div class="course-card">
+                    <div class="course-header">
+                        <span style="background: rgba(0,0,0,0.6); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem;">FIIS - 2025-I</span>
+                    </div>
+                    <div class="course-body">
+                        <span class="course-tag">Obligatorio</span>
+                        <a href="#" class="course-title">${curso.nombre}</a>
+                        
+                        <div style="margin-top: 10px; font-size: 0.85rem; color: ${curso.color}; font-weight: 600;">
+                            <span class="risk-dot" style="background: ${curso.color};"></span>
+                            Riesgo: ${curso.riesgo}
+                        </div>
+
+                        <div class="course-teacher">
+                            <div class="teacher-avatar"><i class="fas fa-user"></i></div>
+                            <span class="teacher-name">${curso.profe}</span>
+                        </div>
+                        
+                        <div style="margin-top: 15px; display: flex; gap: 5px;">
+                            <button onclick="alert('Buscando tutores para ${curso.nombre}...')" class="btn-outline" style="padding: 5px 10px; font-size: 0.8rem; width: 100%;">
+                                <i class="fas fa-chalkboard-teacher"></i> Tutoría
+                            </button>
                         </div>
                     </div>
-                    <aside class="sidebar" style="display: flex; flex-direction: column; gap: 1.5rem;">
-                        <div class="card">
-                            <h3><i class="fas fa-robot" style="color: var(--primary);"></i> Asistente Virtual</h3>
-                            <a href="asistente.html" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Hablar con IA</a>
-                        </div>
-                        <div class="card">
-                            <h3><i class="fas fa-user-friends" style="color: var(--accent);"></i> Tutorías</h3>
-                            <a href="tutorias.html" class="btn btn-outline" style="width: 100%; margin-top: 1rem;">Ver Tutores</a>
-                        </div>
-                    </aside>
+                </div>
+                `;
+            });
+
+            panel.innerHTML = `
+                <div class="welcome-section">
+                    <h1>¡Hola, ${usuario.nombres.split(' ')[0]}!</h1>
+                    <p style="color: var(--gray);">Bienvenido a tu panel de Rumbo Seguro. Aquí tienes el estado de tus cursos.</p>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2 style="font-size: 1.5rem; margin: 0;">Mis cursos</h2>
+                    
+                    <a href="evaluacion.html" class="btn btn-primary" style="font-size: 0.9rem;">
+                        <i class="fas fa-clipboard-check"></i> Actualizar mi Diagnóstico
+                    </a>
+                </div>
+
+                <div class="courses-grid">
+                    ${cursosHTML}
+                </div>
+                
+                <div style="background: linear-gradient(to right, #005A9C, #42a5f5); color: white; padding: 2rem; border-radius: 1rem; display: flex; align-items: center; justify-content: space-between; margin-bottom: 3rem;">
+                    <div>
+                        <h3 style="margin: 0 0 10px 0;">¿Tienes dudas académicas?</h3>
+                        <p style="margin: 0; opacity: 0.9;">Nuestro asistente virtual está disponible 24/7 para ayudarte.</p>
+                    </div>
+                    <a href="asistente.html" class="btn" style="background: white; color: var(--primary);">
+                        <i class="fas fa-robot"></i> Preguntar a la IA
+                    </a>
                 </div>
             `;
         }
 
         async function renderTutor(panel, usuario) {
-            let especialidad = 'No definida';
-            let conteoSolicitudes = 0;
-            let badgeHTML = '';
-            try {
-                const userRes = await fetch(`/api/usuario/${usuario.id}`);
-                const userData = await userRes.json();
-                if (userData && userData.especialidad) {
-                    especialidad = userData.especialidad;
-                }
-                
-                const countRes = await fetch(`/api/solicitudes-tutor/${usuario.id}`);
-                const data = await countRes.json();
-                if (!countRes.ok) throw new Error(data.error || 'Error al contar');
-                
-                conteoSolicitudes = data.count;
-                if (conteoSolicitudes > 0) {
-                    badgeHTML = `<span class="notification-badge">${conteoSolicitudes}</span>`;
-                }
-            } catch(e) { console.error("Error al cargar datos del tutor:", e.message); }
-
-            panel.innerHTML = `
-                <div class="welcome-banner"><h2>👨‍🏫 Panel de Docente Tutor</h2></div>
-                <div class="dashboard-grid">
-                    <div>
-                        <div class="card card-blue">
-                            <h3><i class="fas fa-chalkboard-teacher"></i> Mis Especialidades</h3>
-                            <p style="color: var(--gray); margin: 0.5rem 0 1rem;">Cursos: <strong>${especialidad || 'Aún no has definido tus cursos.'}</strong></p>
-                            <a href="perfil.html" class="btn btn-outline">
-                                <i class="fas fa-edit"></i> Editar Perfil
-                            </a>
-                        </div>
-                    </div>
-                    <aside>
-                        <div class="card card-orange">
-                            <h3><i class="fas fa-users"></i> Solicitudes ${badgeHTML}</h3>
-                            <p style="color: var(--gray); margin: 0.5rem 0 1rem;">Tienes <strong>${conteoSolicitudes}</strong> solicitudes pendientes.</p>
-                            <a href="solicitudes.html" class="btn btn-primary">
-                                <i class="fas fa-eye"></i> Ver Solicitudes
-                            </a>
-                        </div>
-                    </aside>
-                </div>`;
-        }
-
-        function renderPsicologo(panel) {
-            panel.innerHTML = `
-                <div class="welcome-banner"><h2>🧠 Panel de Psicología</h2></div>
-                <div class="card card-red">
-                    <h3><i class="fas fa-exclamation-triangle"></i> Alertas Críticas</h3>
-                    <p style="color: var(--gray); margin: 0.5rem 0 1rem;"><strong>0</strong> casos requieren atención inmediata.</p>
-                    <button class="btn btn-danger" onclick="alert('Próximamente')">Revisar Casos</button>
-                </div>`;
+            // ... (Puedes dejar la función renderTutor anterior aquí, 
+            // o simplemente copiar el HTML del estudiante si solo vas a mostrar la vista de estudiante en el video) ...
+             panel.innerHTML = `<div class="welcome-section"><h1>Panel de Tutor</h1><p>Vista simplificada para el prototipo.</p></div>`;
         }
     </script>
+
 </body>
 </html>
