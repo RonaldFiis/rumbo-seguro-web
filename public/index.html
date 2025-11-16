@@ -11,13 +11,13 @@
 <body>
 
     <nav class="navbar">
-        <div class="container nav-container">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
             <a href="#" class="nav-logo">
                 <img src="images/logo.svg" alt="Logo">
                 <span>RUMBO SEGURO</span>
             </a>
-            <div class="nav-links">
-                <a href="login.html" class="btn btn-secondary" style="box-shadow: none; border: 1px solid #eee;">Intranet</a>
+            <div style="display: flex; gap: 15px;">
+                <a href="login.html" class="btn btn-secondary">Intranet</a>
                 <a href="registro.html" class="btn btn-primary">Registrarse</a>
             </div>
         </div>
@@ -26,7 +26,7 @@
     <header class="hero">
         <div class="container text-center">
             <div class="hero-content" style="margin: 0 auto;">
-                <span style="background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; margin-bottom: 20px; display: inline-block;">Proyecto de Innovación FIIS</span>
+                <span style="background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; margin-bottom: 20px; display: inline-block; color: white;">Proyecto de Innovación FIIS</span>
                 <h1>Tu compañero integral para el éxito académico</h1>
                 <p>Recibe tutorías personalizadas, orientación psicológica y asistencia con IA para superar cualquier desafío en la FIIS.</p>
                 <div style="display: flex; gap: 15px; justify-content: center;">
@@ -43,22 +43,21 @@
                 <h2 class="section-title">¿Cómo te ayudamos?</h2>
                 <p style="color: var(--gray); max-width: 600px; margin: 0 auto;">Tres pilares fundamentales diseñados para acompañarte en cada paso de tu carrera.</p>
             </div>
-            
             <div class="grid-3">
                 <div class="service-card">
                     <div class="icon-box"><i class="fas fa-robot"></i></div>
                     <h3>Asistente Virtual IA</h3>
-                    <p style="font-size: 0.95rem; color: var(--gray);">Resuelve dudas académicas al instante, 24/7.</p>
+                    <p style="color: var(--gray); font-size: 0.95rem;">Acceso 24/7 a un asistente inteligente que resuelve tus dudas académicas y administrativas al instante.</p>
                 </div>
                 <div class="service-card">
                     <div class="icon-box"><i class="fas fa-chalkboard-teacher"></i></div>
                     <h3>Tutorías Personalizadas</h3>
-                    <p style="font-size: 0.95rem; color: var(--gray);">Refuerza tus conocimientos con alumnos de ciclos superiores.</p>
+                    <p style="color: var(--gray); font-size: 0.95rem;">Conecta con tutores de ciclos superiores especializados en las materias que necesitas reforzar.</p>
                 </div>
                 <div class="service-card">
                     <div class="icon-box"><i class="fas fa-heartbeat"></i></div>
                     <h3>Apoyo Emocional</h3>
-                    <p style="font-size: 0.95rem; color: var(--gray);">Herramientas para el manejo del estrés y la ansiedad.</p>
+                    <p style="color: var(--gray); font-size: 0.95rem;">Orientación psicológica y herramientas para el manejo del estrés y la ansiedad académica.</p>
                 </div>
             </div>
         </div>
@@ -69,7 +68,7 @@
             <div class="grid-2">
                 <div>
                     <span class="section-subtitle">Nuestra Misión</span>
-                    <h2 class="section-title">Innovación Sistémica</h2>
+                    <h2 class="section-title" style="margin-bottom: 20px;">Innovación Sistémica</h2>
                     <p style="margin-bottom: 20px; color: var(--gray);">
                         "Rumbo Seguro" nace como una respuesta basada en la Metodología de Sistemas Blandos (MSB) para reducir la deserción estudiantil.
                     </p>
@@ -91,35 +90,32 @@
         <div class="container">
             <div class="footer-grid">
                 <div>
-                    <div class="nav-logo" style="color: white; margin-bottom: 20px;">
-                        <img src="images/logo.svg" alt="Logo" style="filter: brightness(0) invert(1);"> 
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; color: white; font-weight: 800; font-size: 1.2rem;">
+                        <img src="images/logo.svg" alt="Logo" style="height: 40px; filter: brightness(0) invert(1);"> 
                         RUMBO SEGURO
                     </div>
                     <p style="color: #a0aec0; font-size: 0.9rem;">Facultad de Ingeniería Industrial y de Sistemas<br>Universidad Nacional de Ingeniería</p>
                 </div>
                 
                 <div>
-                    <h4 style="color: white; font-size: 1rem; margin-bottom: 15px; font-weight: 700;">Contacto</h4>
-                    <div style="color: #a0aec0; font-size: 0.9rem;">
-                        <p style="margin-bottom: 10px;"><i class="fas fa-map-marker-alt" style="margin-right: 8px;"></i> Av. Túpac Amaru 210, Rímac</p>
-                        <p style="margin-bottom: 10px;"><i class="fas fa-phone" style="margin-right: 8px;"></i> (01) 481-1070</p>
-                        <p style="margin-bottom: 10px;"><i class="fas fa-envelope" style="margin-right: 8px;"></i> rumboseguro@uni.edu.pe</p>
-                    </div>
+                    <h4>Contacto</h4>
+                    <p style="color: #a0aec0; margin-bottom: 10px;"><i class="fas fa-map-marker-alt" style="margin-right: 8px;"></i> Av. Túpac Amaru 210, Rímac</p>
+                    <p style="color: #a0aec0; margin-bottom: 10px;"><i class="fas fa-phone" style="margin-right: 8px;"></i> (01) 481-1070</p>
+                    <p style="color: #a0aec0;"><i class="fas fa-envelope" style="margin-right: 8px;"></i> rumboseguro@uni.edu.pe</p>
                 </div>
 
                 <div>
-                    <h4 style="color: white; font-size: 1rem; margin-bottom: 15px; font-weight: 700;">Enlaces de Interés</h4>
+                    <h4>Enlaces de Interés</h4>
                     <ul class="footer-links">
-                        <li style="margin-bottom: 8px;"><a href="https://acreditacion.uni.edu.pe/es/cise/" target="_blank" style="color: #a0aec0;">Web FIIS <i class="fas fa-external-link-alt" style="font-size: 0.7rem; margin-left: 5px;"></i></a></li>
-                        <li style="margin-bottom: 8px;"><a href="https://www.uni.edu.pe/" target="_blank" style="color: #a0aec0;">Web UNI <i class="fas fa-external-link-alt" style="font-size: 0.7rem; margin-left: 5px;"></i></a></li>
-                        <li style="margin-bottom: 8px;"><a href="https://orce.uni.edu.pe/" target="_blank" style="color: #a0aec0;">ORCE <i class="fas fa-external-link-alt" style="font-size: 0.7rem; margin-left: 5px;"></i></a></li>
-                        <li style="margin-bottom: 8px;"><a href="https://univirtual.uni.edu.pe/" target="_blank" style="color: #a0aec0;">Aula Virtual <i class="fas fa-external-link-alt" style="font-size: 0.7rem; margin-left: 5px;"></i></a></li>
+                        <li><a href="https://acreditacion.uni.edu.pe/es/cise/" target="_blank">Web FIIS <i class="fas fa-external-link-alt" style="font-size: 0.7rem;"></i></a></li>
+                        <li><a href="https://www.uni.edu.pe/" target="_blank">Web UNI <i class="fas fa-external-link-alt" style="font-size: 0.7rem;"></i></a></li>
+                        <li><a href="https://orce.uni.edu.pe/" target="_blank">ORCE <i class="fas fa-external-link-alt" style="font-size: 0.7rem;"></i></a></li>
+                        <li><a href="https://univirtual.uni.edu.pe/" target="_blank">Aula Virtual <i class="fas fa-external-link-alt" style="font-size: 0.7rem;"></i></a></li>
                     </ul>
                 </div>
             </div>
-            
-            <div class="footer-bottom" style="margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; color: #718096; font-size: 0.85rem;">
-                <p>&copy; 2025 Rumbo Seguro - FIIS UNI. Todos los derechos reservados.</p>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Rumbo Seguro. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>
