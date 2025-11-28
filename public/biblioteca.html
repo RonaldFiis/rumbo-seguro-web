@@ -6,20 +6,6 @@
     <link rel="icon" href="images/logo.svg" type="image/svg+xml">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { background-color: var(--light); }
-        /* Estilos locales para pestañas y video */
-        .tabs { display: flex; gap: 10px; margin-bottom: 1rem; }
-        .tab-btn {
-            flex: 1; padding: 10px; border: 1px solid #ddd; background: #f9fafb;
-            cursor: pointer; border-radius: 6px; text-align: center; font-weight: 600; color: var(--gray);
-        }
-        .tab-btn.active {
-            background: var(--primary); color: white; border-color: var(--primary);
-        }
-        .main-container { display: grid; grid-template-columns: 1fr; gap: 2rem; margin-top: 2rem; }
-        .main-container.tutor-view { grid-template-columns: 2fr 1fr; }
-    </style>
 </head>
 <body>
     <header class="app-header">
@@ -94,10 +80,9 @@
 
     <script>
         const usuario = JSON.parse(localStorage.getItem('usuario'));
-
+        
         document.addEventListener('DOMContentLoaded', () => {
             if (!usuario) { window.location.href = 'login.html'; return; }
-            
             if (usuario.rol !== 'estudiante') {
                 document.getElementById('upload-aside').style.display = 'block';
                 document.getElementById('main-container').classList.add('tutor-view');
@@ -110,7 +95,6 @@
             document.getElementById('upload-type').value = type;
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             event.target.classList.add('active');
-            
             if (type === 'file') {
                 document.getElementById('input-file-group').style.display = 'block';
                 document.getElementById('input-youtube-group').style.display = 'none';
@@ -124,8 +108,9 @@
             }
         }
 
+        // Función mejorada para detectar cualquier tipo de link de YouTube
         function getYoutubeId(url) {
-            // Regex más potente para detectar IDs de YouTube
+            if (!url) return null;
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
             const match = url.match(regExp);
             return (match && match[2].length === 11) ? match[2] : null;
@@ -145,24 +130,24 @@
                     const item = document.createElement('div');
                     item.className = 'file-list-item';
                     
-                    // Detección de YouTube mejorada
+                    // Detectar YouTube
                     const videoId = getYoutubeId(recurso.url_descarga);
                     let mediaHtml = '';
 
                     if (videoId) {
-                        // SI ES VIDEO: Muestra el reproductor
                         mediaHtml = `
-                            <div class="video-container">
-                                <iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>
+                            <div class="video-wrapper">
+                                <div class="video-container">
+                                    <iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>
+                                </div>
                             </div>
                             <div style="margin-top:10px;">
                                 <a href="${recurso.url_descarga}" target="_blank" class="btn btn-outline" style="padding: 5px 15px; font-size: 0.8rem;">
-                                    <i class="fab fa-youtube"></i> Abrir en YouTube
+                                    <i class="fab fa-youtube"></i> Ver en YouTube
                                 </a>
                             </div>
                         `;
                     } else {
-                        // SI ES ARCHIVO: Botón de descarga
                         mediaHtml = `
                             <div style="margin-top:15px;">
                                 <a href="${recurso.url_descarga}" target="_blank" class="btn btn-success">
@@ -175,13 +160,13 @@
                     item.innerHTML = `
                         <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                             <div>
-                                <span style="font-size:0.7rem; font-weight:700; color:var(--primary); background:#e0f2fe; padding:2px 8px; border-radius:10px; text-transform:uppercase;">${recurso.curso}</span>
+                                <span class="file-tag">${recurso.curso}</span>
                                 <h3 style="margin: 5px 0; color: var(--dark);">${recurso.nombre_archivo}</h3>
                                 <span style="font-size:0.8rem; color:var(--gray); background:#f3f4f6; padding:2px 6px; border-radius:4px;">${recurso.tipo}</span>
                             </div>
                         </div>
                         ${mediaHtml}
-                        <div style="margin-top: 10px; font-size: 0.8rem; color: var(--gray); border-top: 1px solid #f3f4f6; padding-top: 8px;">
+                        <div class="file-meta">
                             Subido por: <strong>${recurso.usuarios ? recurso.usuarios.nombres : 'Anónimo'}</strong> • ${new Date(recurso.created_at).toLocaleDateString()}
                         </div>
                     `;
@@ -218,7 +203,7 @@
                         statusDiv.textContent = '¡Listo! ✅';
                         statusDiv.style.color = 'green';
                         document.getElementById('upload-form').reset();
-                        cargarRecursos(); // Recargar lista automáticamente
+                        cargarRecursos();
                     } else { throw new Error('Error al subir'); }
                 } catch (error) {
                     statusDiv.textContent = 'Error al publicar.';
