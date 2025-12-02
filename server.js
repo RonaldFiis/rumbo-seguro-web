@@ -61,10 +61,38 @@ app.post('/api/riesgo', async (req, res) => {
     } catch (error) { res.status(500).json({ error: 'Error al guardar' }); }
 });
 
-app.get('/api/riesgo/:id', async (req, res) => {
-    const { data } = await supabase.from('riesgo').select('*').eq('estudiante_id', req.params.id).single();
-    if (!data) return res.status(404).json({ mensaje: 'Sin evaluación' });
-    res.json(data);
+// --- RUTA 4: Guardar Evaluación (LÓGICA CIENTÍFICA) ---
+app.post('/api/riesgo', async (req, res) => {
+    const { estudiante_id, puntaje } = req.body; // Recibe puntaje 0-10
+    const p = parseFloat(puntaje);
+
+    // Clasificación basada en la distribución normal del estudio [cite: 140]
+    // Media aprox 3.5/10.
+    let nivel = 'Bajo';
+    if (p >= 7.0) nivel = 'Crítico';      // Riesgo de BIKA/TRIKA/Abandono
+    else if (p >= 5.0) nivel = 'Alto';    // Acumulación de desaprobaciones
+    else if (p >= 3.0) nivel = 'Medio';   // Bajo rendimiento
+    // Menor a 3.0 es Bajo (Actitud proactiva)
+
+    try {
+        const { data, error } = await supabase
+            .from('riesgo')
+            .upsert({ 
+                estudiante_id, 
+                nivel, 
+                puntaje: p, 
+                fecha_evaluacion: (new Date()).toISOString() 
+            }, { onConflict: 'estudiante_id' })
+            .select()
+            .single();
+
+        if (error) throw error;
+        
+        res.json({ mensaje: 'Guardado', nivel: data.nivel, puntaje: data.puntaje });
+    } catch (error) {
+        console.error('Error al guardar riesgo:', error.message);
+        res.status(500).json({ error: 'Error al guardar' });
+    }
 });
 
 app.get('/api/tutores', async (req, res) => {
@@ -158,3 +186,4 @@ app.post('/api/chat', async (req, res) => {
 
 app.get(/(.*)/, (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.listen(PORT, () => console.log(`🚀 Servidor listo en puerto ${PORT}`));
+
