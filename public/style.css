@@ -1,146 +1,172 @@
-/* --- public/style.css (VERSIÓN FINAL CORREGIDA - BOTONES Y VIDEO) --- */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+/* --- public/style.css (VERSIÓN DINÁMICA Y SEGURA) --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
 
 :root {
-    --primary: #005A9C;       /* Azul Institucional UNI */
+    --primary: #005A9C;       /* Azul Institucional */
     --primary-dark: #003d6b;
     --secondary: #4CAF50;     /* Verde */
     --accent: #8a1c27;        /* Rojo Guinda */
     --danger: #ef4444;
-    --dark: #111827;
+    --dark: #0f172a;          /* Negro más moderno */
     --gray: #4b5563;
-    --light: #f3f4f6;
+    --light: #f8fafc;
     --white: #ffffff;
     --shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
 }
 
-/* --- ESTILOS GLOBALES --- */
+/* --- 1. BASES (Tipografía más grande) --- */
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', sans-serif; color: var(--dark); line-height: 1.6; background-color: var(--light); }
+body { font-family: 'Inter', sans-serif; color: var(--dark); line-height: 1.6; background-color: var(--light); font-size: 16px; }
 a { text-decoration: none; color: inherit; transition: 0.3s; }
 ul { list-style: none; padding: 0; margin: 0; }
 
 .container { width: 90%; max-width: 1200px; margin: 0 auto; }
 .text-center { text-align: center; }
-.section-padding { padding: 80px 0; }
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
-.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+.section-padding { padding: 100px 0; } /* Más aire entre secciones */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2.5rem; }
 
 @media (max-width: 768px) {
     .grid-2, .grid-3, .dashboard-grid, .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
-    .hero h1 { font-size: 2.5rem; }
+    .hero h1 { font-size: 2.8rem !important; }
     .chat-container { height: 80vh; }
-    /* En móvil, ajustamos la navbar */
-    .nav-container { flex-direction: column; gap: 10px; }
+    .nav-links { display: none; } 
 }
 
-/* --- BOTONES --- */
+/* --- 2. BOTONES DINÁMICOS (¡NUEVO!) --- */
 .btn { 
     display: inline-flex; align-items: center; justify-content: center; 
-    padding: 10px 25px; border-radius: 50px; font-weight: 600; 
-    cursor: pointer; border: none; transition: 0.2s; gap: 8px; 
-    text-decoration: none; font-size: 0.95rem; height: 44px; /* Altura fija para alineación */
+    padding: 12px 30px; border-radius: 50px; 
+    font-weight: 700; font-size: 1rem; /* Letra más grande */
+    cursor: pointer; border: none; 
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Animación suave */
+    gap: 8px; text-decoration: none; 
 }
-.btn:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.btn:hover { 
+    transform: translateY(-4px) scale(1.02); /* Se eleva y crece */
+    box-shadow: 0 10px 20px rgba(0, 90, 156, 0.2); 
+}
+.btn:active { transform: translateY(-1px); }
+
 .btn-primary { background: var(--primary); color: white; }
-.btn-secondary { background: white; color: var(--primary); border: 1px solid #eee; }
+.btn-secondary { background: white; color: var(--primary); border: 2px solid transparent; } /* Borde más grueso */
 .btn-danger { background: var(--danger); color: white; }
 .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
 .btn-outline:hover { background: var(--primary); color: white; }
 .btn-success { background: var(--secondary); color: white; }
 
-/* --- NAVBAR (CORRECCIÓN DE ALINEACIÓN) --- */
-.navbar { 
-    background: var(--white); 
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
-    position: sticky; top: 0; z-index: 1000; 
-    padding: 15px 0; 
-}
-.nav-container { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; /* Esto centra verticalmente logo y botones */
-}
-.nav-logo { 
-    display: flex; align-items: center; gap: 12px; 
-    font-size: 1.4rem; font-weight: 800; color: var(--primary); line-height: 1; 
-}
-.nav-logo img { height: 40px; display: block; }
-.nav-links { 
-    display: flex; gap: 15px; align-items: center; /* Centrado estricto */
-}
+/* --- 3. NAVBAR --- */
+.navbar { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: 0 2px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; padding: 15px 0; }
+.nav-logo { display: flex; align-items: center; gap: 12px; font-size: 1.5rem; font-weight: 800; color: var(--primary); line-height: 1; text-transform: uppercase; letter-spacing: 0.5px; }
+.nav-logo img { height: 42px; display: block; }
+.nav-links { display: flex; gap: 15px; align-items: center; }
 
-/* --- ESTILOS DE VIDEO (BIBLIOTECA) --- */
-.video-wrapper {
-    margin-top: 15px;
-    width: 100%;
-    max-width: 100%;
-    border-radius: 10px;
-    overflow: hidden;
-    background: #000;
-    box-shadow: var(--shadow);
-}
-.video-container {
-    position: relative;
-    padding-bottom: 56.25%; /* Ratio 16:9 */
-    height: 0;
-    overflow: hidden;
-}
-.video-container iframe {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;
-}
-
-/* --- PORTADA --- */
+/* --- 4. PORTADA IMPACTANTE (INDEX) --- */
 .hero {
-    background: linear-gradient(rgba(0, 40, 85, 0.85), rgba(0, 40, 85, 0.7)), url('images/fiis-portada.jpg');
+    background: linear-gradient(rgba(0, 30, 70, 0.9), rgba(0, 30, 70, 0.8)), url('images/fiis-portada.jpg');
     background-size: cover; background-position: center; background-attachment: fixed;
-    height: 80vh; display: flex; align-items: center; color: white; text-align: center;
+    min-height: 85vh; display: flex; align-items: center; color: white; text-align: center;
 }
-.hero h1 { font-size: 3.5rem; font-weight: 800; margin-bottom: 1.5rem; color: white; }
-.hero p { font-size: 1.25rem; margin-bottom: 2rem; opacity: 0.9; color: white; }
+.hero h1 { 
+    font-size: 4rem; /* ¡GIGANTE! */
+    font-weight: 800; margin-bottom: 1.5rem; color: white; 
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    line-height: 1.1;
+}
+.hero p { 
+    font-size: 1.35rem; /* Más grande */
+    margin-bottom: 2.5rem; opacity: 0.95; color: white; font-weight: 300; 
+    max-width: 800px; margin-left: auto; margin-right: auto;
+}
 
-/* Secciones */
+.section-title { font-size: 3rem; color: var(--primary); margin-bottom: 1.5rem; font-weight: 800; letter-spacing: -1px; }
+.section-subtitle { 
+    display: block; font-weight: 700; color: var(--accent); margin-bottom: 15px; 
+    text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem;
+}
+
+/* Tarjetas que flotan */
+.service-card { 
+    background: white; padding: 3rem 2rem; border-radius: 20px; 
+    box-shadow: var(--shadow); text-align: center; 
+    transition: all 0.4s ease; border-bottom: 5px solid transparent; 
+}
+.service-card:hover { 
+    transform: translateY(-10px); /* Sube al pasar mouse */
+    border-bottom-color: var(--primary); 
+    box-shadow: 0 20px 30px rgba(0,0,0,0.1);
+}
+.icon-box { font-size: 3rem; color: var(--primary); margin-bottom: 25px; }
+.service-card h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; }
+
+/* Sección Nosotros */
 .about-container {
     background-image: url('images/nosotros-uni-fiis.png');
     background-size: cover; background-position: center;
-    border-radius: 20px; box-shadow: var(--shadow); min-height: 400px; position: relative; overflow: hidden;
+    border-radius: 25px; box-shadow: var(--shadow); min-height: 450px; position: relative; overflow: hidden;
+    transition: transform 0.5s ease;
 }
-.about-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); backdrop-filter: blur(2px); }
-.section-title { font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem; font-weight: 800; }
-.section-subtitle { display: block; font-weight: 700; color: var(--accent); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
-.stats-section { background: linear-gradient(135deg, #005A9C 0%, #003d6b 100%); color: white; padding: 60px 0; }
-.stat-item h3 { font-size: 3rem; font-weight: 800; margin: 0; color: white; }
-.stat-item p { font-size: 1rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; color: white; }
-.service-card { background: white; padding: 40px; border-radius: 15px; box-shadow: var(--shadow); text-align: center; transition: 0.3s; border-top: 5px solid transparent; }
-.service-card:hover { transform: translateY(-10px); border-top-color: var(--primary); }
-.icon-box { font-size: 2.5rem; color: var(--primary); margin-bottom: 20px; }
-.cta-box { background: var(--primary); border-radius: 20px; overflow: hidden; display: flex; box-shadow: var(--shadow); }
-.cta-content { padding: 60px; flex: 1; color: white; }
-.cta-image { flex: 1; background: url('images/edificio.jpg') center/cover; min-height: 300px; }
-.check-list li { margin-bottom: 10px; display: flex; align-items: center; gap: 10px; font-size: 1.1rem; color: var(--gray); }
-.check-list i { color: var(--secondary); }
+.about-container:hover { transform: scale(1.02); } /* Zoom suave en la foto */
+.about-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.2); }
 
-/* --- LOGIN/REGISTRO --- */
-.auth-wrapper { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; background: linear-gradient(rgba(0, 40, 85, 0.85), rgba(0, 40, 85, 0.9)), url('images/nosotros-uni-fiis.png') center/cover; }
-.auth-card { width: 100%; max-width: 400px; background: white; padding: 2.5rem; border-radius: 1rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); }
+.check-list li { margin-bottom: 15px; display: flex; align-items: center; gap: 15px; font-size: 1.1rem; color: var(--gray); font-weight: 500; }
+.check-list i { color: var(--secondary); font-size: 1.3rem; }
+
+/* Estadísticas */
+.stats-section { background: linear-gradient(135deg, #005A9C 0%, #002b4d 100%); color: white; padding: 80px 0; }
+.stat-item h3 { font-size: 3.5rem; font-weight: 800; margin: 0; color: white; }
+.stat-item p { font-size: 1.1rem; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; color: white; }
+
+/* CTA */
+.cta-box { background: var(--primary); border-radius: 25px; overflow: hidden; display: flex; box-shadow: var(--shadow); }
+.cta-content { padding: 80px; flex: 1; color: white; }
+.cta-image { flex: 1; background: url('images/edificio.jpg') center/cover; min-height: 350px; }
+
+/* Footer Negro (Estilo DIRCE) */
+.footer { background: #111; color: #e5e5e5; padding: 80px 0 0; border-top: 5px solid var(--accent); margin-top: 6rem; }
+.footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 4rem; margin-bottom: 50px; }
+.footer h4 { font-size: 1.2rem; margin-bottom: 1.5rem; color: white; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+.footer-info p { margin-bottom: 15px; font-size: 1rem; color: #a3a3a3; display: flex; gap: 12px; align-items: center; }
+.footer-info i { color: var(--primary); font-size: 1.1rem; }
+.footer-links li { margin-bottom: 12px; }
+.footer-links a { color: #a3a3a3; font-size: 1rem; transition: 0.2s; }
+.footer-links a:hover { color: white; padding-left: 5px; }
+.footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding: 25px 0; text-align: center; color: #718096; font-size: 0.9rem; padding-bottom: 30px; }
+
+
+/* =========================================
+   5. LOGIN Y REGISTRO (MANTENIDOS SEGUROS)
+   ========================================= */
+.auth-wrapper { 
+    min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem;
+    background: linear-gradient(rgba(0, 40, 85, 0.9), rgba(0, 40, 85, 0.95)), url('images/nosotros-uni-fiis.png') center/cover;
+}
+.auth-card { width: 100%; max-width: 420px; background: white; padding: 3rem; border-radius: 1.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
 .login-logo { height: 70px; margin: 0 auto 1.5rem; display: block; object-fit: contain; }
-.auth-brand { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 1.5rem; text-decoration: none; }
-.auth-brand img { height: 35px; width: auto; }
-.auth-brand span { font-size: 1.4rem; font-weight: 800; color: var(--primary); line-height: 1; }
-.form-input { width: 100%; padding: 0.8rem; border: 1px solid #ccc; border-radius: 6px; margin-bottom: 1rem; display: block; }
-.google-btn { display: flex; align-items: center; justify-content: center; gap: 10px; background: white; border: 1px solid #ddd; color: var(--gray); padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; width: 100%; margin-bottom: 1rem; transition: 0.2s; }
-.google-btn img { width: 20px; height: 20px; }
-.forgot-link { display: block; text-align: center; color: var(--primary); font-size: 0.9rem; margin-bottom: 0.5rem; }
+.auth-brand { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 2rem; text-decoration: none; }
+.auth-brand img { height: 40px; width: auto; }
+.auth-brand span { font-size: 1.6rem; font-weight: 800; color: var(--primary); line-height: 1; }
+.form-input { width: 100%; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 0.8rem; margin-bottom: 1rem; display: block; font-size: 1rem; transition: 0.3s; }
+.form-input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(0,90,156,0.15); }
+.google-btn { display: flex; align-items: center; justify-content: center; gap: 12px; background: white; border: 2px solid #e2e8f0; color: var(--gray); padding: 12px; border-radius: 0.8rem; font-weight: 600; cursor: pointer; width: 100%; margin-bottom: 1rem; transition: 0.2s; font-size: 1rem; }
+.google-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+.google-btn img { width: 22px; height: 22px; }
+.forgot-link { display: block; text-align: center; color: var(--primary); font-size: 0.95rem; margin-bottom: 0.5rem; font-weight: 500; }
 
-/* --- DASHBOARD --- */
+
+/* =========================================
+   6. DASHBOARD Y PÁGINAS INTERNAS (MANTENIDOS)
+   ========================================= */
 .app-header { background: white; padding: 0.8rem 0; border-bottom: 1px solid #eee; margin-bottom: 2rem; }
 .app-header .nav-logo { font-size: 1.2rem; gap: 10px; }
-.app-header .nav-logo img { height: 35px; width: auto; }
+.app-header .nav-logo img { height: 35px !important; width: auto !important; } 
 .app-header .nav-link { display: flex; align-items: center; gap: 0.5rem; color: var(--gray); font-weight: 600; }
 .app-header .user-info { font-weight: 500; color: var(--gray); }
 .app-header .user-info strong { color: var(--dark); }
+
 .welcome-banner { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 2rem; border-radius: 1rem; margin-bottom: 2rem; }
 .welcome-banner h2 { color: white; margin: 0; }
+
 .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
 .tool-card { background: white; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; transition: transform 0.2s; display: flex; flex-direction: column; }
 .tool-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
@@ -151,22 +177,15 @@ ul { list-style: none; padding: 0; margin: 0; }
 .bg-ia { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
 .card-tag { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.6); color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
 .card-body { padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column; }
-.card-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem; }
-.card-desc { font-size: 0.9rem; color: var(--gray); margin-bottom: 1.5rem; flex-grow: 1; }
+.card-title { font-size: 1.2rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem; }
+.card-desc { font-size: 0.95rem; color: var(--gray); margin-bottom: 1.5rem; flex-grow: 1; }
 .ai-footer-banner { background: linear-gradient(to right, var(--primary), var(--primary-dark)); color: white; padding: 2rem; border-radius: 1rem; display: flex; align-items: center; justify-content: space-between; }
 
-/* --- FOOTER --- */
-.footer { background: #1a1a1a; color: #e5e5e5; padding: 60px 0 0; border-top: 5px solid var(--accent); margin-top: 4rem; }
-.footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 3rem; margin-bottom: 40px; }
-.footer h4 { font-size: 1.1rem; margin-bottom: 1.5rem; color: white; font-weight: 700; text-transform: uppercase; }
-.footer-info p { margin-bottom: 12px; font-size: 0.9rem; color: #a3a3a3; display: flex; gap: 10px; align-items: flex-start; }
-.footer-links li { margin-bottom: 10px; }
-.footer-links a { color: #a3a3a3; font-size: 0.9rem; }
-.footer-links a:hover { color: white; text-decoration: underline; }
-.footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding: 20px 0; text-align: center; color: #718096; padding-bottom: 20px; }
-
-/* Otros */
 .card { background: white; padding: 2rem; border-radius: 1rem; box-shadow: var(--shadow); margin-bottom: 1.5rem; }
+.card-blue { border-left: 5px solid var(--primary); background: #f0f9ff; }
+.card-orange { border-left: 5px solid #f59e0b; background: #fffbeb; }
+.card-red { border-left: 5px solid #ef4444; background: #fef2f2; }
+
 .risk-badge { padding: 5px 12px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; display: inline-block; }
 .bg-Pendiente { background: #e5e7eb; color: #374151; }
 .bg-Bajo { background: #d1fae5; color: #065f46; }
@@ -174,23 +193,28 @@ ul { list-style: none; padding: 0; margin: 0; }
 .bg-Alto { background: #fee2e2; color: #991b1b; }
 .bg-Crítico { background: #7f1d1d; color: #fecaca; }
 .notification-badge { background: var(--danger); color: white; font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
-.tutor-card, .file-list-item, .solicitud-card { background: white; border-radius: 1rem; box-shadow: var(--shadow-sm); margin-bottom: 1.5rem; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; }
+
+.tutor-card, .file-list-item, .solicitud-card { background: white; border-radius: 1rem; box-shadow: var(--shadow-sm); margin-bottom: 1.5rem; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; transition: 0.2s; }
+.tutor-card:hover, .file-list-item:hover { transform: translateY(-3px); box-shadow: var(--shadow); border-left: 5px solid var(--primary); }
 .tutor-avatar { font-size: 2rem; color: var(--primary); background: #e0f2fe; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1rem; }
 .file-info .curso { font-size: 0.8rem; font-weight: 600; color: var(--primary); background: #e0f2fe; padding: 2px 10px; border-radius: 10px; display: inline-block; margin-bottom: 5px; }
 .solicitud-card { display: block; border-left: 5px solid var(--accent); }
 .solicitud-header { display: flex; justify-content: space-between; margin-bottom: 1rem; align-items: center; }
+.solicitud-header .curso { font-size: 0.8rem; font-weight: 600; color: var(--primary); background: #e0f2fe; padding: 2px 10px; border-radius: 10px; }
 .solicitud-actions { display: flex; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; justify-content: flex-end; }
+
 .chat-container { max-width: 800px; margin: 2rem auto; background: white; border-radius: 1.5rem; box-shadow: var(--shadow); overflow: hidden; height: 70vh; display: flex; flex-direction: column; border: 1px solid #eee; }
 .chat-header { padding: 1.5rem; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 1rem; background: #fafafa; }
 .chat-messages { flex: 1; padding: 1.5rem; overflow-y: auto; background: #fff; }
 .message { display: flex; margin-bottom: 1rem; }
 .message.user { justify-content: flex-end; }
 .message-bubble { padding: 10px 15px; border-radius: 15px; max-width: 70%; }
-.message.user .message-bubble { background: var(--primary); color: white; }
-.message.assistant .message-bubble { background: #f3f4f6; color: var(--dark); }
+.message.user .message-bubble { background: var(--primary); color: white; border-bottom-right-radius: 2px; }
+.message.assistant .message-bubble { background: #f3f4f6; color: var(--dark); border-bottom-left-radius: 2px; }
 .chat-input { padding: 1.5rem; border-top: 1px solid #eee; background: #fafafa; }
 .chat-input form { display: flex; gap: 10px; }
-.checkbox-group { max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; }
+
+.checkbox-group { max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 0.8rem; }
 #campo-especialidad { display: none; }
 .modal-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: none; align-items: center; justify-content: center; }
 .modal-content { background: white; padding: 2rem; border-radius: 1.5rem; width: 90%; max-width: 500px; box-shadow: var(--shadow); }
@@ -198,6 +222,8 @@ ul { list-style: none; padding: 0; margin: 0; }
 .modal-body label { display: block; padding: 10px; border: 1px solid #eee; margin-bottom: 5px; border-radius: 5px; cursor: pointer; }
 .modal-body label:hover { background: #f9fafb; }
 .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+.video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 0.5rem; margin-top: 10px; background: #000; border: 1px solid #eee; }
+.video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
 .tabs { display: flex; gap: 10px; margin-bottom: 1rem; }
 .tab-btn { flex: 1; padding: 8px; border: 1px solid #ddd; background: #f9fafb; cursor: pointer; border-radius: 5px; text-align: center; font-weight: 600; }
 .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
