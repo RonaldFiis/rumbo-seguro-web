@@ -7,78 +7,77 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Estilos específicos para el Test Wizard */
         body { background-color: var(--light); min-height: 100vh; display: flex; flex-direction: column; }
         
-        .eval-wrapper {
-            flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 2rem;
-        }
+        .eval-wrapper { flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 2rem; }
         
-        .eval-card {
-            width: 100%; max-width: 700px;
-            background: var(--white); border-radius: 20px;
-            box-shadow: var(--shadow-lg); overflow: hidden;
-            position: relative;
+        .eval-card { 
+            width: 100%; max-width: 700px; 
+            background: var(--white); border-radius: 20px; 
+            box-shadow: var(--shadow-lg); overflow: hidden; 
+            position: relative; min-height: 500px;
         }
 
-        .eval-header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white; padding: 2rem; text-align: center;
+        .eval-header { 
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
+            color: white; padding: 2rem; text-align: center; 
         }
         
-        .progress-container {
-            background: #e2e8f0; height: 8px; width: 100%;
-        }
-        .progress-bar {
-            background: var(--secondary); height: 100%; width: 0%;
-            transition: width 0.5s ease;
-        }
+        .progress-container { background: #e2e8f0; height: 8px; width: 100%; }
+        .progress-bar { background: var(--secondary); height: 100%; width: 0%; transition: width 0.5s ease; }
 
-        .question-step {
-            display: none; padding: 3rem 2rem;
-            animation: slideIn 0.4s ease;
-        }
+        /* Estilos del Formulario */
+        .question-step { display: none; padding: 3rem 2rem; animation: slideIn 0.4s ease; }
         .question-step.active { display: block; }
+        
+        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(20px); }
-            to { opacity: 1; transform: translateX(0); }
+        .category-badge { 
+            display: inline-block; background: #eff6ff; color: var(--primary); 
+            padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; 
+            font-weight: 700; text-transform: uppercase; letter-spacing: 1px; 
+            margin-bottom: 1.5rem; 
         }
 
-        .category-badge {
-            display: inline-block; background: #eff6ff; color: var(--primary);
-            padding: 5px 15px; border-radius: 20px; font-size: 0.85rem;
-            font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
-            margin-bottom: 1.5rem;
-        }
-
-        .question-text {
-            font-size: 1.5rem; font-weight: 700; color: var(--dark);
-            margin-bottom: 2.5rem; line-height: 1.3;
-        }
-
-        /* Opciones Grandes y Dinámicas */
+        .question-text { font-size: 1.3rem; font-weight: 700; color: var(--dark); margin-bottom: 2.5rem; line-height: 1.3; }
         .options-grid { display: grid; gap: 1rem; }
-        .option-btn {
-            display: flex; align-items: center; padding: 1.2rem;
-            border: 2px solid #e2e8f0; border-radius: 12px;
-            cursor: pointer; transition: all 0.2s;
-            font-size: 1.1rem; color: var(--gray); font-weight: 500;
+        .option-btn { 
+            display: flex; align-items: center; padding: 1.2rem; 
+            border: 2px solid #e2e8f0; border-radius: 12px; 
+            cursor: pointer; transition: all 0.2s; font-size: 1rem; 
+            color: var(--gray); font-weight: 500; 
         }
-        .option-btn:hover {
-            border-color: var(--primary); background: #f0f9ff; color: var(--primary);
-            transform: translateX(5px);
-        }
-        .option-btn.selected {
-            background: var(--primary); border-color: var(--primary); color: white;
-        }
+        .option-btn:hover { border-color: var(--primary); background: #f0f9ff; color: var(--primary); transform: translateX(5px); }
+        .option-btn.selected { background: var(--primary); border-color: var(--primary); color: white; }
         .option-btn input { display: none; }
 
-        .nav-actions {
-            padding: 1.5rem 2rem; border-top: 1px solid #f1f5f9;
-            display: flex; justify-content: space-between; align-items: center;
-            background: #fafafa;
+        .nav-actions { 
+            padding: 1.5rem 2rem; border-top: 1px solid #f1f5f9; 
+            display: flex; justify-content: space-between; align-items: center; 
+            background: #fafafa; 
         }
+
+        /* --- NUEVOS ESTILOS PARA LA PANTALLA DE RESULTADOS --- */
+        #result-screen { display: none; padding: 3rem 2rem; text-align: center; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .result-icon { font-size: 5rem; margin-bottom: 1.5rem; display: block; }
+        .result-title { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--dark); }
+        .result-score { font-size: 1.2rem; color: var(--gray); margin-bottom: 2rem; font-weight: 500; }
+        
+        .recommendation-box {
+            background: #f8fafc; border: 1px solid #e2e8f0; 
+            border-radius: 15px; padding: 2rem; text-align: left; margin-bottom: 2rem;
+        }
+        .recommendation-box h4 { margin-top: 0; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+        .recommendation-box ul { padding-left: 20px; margin-bottom: 0; }
+        .recommendation-box li { margin-bottom: 10px; color: var(--gray); }
+
+        /* Colores de estado */
+        .status-Bajo { color: var(--secondary); }
+        .status-Medio { color: #f59e0b; }
+        .status-Alto { color: #ea580c; }
+        .status-Crítico { color: var(--danger); }
     </style>
 </head>
 <body>
@@ -89,218 +88,218 @@
                 <a href="index.html" class="nav-logo"><img src="images/logo.svg" alt="Logo"></a>
                 <span style="font-size: 1.2rem; font-weight: 700; color: var(--dark);">RUMBO SEGURO</span>
             </div>
-            <a href="dashboard.html" class="btn btn-outline" style="padding: 8px 20px; font-size: 0.9rem;">Cancelar y Salir</a>
         </div>
     </header>
 
     <div class="eval-wrapper">
         <div class="eval-card">
-            <div class="eval-header">
+            
+            <div class="eval-header" id="header-section">
                 <h2 style="color: white; margin: 0;">Diagnóstico Integral IMRA</h2>
                 <p style="opacity: 0.9; font-size: 0.95rem; margin-top: 5px;">Basado en el modelo científico de la FIEECS-UNI</p>
             </div>
-            
-            <div class="progress-container">
-                <div class="progress-bar" id="progress-bar"></div>
+            <div class="progress-container" id="progress-section"><div class="progress-bar" id="progress-bar"></div></div>
+
+            <div id="result-screen">
+                <i id="res-icon" class="fas fa-check-circle result-icon"></i>
+                <h2 id="res-level" class="result-title">Nivel de Riesgo: ...</h2>
+                <p id="res-score" class="result-score">Puntaje IMRA: ...</p>
+
+                <div class="recommendation-box">
+                    <h4><i class="fas fa-lightbulb"></i> Recomendaciones:</h4>
+                    <ul id="res-list">
+                        </ul>
+                </div>
+
+                <a href="dashboard.html" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-home"></i> Volver al Panel
+                </a>
             </div>
 
             <form id="imra-form">
                 <div id="questions-container"></div>
-                
-                <div class="nav-actions">
+                <div class="nav-actions" id="nav-section">
                     <button type="button" id="btn-prev" class="btn btn-secondary" style="visibility: hidden;">Anterior</button>
                     <div style="color: var(--gray); font-size: 0.9rem;"><span id="step-indicator">1</span> de 12</div>
-                    <button type="button" id="btn-next" class="btn btn-primary">Siguiente <i class="fas fa-arrow-right"></i></button>
-                    <button type="submit" id="btn-finish" class="btn btn-success" style="display: none;">Ver Resultados <i class="fas fa-check"></i></button>
+                    <button type="button" id="btn-next" class="btn btn-primary">Siguiente</button>
+                    <button type="submit" id="btn-finish" class="btn btn-success" style="display: none;">Ver Resultados</button>
                 </div>
             </form>
+
         </div>
     </div>
 
     <script>
-        // --- CONFIGURACIÓN CIENTÍFICA (Basada en tu PDF) ---
-        // Dimensiones: X1:Personal, X2:Familiar, X3:Docente, X4:Estrategias, X5:Salud, X6:Economía
+        // DATOS Y LÓGICA
         const preguntas = [
             { id: 'p1', dim: 'personal', type: 'directa', text: "¿Sueles dejar el estudio para el último momento (solo para el examen)?" },
             { id: 'p2', dim: 'personal', type: 'inversa', text: "¿Sientes que tienes la capacidad y disciplina para terminar tu carrera?" },
-            { id: 'p3', dim: 'familiar', type: 'inversa', text: "¿Tu familia comprende tus exigencias académicas y te apoya emocionalmente?" },
-            { id: 'p4', dim: 'familiar', type: 'inversa', text: "¿Cuentas en casa con un ambiente tranquilo que te permita concentrarte?" },
-            { id: 'p5', dim: 'docente', type: 'inversa', text: "¿Sientes que la mayoría de tus docentes dominan los temas y se dejan entender?" },
-            { id: 'p6', dim: 'docente', type: 'inversa', text: "¿Las evaluaciones reflejan realmente lo que se enseñó en clase?" },
-            { id: 'p7', dim: 'estrategias', type: 'inversa', text: "¿Tienes un horario de estudio definido fuera de clases y lo cumples?" },
-            { id: 'p8', dim: 'estrategias', type: 'inversa', text: "¿Tomas apuntes y organizas tu información de manera ordenada?" },
+            { id: 'p3', dim: 'personal', type: 'inversa', text: "¿Cumples con el horario de estudio que te propones fuera de clases?" },
+            { id: 'p4', dim: 'personal', type: 'directa', text: "¿Faltas a clases frecuentemente cuando sientes que el curso es difícil?" },
+            { id: 'p5', dim: 'familiar', type: 'inversa', text: "¿En tu hogar existe un ambiente tranquilo que te permite concentrarte?" },
+            { id: 'p6', dim: 'familiar', type: 'inversa', text: "¿Tu familia comprende tus exigencias académicas y te apoya?" },
+            { id: 'p7', dim: 'docente', type: 'inversa', text: "¿Sientes que la mayoría de tus docentes dominan los temas?" },
+            { id: 'p8', dim: 'docente', type: 'inversa', text: "¿Las evaluaciones reflejan realmente lo que se enseñó en clase?" },
             { id: 'p9', dim: 'salud', type: 'directa', text: "¿Sufres de ansiedad, insomnio o dolores fuertes en época de exámenes?" },
             { id: 'p10', dim: 'salud', type: 'directa', text: "¿Te sientes físicamente agotado o sin energía la mayor parte del tiempo?" },
             { id: 'p11', dim: 'economia', type: 'directa', text: "¿Tienes dificultades económicas para adquirir materiales, libros o internet?" },
             { id: 'p12', dim: 'economia', type: 'directa', text: "¿Necesitas trabajar para costear tus estudios, restándote tiempo de repaso?" }
         ];
 
-        const opcionesDirectas = [
-            { val: 0, text: "Nunca (0 pts)" },
-            { val: 1, text: "Rara vez (1 pt)" },
-            { val: 2, text: "A veces (2 pts)" },
-            { val: 3, text: "Frecuentemente (3 pts)" },
-            { val: 4, text: "Siempre (4 pts)" }
-        ];
-        
-        // Para preguntas inversas (donde "Siempre" es bueno, o sea 0 riesgo)
-        const opcionesInversas = [
-            { val: 4, text: "Nunca (4 pts)" },
-            { val: 3, text: "Rara vez (3 pts)" },
-            { val: 2, text: "A veces (2 pts)" },
-            { val: 1, text: "Frecuentemente (1 pt)" },
-            { val: 0, text: "Siempre (0 pts)" }
-        ];
+        const optsDirecta = [ { val: 0, text: "Nunca" }, { val: 1, text: "Rara vez" }, { val: 2, text: "A veces" }, { val: 3, text: "Frecuentemente" }, { val: 4, text: "Siempre" } ];
+        const optsInversa = [ { val: 4, text: "Nunca" }, { val: 3, text: "Rara vez" }, { val: 2, text: "A veces" }, { val: 1, text: "Frecuentemente" }, { val: 0, text: "Siempre" } ];
 
         let currentStep = 0;
         const answers = {};
 
-        // Inicializar el cuestionario
         function init() {
             const container = document.getElementById('questions-container');
-            
             preguntas.forEach((preg, index) => {
                 const stepDiv = document.createElement('div');
                 stepDiv.className = `question-step ${index === 0 ? 'active' : ''}`;
-                stepDiv.dataset.index = index;
-
-                // Mapeo de nombres bonitos para las dimensiones
-                const dimNames = { 
-                    'personal': 'Actitud Personal', 'familiar': 'Apoyo Familiar', 
-                    'docente': 'Dominio Docente', 'estrategias': 'Estrategias Académicas', 
-                    'salud': 'Salud y Bienestar', 'economia': 'Situación Económica'
-                };
-
-                const opciones = preg.type === 'directa' ? opcionesDirectas : opcionesInversas;
-                let optionsHtml = '';
                 
+                const dimNames = { 'personal': 'Actitud Personal', 'familiar': 'Apoyo Familiar', 'docente': 'Dominio Docente', 'salud': 'Salud y Bienestar', 'economia': 'Economía' };
+                const opciones = preg.type === 'directa' ? optsDirecta : optsInversa;
+                
+                let optionsHtml = '';
                 opciones.forEach(opt => {
-                    optionsHtml += `
-                        <label class="option-btn" onclick="selectOption(this, '${preg.id}', ${opt.val})">
-                            <input type="radio" name="${preg.id}" value="${opt.val}">
-                            ${opt.text}
-                        </label>
-                    `;
+                    optionsHtml += `<label class="option-btn" onclick="selectOption(this, '${preg.id}', ${opt.val})"><input type="radio" name="${preg.id}" value="${opt.val}"> ${opt.text}</label>`;
                 });
 
-                stepDiv.innerHTML = `
-                    <span class="category-badge">${dimNames[preg.dim]}</span>
-                    <h3 class="question-text">${preg.text}</h3>
-                    <div class="options-grid">${optionsHtml}</div>
-                `;
+                stepDiv.innerHTML = `<span class="category-badge">${dimNames[preg.dim]}</span><h3 class="question-text">${preg.text}</h3><div class="options-grid">${optionsHtml}</div>`;
                 container.appendChild(stepDiv);
             });
             updateProgress();
         }
 
-        // Seleccionar opción
-        window.selectOption = (element, questionId, value) => {
-            // Visual
-            const parent = element.parentElement;
-            parent.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
-            element.classList.add('selected');
-            
-            // Guardar dato
-            answers[questionId] = value;
-            
-            // Auto-avance suave
-            setTimeout(() => {
-                if (currentStep < preguntas.length - 1) {
-                    nextStep();
-                } else {
-                    // Si es la última, mostramos botón finalizar
-                    document.getElementById('btn-next').style.display = 'none';
-                    document.getElementById('btn-finish').style.display = 'block';
-                }
+        window.selectOption = (el, qId, val) => {
+            el.parentElement.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
+            el.classList.add('selected');
+            answers[qId] = val;
+            setTimeout(() => { 
+                if(currentStep < preguntas.length - 1) nextStep(); 
+                else { 
+                    document.getElementById('btn-next').style.display = 'none'; 
+                    document.getElementById('btn-finish').style.display = 'block'; 
+                } 
             }, 250);
         };
 
         function nextStep() {
-            if (!answers[preguntas[currentStep].id] && answers[preguntas[currentStep].id] !== 0) {
-                alert("Por favor selecciona una opción.");
-                return;
-            }
+            if (answers[preguntas[currentStep].id] === undefined) return alert("Selecciona una opción.");
             changeStep(currentStep + 1);
         }
-
         document.getElementById('btn-prev').onclick = () => changeStep(currentStep - 1);
         document.getElementById('btn-next').onclick = nextStep;
 
         function changeStep(newStep) {
-            const steps = document.querySelectorAll('.question-step');
-            steps[currentStep].classList.remove('active');
+            document.querySelectorAll('.question-step')[currentStep].classList.remove('active');
             currentStep = newStep;
-            steps[currentStep].classList.add('active');
-            
+            document.querySelectorAll('.question-step')[currentStep].classList.add('active');
             document.getElementById('btn-prev').style.visibility = currentStep > 0 ? 'visible' : 'hidden';
             document.getElementById('step-indicator').textContent = currentStep + 1;
-            
-            // Manejo de botones finales
-            if (currentStep === preguntas.length - 1) {
-                document.getElementById('btn-next').style.display = 'none';
-                document.getElementById('btn-finish').style.display = 'block';
-            } else {
-                document.getElementById('btn-next').style.display = 'block';
-                document.getElementById('btn-finish').style.display = 'none';
-            }
             updateProgress();
         }
+        function updateProgress() { document.getElementById('progress-bar').style.width = `${((currentStep + 1) / preguntas.length) * 100}%`; }
 
-        function updateProgress() {
-            const percent = ((currentStep + 1) / preguntas.length) * 100;
-            document.getElementById('progress-bar').style.width = `${percent}%`;
+        // --- MOSTRAR RESULTADOS BONITOS ---
+        function showResultScreen(nivel, puntaje) {
+            // Ocultar formulario y cabecera
+            document.getElementById('imra-form').style.display = 'none';
+            document.getElementById('header-section').style.display = 'none';
+            document.getElementById('progress-section').style.display = 'none';
+            
+            // Configurar datos
+            const screen = document.getElementById('result-screen');
+            const icon = document.getElementById('res-icon');
+            const title = document.getElementById('res-level');
+            const score = document.getElementById('res-score');
+            const list = document.getElementById('res-list');
+
+            title.textContent = `Nivel de Riesgo: ${nivel.toUpperCase()}`;
+            score.textContent = `Puntaje IMRA: ${puntaje}/10`;
+
+            // Colores y Recomendaciones según nivel
+            let recs = [];
+            if (nivel === 'Bajo') {
+                icon.className = 'fas fa-smile-beam result-icon status-Bajo';
+                title.className = 'result-title status-Bajo';
+                recs = [
+                    "¡Excelente! Tienes hábitos sólidos y buen soporte.",
+                    "Mantén tu organización y comparte tus técnicas con compañeros.",
+                    "Considera inscribirte como Tutor voluntario."
+                ];
+            } else if (nivel === 'Medio') {
+                icon.className = 'fas fa-meh result-icon status-Medio';
+                title.className = 'result-title status-Medio';
+                recs = [
+                    "Atención: Hay áreas que puedes mejorar (horarios o estrés).",
+                    "Te recomendamos asistir a un taller de gestión del tiempo.",
+                    "No dudes en consultar con un tutor para cursos difíciles."
+                ];
+            } else if (nivel === 'Alto') {
+                icon.className = 'fas fa-frown-open result-icon status-Alto';
+                title.className = 'result-title status-Alto';
+                recs = [
+                    "Cuidado: Estás en zona de riesgo académico.",
+                    "Es muy recomendable que solicites una Tutoría esta semana.",
+                    "Considera hablar con Bienestar Universitario para apoyo emocional."
+                ];
+            } else { // Crítico
+                icon.className = 'fas fa-exclamation-triangle result-icon status-Crítico';
+                title.className = 'result-title status-Crítico';
+                recs = [
+                    "URGENTE: Alto riesgo de BIKA o TRIKA detectado.",
+                    "Por favor, agenda una cita con Psicología de la FIIS de inmediato.",
+                    "Solicita tutoría intensiva para tus cursos críticos.",
+                    "No dejes pasar más tiempo, estamos para ayudarte."
+                ];
+            }
+
+            // Llenar lista
+            list.innerHTML = recs.map(r => `<li>${r}</li>`).join('');
+            
+            // Mostrar pantalla
+            screen.style.display = 'block';
         }
 
-        // ENVÍO Y CÁLCULO (BACKEND)
         document.getElementById('imra-form').onsubmit = async (e) => {
             e.preventDefault();
-            const usuario = JSON.parse(localStorage.getItem('usuario'));
+            const btn = document.getElementById('btn-finish');
+            btn.textContent = "Analizando...";
+            btn.disabled = true;
 
-            // Preparar datos para el servidor (se envían las respuestas crudas para que el server calcule)
-            // O podemos calcular aquí. Mejor calculamos aquí para enviar ya el puntaje final.
-            
-            // Agrupar por dimensiones
             const scores = { personal: [], familiar: [], docente: [], estrategias: [], salud: [], economia: [] };
+            preguntas.forEach(p => scores[p.dim] ? scores[p.dim].push(answers[p.id]) : null); // (Estrategias usa 'docente' en este array simplificado o se agrega manual)
             
-            preguntas.forEach(p => {
-                scores[p.dim].push(answers[p.id]);
-            });
-
-            // Promedios (0 a 4)
-            const avg = (arr) => arr.reduce((a,b) => a+b, 0) / arr.length;
+            // Recalculamos scores limpios
+            const avg = (arr) => arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0;
             
-            // FÓRMULA DEL ESTUDIO UNI [CITE: 137]
-            // Coeficientes: P(0.679), F(0.089), D(0.068), E(0.064), S(0.054), Eco(0.046)
-            const imraRaw = 
-                (avg(scores.personal) * 0.679) + 
-                (avg(scores.familiar) * 0.089) + 
-                (avg(scores.docente) * 0.068) + 
-                (avg(scores.estrategias) * 0.064) + 
-                (avg(scores.salud) * 0.054) + 
-                (avg(scores.economia) * 0.046);
-            
-            // imraRaw está entre 0 y 4. Lo pasamos a escala 0-10 para facilitar lectura
+            // Lógica simple para el frontend (el backend hace el guardado real)
+            const imraRaw = (avg(scores.personal)*0.68) + (avg(scores.familiar)*0.09) + (avg(scores.docente)*0.13) + (avg(scores.salud)*0.05) + (avg(scores.economia)*0.05);
             const puntajeFinal = (imraRaw / 4) * 10;
 
+            const usuario = JSON.parse(localStorage.getItem('usuario'));
             try {
                 const res = await fetch('/api/riesgo', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        estudiante_id: usuario.id,
-                        puntaje: puntajeFinal.toFixed(2)
-                    })
+                    body: JSON.stringify({ estudiante_id: usuario.id, puntaje: puntajeFinal.toFixed(2) })
                 });
 
                 if (res.ok) {
                     const data = await res.json();
-                    alert(`¡Diagnóstico Completado!\n\nTu nivel de riesgo es: ${data.nivel}\nPuntaje IMRA: ${data.puntaje}/10`);
-                    window.location.href = 'dashboard.html';
+                    // ¡AQUÍ MOSTRAMOS LA PANTALLA EN LUGAR DEL ALERT!
+                    showResultScreen(data.nivel, data.puntaje);
                 } else {
                     alert('Error al guardar los resultados.');
+                    btn.textContent = "Ver Resultados";
+                    btn.disabled = false;
                 }
             } catch (error) {
                 alert('Error de conexión.');
+                btn.textContent = "Ver Resultados";
+                btn.disabled = false;
             }
         };
 
