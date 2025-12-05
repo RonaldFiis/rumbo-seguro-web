@@ -55,11 +55,66 @@ ul { list-style: none; padding: 0; margin: 0; }
 .btn-outline:hover { background: var(--primary); color: white; }
 .btn-success { background: var(--secondary); color: white; }
 
-/* --- 3. NAVBAR --- */
-.navbar { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: 0 2px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; padding: 15px 0; }
-.nav-logo { display: flex; align-items: center; gap: 12px; font-size: 1.5rem; font-weight: 800; color: var(--primary); line-height: 1; text-transform: uppercase; letter-spacing: 0.5px; }
-.nav-logo img { height: 42px; display: block; }
-.nav-links { display: flex; gap: 15px; align-items: center; }
+/* --- NAVBAR (Navegación Superior) --- */
+.navbar {
+    background: rgba(255, 255, 255, 0.98); /* Un poco más sólido */
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08); /* Sombra más suave */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding: 12px 0; /* Padding vertical consistente */
+}
+
+/* Contenedor interno flexible */
+.navbar .container {
+    display: flex;
+    justify-content: space-between; /* Logo a la izq, botones a la der */
+    align-items: center; /* ¡ESTO ES CLAVE! Centra todo verticalmente */
+}
+
+/* Logo */
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--primary);
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.nav-logo img {
+    height: 42px; /* Altura fija para el logo */
+    width: auto;
+    display: block;
+}
+
+/* Grupo de botones (derecha) */
+.nav-links {
+    display: flex;
+    gap: 15px; /* Espacio entre botones */
+    align-items: center; /* Asegura que los botones estén alineados entre sí */
+}
+
+/* FORZAR ALINEACIÓN DE LOS BOTONES DEL NAVBAR */
+.nav-links .btn {
+    height: 44px !important; /* Forzamos la misma altura exacta */
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 24px !important; /* Padding solo horizontal */
+    font-size: 0.95rem !important;
+    line-height: 1 !important; /* Evita problemas de interlineado */
+}
+
+/* Ocultar en móviles (se usa el menú hamburguesa en el futuro) */
+@media (max-width: 768px) {
+    .nav-links { display: none; } 
+}
+
+
 
 /* --- 4. PORTADA IMPACTANTE (INDEX) --- */
 .hero {
@@ -227,3 +282,4 @@ ul { list-style: none; padding: 0; margin: 0; }
 .tabs { display: flex; gap: 10px; margin-bottom: 1rem; }
 .tab-btn { flex: 1; padding: 8px; border: 1px solid #ddd; background: #f9fafb; cursor: pointer; border-radius: 5px; text-align: center; font-weight: 600; }
 .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
