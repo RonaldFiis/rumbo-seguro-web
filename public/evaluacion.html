@@ -8,14 +8,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background-color: var(--light); min-height: 100vh; display: flex; flex-direction: column; }
-        
         .eval-wrapper { flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 2rem; }
         
         .eval-card { 
             width: 100%; max-width: 700px; 
             background: var(--white); border-radius: 20px; 
             box-shadow: var(--shadow-lg); overflow: hidden; 
-            position: relative; min-height: 500px;
+            position: relative; min-height: 550px; display: flex; flex-direction: column;
         }
 
         .eval-header { 
@@ -26,58 +25,39 @@
         .progress-container { background: #e2e8f0; height: 8px; width: 100%; }
         .progress-bar { background: var(--secondary); height: 100%; width: 0%; transition: width 0.5s ease; }
 
-        /* Estilos del Formulario */
-        .question-step { display: none; padding: 3rem 2rem; animation: slideIn 0.4s ease; }
+        .question-step { display: none; padding: 2rem 3rem; flex-grow: 1; animation: fadeIn 0.4s ease; }
         .question-step.active { display: block; }
-        
-        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .category-badge { 
-            display: inline-block; background: #eff6ff; color: var(--primary); 
-            padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; 
-            font-weight: 700; text-transform: uppercase; letter-spacing: 1px; 
-            margin-bottom: 1.5rem; 
-        }
-
-        .question-text { font-size: 1.3rem; font-weight: 700; color: var(--dark); margin-bottom: 2.5rem; line-height: 1.3; }
+        .category-badge { display: inline-block; background: #e0f2fe; color: var(--primary); padding: 6px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2rem; }
+        .question-text { font-size: 1.5rem; font-weight: 700; color: var(--dark); margin-bottom: 2rem; line-height: 1.3; }
         .options-grid { display: grid; gap: 1rem; }
+        
         .option-btn { 
             display: flex; align-items: center; padding: 1.2rem; 
             border: 2px solid #e2e8f0; border-radius: 12px; 
             cursor: pointer; transition: all 0.2s; font-size: 1rem; 
             color: var(--gray); font-weight: 500; 
         }
-        .option-btn:hover { border-color: var(--primary); background: #f0f9ff; color: var(--primary); transform: translateX(5px); }
-        .option-btn.selected { background: var(--primary); border-color: var(--primary); color: white; }
+        .option-btn:hover { border-color: var(--primary); background: #f0f9ff; transform: translateX(5px); }
+        .option-btn.selected { background: var(--primary); border-color: var(--primary); color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .option-btn input { display: none; }
 
-        .nav-actions { 
-            padding: 1.5rem 2rem; border-top: 1px solid #f1f5f9; 
-            display: flex; justify-content: space-between; align-items: center; 
-            background: #fafafa; 
+        .nav-actions { padding: 1.5rem 2rem; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; background: #fafafa; margin-top: auto; }
+
+        /* MENSAJE DE ERROR SUAVE */
+        .inline-error {
+            color: var(--danger); font-weight: 600; font-size: 0.9rem;
+            text-align: center; padding: 10px; display: none;
+            animation: shake 0.3s ease;
         }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
-        /* --- NUEVOS ESTILOS PARA LA PANTALLA DE RESULTADOS --- */
-        #result-screen { display: none; padding: 3rem 2rem; text-align: center; animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
+        /* PANTALLA DE RESULTADOS */
+        #result-screen { display: none; padding: 3rem; text-align: center; animation: fadeIn 0.5s ease; flex-grow: 1; flex-direction: column; justify-content: center; }
         .result-icon { font-size: 5rem; margin-bottom: 1.5rem; display: block; }
-        .result-title { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--dark); }
-        .result-score { font-size: 1.2rem; color: var(--gray); margin-bottom: 2rem; font-weight: 500; }
-        
-        .recommendation-box {
-            background: #f8fafc; border: 1px solid #e2e8f0; 
-            border-radius: 15px; padding: 2rem; text-align: left; margin-bottom: 2rem;
-        }
-        .recommendation-box h4 { margin-top: 0; color: var(--primary); display: flex; align-items: center; gap: 10px; }
-        .recommendation-box ul { padding-left: 20px; margin-bottom: 0; }
-        .recommendation-box li { margin-bottom: 10px; color: var(--gray); }
-
-        /* Colores de estado */
-        .status-Bajo { color: var(--secondary); }
-        .status-Medio { color: #f59e0b; }
-        .status-Alto { color: #ea580c; }
-        .status-Crítico { color: var(--danger); }
+        .result-data { background: #f8fafc; padding: 1.5rem; border-radius: 15px; margin: 2rem 0; border: 1px solid #e2e8f0; }
+        .status-Bajo { color: var(--secondary); } .status-Medio { color: #f59e0b; } .status-Alto { color: #ea580c; } .status-Crítico { color: var(--danger); }
     </style>
 </head>
 <body>
@@ -85,65 +65,63 @@
     <header class="app-header" style="margin-bottom: 0;">
         <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
             <div style="display: flex; align-items: center; gap: 15px;">
-                <a href="index.html" class="nav-logo"><img src="images/logo.svg" alt="Logo"></a>
+                <img src="images/logo.svg" alt="Logo" style="height: 35px;">
                 <span style="font-size: 1.2rem; font-weight: 700; color: var(--dark);">RUMBO SEGURO</span>
             </div>
+            <a href="dashboard.html" class="btn btn-outline" style="padding: 5px 15px; font-size: 0.9rem;">Salir</a>
         </div>
     </header>
 
     <div class="eval-wrapper">
         <div class="eval-card">
-            
-            <div class="eval-header" id="header-section">
-                <h2 style="color: white; margin: 0;">Diagnóstico Integral IMRA</h2>
-                <p style="opacity: 0.9; font-size: 0.95rem; margin-top: 5px;">Basado en el modelo científico de la FIEECS-UNI</p>
+            <div id="header-section">
+                <div class="eval-header">
+                    <h2 style="color: white; margin: 0;">Diagnóstico Integral</h2>
+                    <p style="opacity: 0.9; font-size: 0.95rem; margin-top: 5px;">Responde con sinceridad para obtener tu perfil.</p>
+                </div>
+                <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
             </div>
-            <div class="progress-container" id="progress-section"><div class="progress-bar" id="progress-bar"></div></div>
 
             <div id="result-screen">
                 <i id="res-icon" class="fas fa-check-circle result-icon"></i>
-                <h2 id="res-level" class="result-title">Nivel de Riesgo: ...</h2>
-                <p id="res-score" class="result-score">Puntaje IMRA: ...</p>
-
-                <div class="recommendation-box">
-                    <h4><i class="fas fa-lightbulb"></i> Recomendaciones:</h4>
-                    <ul id="res-list">
-                        </ul>
+                <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Diagnóstico Completado</h2>
+                <div class="result-data">
+                    <h3 id="res-level" style="font-size: 1.5rem; margin-bottom: 0.5rem;">...</h3>
+                    <p id="res-score" style="color: var(--gray); margin: 0;">...</p>
                 </div>
-
-                <a href="dashboard.html" class="btn btn-primary" style="width: 100%;">
-                    <i class="fas fa-home"></i> Volver al Panel
-                </a>
+                <p style="color: var(--gray); margin-bottom: 2rem;">Tus resultados han sido guardados en tu perfil. Un tutor revisará tu caso si es necesario.</p>
+                <a href="dashboard.html" class="btn btn-primary" style="width: 100%; padding: 15px;">Volver al Panel</a>
             </div>
 
-            <form id="imra-form">
+            <form id="imra-form" style="display: flex; flex-direction: column; flex-grow: 1;">
                 <div id="questions-container"></div>
+                
+                <div id="error-msg" class="inline-error"><i class="fas fa-exclamation-circle"></i> Por favor, selecciona una opción para continuar.</div>
+
                 <div class="nav-actions" id="nav-section">
                     <button type="button" id="btn-prev" class="btn btn-secondary" style="visibility: hidden;">Anterior</button>
-                    <div style="color: var(--gray); font-size: 0.9rem;"><span id="step-indicator">1</span> de 12</div>
+                    <div style="color: var(--gray); font-weight: 600;">Pregunta <span id="step-indicator">1</span>/12</div>
                     <button type="button" id="btn-next" class="btn btn-primary">Siguiente</button>
                     <button type="submit" id="btn-finish" class="btn btn-success" style="display: none;">Ver Resultados</button>
                 </div>
             </form>
-
         </div>
     </div>
 
     <script>
-        // DATOS Y LÓGICA
         const preguntas = [
-            { id: 'p1', dim: 'personal', type: 'directa', text: "¿Sueles dejar el estudio para el último momento (solo para el examen)?" },
-            { id: 'p2', dim: 'personal', type: 'inversa', text: "¿Sientes que tienes la capacidad y disciplina para terminar tu carrera?" },
-            { id: 'p3', dim: 'personal', type: 'inversa', text: "¿Cumples con el horario de estudio que te propones fuera de clases?" },
-            { id: 'p4', dim: 'personal', type: 'directa', text: "¿Faltas a clases frecuentemente cuando sientes que el curso es difícil?" },
-            { id: 'p5', dim: 'familiar', type: 'inversa', text: "¿En tu hogar existe un ambiente tranquilo que te permite concentrarte?" },
-            { id: 'p6', dim: 'familiar', type: 'inversa', text: "¿Tu familia comprende tus exigencias académicas y te apoya?" },
-            { id: 'p7', dim: 'docente', type: 'inversa', text: "¿Sientes que la mayoría de tus docentes dominan los temas?" },
-            { id: 'p8', dim: 'docente', type: 'inversa', text: "¿Las evaluaciones reflejan realmente lo que se enseñó en clase?" },
-            { id: 'p9', dim: 'salud', type: 'directa', text: "¿Sufres de ansiedad, insomnio o dolores fuertes en época de exámenes?" },
-            { id: 'p10', dim: 'salud', type: 'directa', text: "¿Te sientes físicamente agotado o sin energía la mayor parte del tiempo?" },
-            { id: 'p11', dim: 'economia', type: 'directa', text: "¿Tienes dificultades económicas para adquirir materiales, libros o internet?" },
-            { id: 'p12', dim: 'economia', type: 'directa', text: "¿Necesitas trabajar para costear tus estudios, restándote tiempo de repaso?" }
+            { id: 'p1', dim: 'personal', type: 'directa', text: "¿Sueles dejar el estudio para el último momento?" },
+            { id: 'p2', dim: 'personal', type: 'inversa', text: "¿Sientes capacidad para terminar tu carrera?" },
+            { id: 'p3', dim: 'personal', type: 'inversa', text: "¿Cumples con tu horario de estudio?" },
+            { id: 'p4', dim: 'personal', type: 'directa', text: "¿Faltas a clases cuando el curso es difícil?" },
+            { id: 'p5', dim: 'familiar', type: 'inversa', text: "¿Tienes un ambiente tranquilo en casa?" },
+            { id: 'p6', dim: 'familiar', type: 'inversa', text: "¿Tu familia apoya tus estudios?" },
+            { id: 'p7', dim: 'docente', type: 'inversa', text: "¿Tus docentes dominan los temas?" },
+            { id: 'p8', dim: 'docente', type: 'inversa', text: "¿Las evaluaciones reflejan lo enseñado?" },
+            { id: 'p9', dim: 'salud', type: 'directa', text: "¿Sufres ansiedad o insomnio en exámenes?" },
+            { id: 'p10', dim: 'salud', type: 'directa', text: "¿Te sientes físicamente agotado?" },
+            { id: 'p11', dim: 'economia', type: 'directa', text: "¿Tienes dificultades para materiales/internet?" },
+            { id: 'p12', dim: 'economia', type: 'directa', text: "¿Necesitas trabajar para estudiar?" }
         ];
 
         const optsDirecta = [ { val: 0, text: "Nunca" }, { val: 1, text: "Rara vez" }, { val: 2, text: "A veces" }, { val: 3, text: "Frecuentemente" }, { val: 4, text: "Siempre" } ];
@@ -157,15 +135,12 @@
             preguntas.forEach((preg, index) => {
                 const stepDiv = document.createElement('div');
                 stepDiv.className = `question-step ${index === 0 ? 'active' : ''}`;
-                
-                const dimNames = { 'personal': 'Actitud Personal', 'familiar': 'Apoyo Familiar', 'docente': 'Dominio Docente', 'salud': 'Salud y Bienestar', 'economia': 'Economía' };
+                const dimNames = { 'personal': 'Actitud Personal', 'familiar': 'Apoyo Familiar', 'docente': 'Académico', 'salud': 'Bienestar', 'economia': 'Economía' };
                 const opciones = preg.type === 'directa' ? optsDirecta : optsInversa;
-                
                 let optionsHtml = '';
                 opciones.forEach(opt => {
                     optionsHtml += `<label class="option-btn" onclick="selectOption(this, '${preg.id}', ${opt.val})"><input type="radio" name="${preg.id}" value="${opt.val}"> ${opt.text}</label>`;
                 });
-
                 stepDiv.innerHTML = `<span class="category-badge">${dimNames[preg.dim]}</span><h3 class="question-text">${preg.text}</h3><div class="options-grid">${optionsHtml}</div>`;
                 container.appendChild(stepDiv);
             });
@@ -176,19 +151,17 @@
             el.parentElement.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
             el.classList.add('selected');
             answers[qId] = val;
-            setTimeout(() => { 
-                if(currentStep < preguntas.length - 1) nextStep(); 
-                else { 
-                    document.getElementById('btn-next').style.display = 'none'; 
-                    document.getElementById('btn-finish').style.display = 'block'; 
-                } 
-            }, 250);
+            document.getElementById('error-msg').style.display = 'none'; // Ocultar error
         };
 
         function nextStep() {
-            if (answers[preguntas[currentStep].id] === undefined) return alert("Selecciona una opción.");
+            if (answers[preguntas[currentStep].id] === undefined) {
+                document.getElementById('error-msg').style.display = 'block'; // Mostrar error suave
+                return;
+            }
             changeStep(currentStep + 1);
         }
+
         document.getElementById('btn-prev').onclick = () => changeStep(currentStep - 1);
         document.getElementById('btn-next').onclick = nextStep;
 
@@ -198,84 +171,37 @@
             document.querySelectorAll('.question-step')[currentStep].classList.add('active');
             document.getElementById('btn-prev').style.visibility = currentStep > 0 ? 'visible' : 'hidden';
             document.getElementById('step-indicator').textContent = currentStep + 1;
+            
+            if(currentStep === preguntas.length - 1) {
+                document.getElementById('btn-next').style.display = 'none';
+                document.getElementById('btn-finish').style.display = 'block';
+            } else {
+                document.getElementById('btn-next').style.display = 'block';
+                document.getElementById('btn-finish').style.display = 'none';
+            }
             updateProgress();
         }
         function updateProgress() { document.getElementById('progress-bar').style.width = `${((currentStep + 1) / preguntas.length) * 100}%`; }
 
-        // --- MOSTRAR RESULTADOS BONITOS ---
-        function showResultScreen(nivel, puntaje) {
-            // Ocultar formulario y cabecera
-            document.getElementById('imra-form').style.display = 'none';
-            document.getElementById('header-section').style.display = 'none';
-            document.getElementById('progress-section').style.display = 'none';
-            
-            // Configurar datos
-            const screen = document.getElementById('result-screen');
-            const icon = document.getElementById('res-icon');
-            const title = document.getElementById('res-level');
-            const score = document.getElementById('res-score');
-            const list = document.getElementById('res-list');
-
-            title.textContent = `Nivel de Riesgo: ${nivel.toUpperCase()}`;
-            score.textContent = `Puntaje IMRA: ${puntaje}/10`;
-
-            // Colores y Recomendaciones según nivel
-            let recs = [];
-            if (nivel === 'Bajo') {
-                icon.className = 'fas fa-smile-beam result-icon status-Bajo';
-                title.className = 'result-title status-Bajo';
-                recs = [
-                    "¡Excelente! Tienes hábitos sólidos y buen soporte.",
-                    "Mantén tu organización y comparte tus técnicas con compañeros.",
-                    "Considera inscribirte como Tutor voluntario."
-                ];
-            } else if (nivel === 'Medio') {
-                icon.className = 'fas fa-meh result-icon status-Medio';
-                title.className = 'result-title status-Medio';
-                recs = [
-                    "Atención: Hay áreas que puedes mejorar (horarios o estrés).",
-                    "Te recomendamos asistir a un taller de gestión del tiempo.",
-                    "No dudes en consultar con un tutor para cursos difíciles."
-                ];
-            } else if (nivel === 'Alto') {
-                icon.className = 'fas fa-frown-open result-icon status-Alto';
-                title.className = 'result-title status-Alto';
-                recs = [
-                    "Cuidado: Estás en zona de riesgo académico.",
-                    "Es muy recomendable que solicites una Tutoría esta semana.",
-                    "Considera hablar con Bienestar Universitario para apoyo emocional."
-                ];
-            } else { // Crítico
-                icon.className = 'fas fa-exclamation-triangle result-icon status-Crítico';
-                title.className = 'result-title status-Crítico';
-                recs = [
-                    "URGENTE: Alto riesgo de BIKA o TRIKA detectado.",
-                    "Por favor, agenda una cita con Psicología de la FIIS de inmediato.",
-                    "Solicita tutoría intensiva para tus cursos críticos.",
-                    "No dejes pasar más tiempo, estamos para ayudarte."
-                ];
-            }
-
-            // Llenar lista
-            list.innerHTML = recs.map(r => `<li>${r}</li>`).join('');
-            
-            // Mostrar pantalla
-            screen.style.display = 'block';
-        }
-
+        // --- LÓGICA FINAL SIN ALERTAS ---
         document.getElementById('imra-form').onsubmit = async (e) => {
             e.preventDefault();
+            if (answers[preguntas[currentStep].id] === undefined) {
+                document.getElementById('error-msg').style.display = 'block'; return;
+            }
+
             const btn = document.getElementById('btn-finish');
-            btn.textContent = "Analizando...";
+            btn.textContent = "Procesando...";
             btn.disabled = true;
 
             const scores = { personal: [], familiar: [], docente: [], estrategias: [], salud: [], economia: [] };
-            preguntas.forEach(p => scores[p.dim] ? scores[p.dim].push(answers[p.id]) : null); // (Estrategias usa 'docente' en este array simplificado o se agrega manual)
-            
-            // Recalculamos scores limpios
+            preguntas.forEach(p => {
+                let dimKey = p.dim;
+                if (dimKey === 'docente') dimKey = 'docente'; 
+                scores[dimKey].push(answers[p.id]);
+            });
+
             const avg = (arr) => arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0;
-            
-            // Lógica simple para el frontend (el backend hace el guardado real)
             const imraRaw = (avg(scores.personal)*0.68) + (avg(scores.familiar)*0.09) + (avg(scores.docente)*0.13) + (avg(scores.salud)*0.05) + (avg(scores.economia)*0.05);
             const puntajeFinal = (imraRaw / 4) * 10;
 
@@ -289,19 +215,39 @@
 
                 if (res.ok) {
                     const data = await res.json();
-                    // ¡AQUÍ MOSTRAMOS LA PANTALLA EN LUGAR DEL ALERT!
-                    showResultScreen(data.nivel, data.puntaje);
+                    showResultScreen(data.nivel, data.puntaje); // Mostrar pantalla bonita
                 } else {
-                    alert('Error al guardar los resultados.');
-                    btn.textContent = "Ver Resultados";
+                    document.getElementById('error-msg').textContent = "Error al guardar. Intenta de nuevo.";
+                    document.getElementById('error-msg').style.display = 'block';
                     btn.disabled = false;
                 }
             } catch (error) {
-                alert('Error de conexión.');
-                btn.textContent = "Ver Resultados";
+                document.getElementById('error-msg').textContent = "Error de conexión.";
+                document.getElementById('error-msg').style.display = 'block';
                 btn.disabled = false;
             }
         };
+
+        function showResultScreen(nivel, puntaje) {
+            // Transición suave: Ocultar form y header
+            document.getElementById('imra-form').style.display = 'none';
+            document.getElementById('header-section').style.display = 'none';
+            
+            const screen = document.getElementById('result-screen');
+            const icon = document.getElementById('res-icon');
+            const title = document.getElementById('res-level');
+            const score = document.getElementById('res-score');
+
+            title.textContent = `Nivel de Riesgo: ${nivel.toUpperCase()}`;
+            title.className = `result-title status-${nivel}`; // Color según nivel
+            score.textContent = `Puntaje IMRA: ${puntaje}/10`;
+            
+            if(nivel === 'Bajo') { icon.className = 'fas fa-smile-beam result-icon status-Bajo'; }
+            else if(nivel === 'Medio') { icon.className = 'fas fa-meh result-icon status-Medio'; }
+            else { icon.className = 'fas fa-exclamation-triangle result-icon status-Crítico'; }
+
+            screen.style.display = 'flex'; // Mostrar pantalla final
+        }
 
         init();
     </script>
