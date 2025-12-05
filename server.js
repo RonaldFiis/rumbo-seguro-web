@@ -1,4 +1,4 @@
-// --- Archivo: server.js (VERSIÓN MAESTRA FINAL) ---
+// --- Archivo: server.js (VERSIÓN MAESTRA FINAL - SIN RECORTES) ---
 const express = require('express');
 const cors = require('cors');
 const supabase = require('./database'); // Importamos la conexión a Supabase
@@ -32,7 +32,6 @@ app.get('/api/status', (req, res) => res.send('✅ Servidor Rumbo Seguro funcion
 app.post('/api/registro', async (req, res) => {
     const { nombres, email, password, rol, es_tutor, especialidad } = req.body;
     
-    // Validación básica
     if (!nombres || !email || !password) {
         return res.status(400).json({ error: 'Faltan datos obligatorios' });
     }
@@ -43,7 +42,7 @@ app.post('/api/registro', async (req, res) => {
             .insert({
                 nombres,
                 email,
-                password, // Nota: En producción real, esto debería estar encriptado (hash)
+                password, // Nota: En producción real, usar hash
                 rol: rol || 'estudiante',
                 es_tutor: es_tutor || false,
                 especialidad: especialidad
@@ -106,7 +105,7 @@ app.patch('/api/usuario/:id', async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('usuarios')
-            .update(req.body) // Actualiza cualquier campo que venga en el body
+            .update(req.body)
             .eq('id', id)
             .select()
             .single();
@@ -164,6 +163,29 @@ app.get('/api/riesgo/:id', async (req, res) => {
     }
 });
 
+// --- RUTA PARA EL PSICÓLOGO (VER CASOS EN RIESGO) ---
+app.get('/api/casos-riesgo', async (req, res) => {
+    try {
+        // Obtiene riesgos Altos y Críticos junto con info del alumno
+        const { data, error } = await supabase
+            .from('riesgo')
+            .select(`
+                id, nivel, puntaje, fecha_evaluacion,
+                estudiante:usuarios!estudiante_id ( id, nombres, email )
+            `)
+            .in('nivel', ['Alto', 'Crítico', 'Medio'])
+            .order('puntaje', { ascending: false });
+
+        if (error) throw error;
+        res.json(data);
+    } catch (error) {
+        console.error('Error psicólogo:', error);
+        // Fallback si falla el JOIN
+        const { data } = await supabase.from('riesgo').select('*').in('nivel', ['Alto', 'Crítico']);
+        res.json(data || []);
+    }
+});
+
 /* =========================================
    4. BIBLIOTECA (ARCHIVOS + YOUTUBE)
    ========================================= */
@@ -175,7 +197,7 @@ app.get('/api/biblioteca', async (req, res) => {
                 id, created_at, nombre_archivo, curso, tipo, url_descarga, 
                 usuarios ( nombres )
             `)
-            .order('created_at', { ascending: false }); // Más recientes primero
+            .order('created_at', { ascending: false });
 
         if (error) throw error;
         res.json(data);
@@ -208,13 +230,11 @@ app.post('/api/recursos', upload.single('archivo'), async (req, res) => {
             
             finalUrl = pubUrl.publicUrl;
         } else if (youtube_url) {
-            // Guardar link de YouTube
             finalUrl = youtube_url;
         } else {
             return res.status(400).json({ error: 'Falta archivo o link' });
         }
 
-        // Guardar registro en BD
         const { error: dbErr } = await supabase
             .from('recursos')
             .insert({
@@ -232,7 +252,7 @@ app.post('/api/recursos', upload.single('archivo'), async (req, res) => {
 });
 
 /* =========================================
-   5. TUTORÍAS Y SOLICITUDES
+   5. TUTORÍAS Y SOLICITUDES (¡AQUÍ ESTÁ TODO!)
    ========================================= */
 app.get('/api/tutores', async (req, res) => {
     try {
@@ -270,7 +290,7 @@ app.get('/api/solicitudes-tutor/:tutor_id', async (req, res) => {
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// Detalle de solicitudes (CORREGIDO RELACIÓN AMBIGUA)
+// Detalle de solicitudes
 app.get('/api/solicitudes-detalle/:tutor_id', async (req, res) => {
     try {
         const { data, error } = await supabase
@@ -306,7 +326,7 @@ app.post('/api/chat', async (req, res) => {
     if (!process.env.API_KEY) return res.status(500).json({ reply: "Error: Falta API Key." });
 
     const userMessage = req.body.message;
-    const systemPrompt = "Eres Rumbo Seguro, asistente de la FIIS UNI. Sé breve, empático y útil.";
+    const systemPrompt = "Eres Rumbo Seguro, asistente de la FIIS UNI. Sé breve, empático y útil. Responde siempre en español.";
 
     try {
         const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -332,7 +352,7 @@ app.post('/api/chat', async (req, res) => {
     }
 });
 
-// --- RUTA COMODÍN (PARA SPA) ---
+// --- RUTA COMODÍN ---
 app.get(/(.*)/, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
