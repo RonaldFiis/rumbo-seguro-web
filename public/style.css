@@ -283,3 +283,26 @@ ul { list-style: none; padding: 0; margin: 0; }
 .tab-btn { flex: 1; padding: 8px; border: 1px solid #ddd; background: #f9fafb; cursor: pointer; border-radius: 5px; text-align: center; font-weight: 600; }
 .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
+/* --- PEGAR ESTO AL FINAL DE STYLE.CSS SI FALTA --- */
+.video-wrapper {
+    margin-top: 15px;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    background: #000;
+}
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* Ratio 16:9 */
+    height: 0;
+    overflow: hidden;
+}
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
