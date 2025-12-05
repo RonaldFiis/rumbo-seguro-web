@@ -317,37 +317,58 @@ app.patch('/api/tutorias/:id', async (req, res) => {
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-/* =========================================
-   6. CHAT IA (OPENROUTER AUTO)
-   ========================================= */
+// --- RUTA CHAT (CON MODO DEMO PARA VIDEO) ---
 app.post('/api/chat', async (req, res) => {
-    if (!process.env.API_KEY) return res.status(500).json({ reply: "Error: Falta API Key." });
+    const userMessage = req.body.message.toLowerCase();
 
-    const userMessage = req.body.message;
-    const systemPrompt = "Eres Rumbo Seguro, asistente de la FIIS UNI. Sé breve, empático y útil. Responde siempre en español.";
-
-    try {
-        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${process.env.API_KEY}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                "model": "openrouter/auto", // Modelo automático gratuito
-                "messages": [
-                    { "role": "system", "content": systemPrompt },
-                    { "role": "user", "content": userMessage }
-                ]
-            })
+    // 1. GUIÓN DE DEMOSTRACIÓN (Respuestas instantáneas)
+    if (userMessage.includes('hola') || userMessage.includes('buenos dias')) {
+        await new Promise(r => setTimeout(r, 1000)); // Pausa para realismo
+        return res.json({ 
+            reply: "¡Hola! Soy el asistente de Rumbo Seguro. Puedo ayudarte a encontrar tutores, recursos académicos o apoyo emocional. ¿En qué necesitas ayuda hoy?" 
         });
-
-        const data = await response.json();
-        res.json({ reply: data.choices?.[0]?.message?.content || "Lo siento, intenta de nuevo." });
-    } catch (e) {
-        console.error(e);
-        res.status(500).json({ reply: "Error de conexión con la IA." });
     }
+
+    if (userMessage.includes('jalar') || userMessage.includes('trica') || userMessage.includes('bika') || userMessage.includes('miedo') || userMessage.includes('ayuda')) {
+        await new Promise(r => setTimeout(r, 1500));
+        return res.json({ 
+            reply: "Entiendo tu preocupación, pero estamos aquí para evitar eso. Según tu perfil, te recomiendo agendar una tutoría de refuerzo o revisar los exámenes pasados en la Biblioteca. ¡Aún estás a tiempo!" 
+        });
+    }
+
+    if (userMessage.includes('tutor') || userMessage.includes('asesoria') || userMessage.includes('ver')) {
+        await new Promise(r => setTimeout(r, 1200));
+        return res.json({ 
+            reply: "¡Excelente decisión! Puedes encontrar la lista de compañeros disponibles en la sección 'Tutorías' de tu panel principal. Allí podrás ver sus horarios y especialidades." 
+        });
+    }
+    
+    // 2. FALLBACK: Si no es del guion, usa la IA real (si hay clave)
+    if (process.env.API_KEY) {
+        try {
+            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${process.env.API_KEY}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    "model": "openrouter/auto",
+                    "messages": [
+                        { "role": "system", "content": "Eres Rumbo Seguro, un asistente útil para estudiantes de ingeniería." },
+                        { "role": "user", "content": req.body.message }
+                    ]
+                })
+            });
+            const data = await response.json();
+            return res.json({ reply: data.choices?.[0]?.message?.content || "Intenta de nuevo." });
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    // Respuesta por defecto si todo falla
+    res.json({ reply: "Lo siento, solo puedo responder preguntas sobre tutorías y riesgo académico en este momento." });
 });
 
 // --- RUTA COMODÍN ---
@@ -356,4 +377,5 @@ app.get(/(.*)/, (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`🚀 Servidor listo en puerto ${PORT}`));
+
 
