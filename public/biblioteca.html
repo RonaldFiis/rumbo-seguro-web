@@ -3,77 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <title>Biblioteca - Rumbo Seguro</title>
-    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ESTILOS EXCLUSIVOS PARA EL VIDEO */
+        .video-wrapper {
+            margin-top: 15px;
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background: #000;
+        }
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* Relación de aspecto 16:9 (Youtube) */
+            height: 0;
+            overflow: hidden;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        
+        /* Pestañas del formulario */
+        .tabs { display: flex; gap: 10px; margin-bottom: 1rem; }
+        .tab-btn { flex: 1; padding: 10px; border: 1px solid #ddd; background: #f9fafb; cursor: pointer; border-radius: 5px; text-align: center; }
+        .tab-btn.active { background: #005A9C; color: white; border-color: #005A9C; }
+    </style>
 </head>
 <body>
     <header class="app-header">
-        <div class="container">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <a href="index.html" class="nav-logo"><img src="images/logo.svg" alt="Logo"></a>
-                    <span style="font-size: 1.2rem; font-weight: 700; color: var(--dark);">RUMBO SEGURO</span>
-                </div>
-                <a href="dashboard.html" class="nav-link btn btn-outline" style="font-size: 0.9rem;">
-                    <i class="fas fa-arrow-left"></i> Volver al Panel
-                </a>
-            </div>
+        <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
+             <h3>📚 Biblioteca</h3>
+             <a href="dashboard.html" class="btn btn-outline">Volver</a>
         </div>
     </header>
 
-    <main class="container main-container" id="main-container">
+    <main class="container" style="display: grid; grid-template-columns: 1fr; gap: 2rem; margin-top: 2rem;">
+        
         <section>
-            <h2 style="margin-bottom: 1.5rem; border-bottom: 2px solid #eee; padding-bottom: 10px;">📚 Biblioteca de Recursos</h2>
-            <div id="recursos-container">
-                <div class="text-center" style="padding: 50px; color: var(--gray);"><i class="fas fa-spinner fa-spin fa-3x"></i></div>
-            </div>
+            <div id="recursos-container">Cargando...</div>
         </section>
 
-        <aside id="upload-aside" class="card" style="display: none; position: sticky; top: 100px; height: fit-content;">
-            <h3 style="margin-bottom: 10px;"><i class="fas fa-plus-circle"></i> Nuevo Recurso</h3>
-            <p style="font-size: 0.9rem; color: var(--gray); margin-bottom: 1rem;">Comparte material o videos.</p>
+        <aside id="upload-aside" class="card" style="display: none;">
+            <h3>Subir Recurso</h3>
             
             <div class="tabs">
-                <div class="tab-btn active" onclick="switchTab('file')"><i class="fas fa-file-pdf"></i> Archivo</div>
-                <div class="tab-btn" onclick="switchTab('video')"><i class="fab fa-youtube"></i> Video</div>
+                <div class="tab-btn active" onclick="switchTab('file')">Archivo</div>
+                <div class="tab-btn" onclick="switchTab('video')">Video YouTube</div>
             </div>
 
             <form id="upload-form">
                 <input type="hidden" id="upload-type" value="file">
                 
-                <div style="margin-bottom: 1rem;">
-                    <input type="text" id="nombre_archivo" class="form-input" required placeholder="Título del recurso">
+                <div style="margin-bottom:10px;">
+                    <input type="text" id="nombre_archivo" class="form-input" required placeholder="Título">
                 </div>
-                <div style="margin-bottom: 1rem;">
+                <div style="margin-bottom:10px;">
                     <select id="curso" class="form-input">
                         <option value="Cálculo">Cálculo</option>
                         <option value="Física">Física</option>
                         <option value="Química">Química</option>
-                        <option value="Algoritmia">Algoritmia</option>
                         <option value="Otro">Otro</option>
                     </select>
                 </div>
-                <div style="margin-bottom: 1rem;">
+                <div style="margin-bottom:10px;">
                     <select id="tipo" class="form-input">
-                        <option value="Examen/PC">Examen / PC</option>
-                        <option value="Solucionario">Solucionario</option>
-                        <option value="Clase Grabada">Clase Grabada</option>
+                        <option value="Examen">Examen</option>
+                        <option value="Clase">Clase Grabada</option>
                     </select>
                 </div>
 
-                <div id="input-file-group" style="margin-bottom: 1.5rem;">
-                    <label class="form-label">Archivo (PDF/Img)</label>
-                    <input type="file" id="archivo" class="form-input" accept=".pdf,.png,.jpg">
+                <div id="input-file-group" style="margin-bottom:10px;">
+                    <input type="file" id="archivo" class="form-input">
                 </div>
 
-                <div id="input-youtube-group" style="margin-bottom: 1.5rem; display: none;">
-                    <label class="form-label">Link de YouTube</label>
-                    <input type="url" id="youtube_url" class="form-input" placeholder="https://youtube.com/watch?v=...">
+                <div id="input-youtube-group" style="margin-bottom:10px; display:none;">
+                    <input type="url" id="youtube_url" class="form-input" placeholder="Pega el link de YouTube aquí">
                 </div>
 
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Publicar</button>
-                <div id="upload-status" style="margin-top: 1rem; text-align: center; font-size: 0.9rem;"></div>
+                <button type="submit" class="btn btn-primary" style="width:100%;">Publicar</button>
             </form>
         </aside>
     </main>
@@ -82,19 +96,20 @@
         const usuario = JSON.parse(localStorage.getItem('usuario'));
         
         document.addEventListener('DOMContentLoaded', () => {
-            if (!usuario) { window.location.href = 'login.html'; return; }
-            if (usuario.rol !== 'estudiante') {
+            if (usuario && usuario.rol !== 'estudiante') {
                 document.getElementById('upload-aside').style.display = 'block';
-                document.getElementById('main-container').classList.add('tutor-view');
+                document.querySelector('main').style.gridTemplateColumns = "2fr 1fr";
             }
             cargarRecursos();
-            setupUploadForm();
+            setupForm();
         });
 
         function switchTab(type) {
             document.getElementById('upload-type').value = type;
+            // Cambiar visual de pestañas (simple)
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             event.target.classList.add('active');
+
             if (type === 'file') {
                 document.getElementById('input-file-group').style.display = 'block';
                 document.getElementById('input-youtube-group').style.display = 'none';
@@ -108,9 +123,10 @@
             }
         }
 
-        // Función mejorada para detectar cualquier tipo de link de YouTube
+        // --- LÓGICA DE VIDEO ---
         function getYoutubeId(url) {
             if (!url) return null;
+            // Regex poderoso para detectar ID de cualquier link de youtube
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
             const match = url.match(regExp);
             return (match && match[2].length === 11) ? match[2] : null;
@@ -118,74 +134,55 @@
 
         async function cargarRecursos() {
             const container = document.getElementById('recursos-container');
-            try {
-                const res = await fetch('/api/biblioteca');
-                const recursos = await res.json();
-                if (recursos.length === 0) {
-                    container.innerHTML = '<p class="text-center" style="color: var(--gray);">No hay recursos aún.</p>';
-                    return;
-                }
-                container.innerHTML = '';
-                recursos.reverse().forEach(recurso => {
-                    const item = document.createElement('div');
-                    item.className = 'file-list-item';
-                    
-                    // Detectar YouTube
-                    const videoId = getYoutubeId(recurso.url_descarga);
-                    let mediaHtml = '';
+            const res = await fetch('/api/biblioteca');
+            const recursos = await res.json();
+            
+            container.innerHTML = '';
+            recursos.reverse().forEach(recurso => {
+                const item = document.createElement('div');
+                item.className = 'card'; // Usamos clase card existente
+                item.style.marginBottom = "20px";
 
-                    if (videoId) {
-                        mediaHtml = `
-                            <div class="video-wrapper">
-                                <div class="video-container">
-                                    <iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>
-                                </div>
-                            </div>
-                            <div style="margin-top:10px;">
-                                <a href="${recurso.url_descarga}" target="_blank" class="btn btn-outline" style="padding: 5px 15px; font-size: 0.8rem;">
-                                    <i class="fab fa-youtube"></i> Ver en YouTube
-                                </a>
-                            </div>
-                        `;
-                    } else {
-                        mediaHtml = `
-                            <div style="margin-top:15px;">
-                                <a href="${recurso.url_descarga}" target="_blank" class="btn btn-success">
-                                    <i class="fas fa-download"></i> Descargar Archivo
-                                </a>
-                            </div>
-                        `;
-                    }
+                // Detectar si es video
+                const videoId = getYoutubeId(recurso.url_descarga);
+                let contenido = '';
 
-                    item.innerHTML = `
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                            <div>
-                                <span class="file-tag">${recurso.curso}</span>
-                                <h3 style="margin: 5px 0; color: var(--dark);">${recurso.nombre_archivo}</h3>
-                                <span style="font-size:0.8rem; color:var(--gray); background:#f3f4f6; padding:2px 6px; border-radius:4px;">${recurso.tipo}</span>
+                if (videoId) {
+                    // ES VIDEO: MOSTRAR REPRODUCTOR
+                    contenido = `
+                        <div class="video-wrapper">
+                            <div class="video-container">
+                                <iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>
                             </div>
-                        </div>
-                        ${mediaHtml}
-                        <div class="file-meta">
-                            Subido por: <strong>${recurso.usuarios ? recurso.usuarios.nombres : 'Anónimo'}</strong> • ${new Date(recurso.created_at).toLocaleDateString()}
                         </div>
                     `;
-                    container.appendChild(item);
-                });
-            } catch (error) {
-                container.innerHTML = '<p style="color: red;">Error al cargar.</p>';
-            }
+                } else {
+                    // ES ARCHIVO: MOSTRAR BOTÓN
+                    contenido = `
+                        <a href="${recurso.url_descarga}" target="_blank" class="btn btn-success" style="margin-top:10px;">
+                            Descargar Archivo
+                        </a>
+                    `;
+                }
+
+                item.innerHTML = `
+                    <div style="display:flex; justify-content:space-between;">
+                        <h4>${recurso.nombre_archivo} <small style="color:gray;">(${recurso.curso})</small></h4>
+                        <span style="font-size:0.8rem; background:#eee; padding:5px; border-radius:5px;">${recurso.tipo}</span>
+                    </div>
+                    ${contenido}
+                    <div style="margin-top:10px; font-size:0.8rem; color:gray;">Subido por: ${recurso.usuarios?.nombres}</div>
+                `;
+                container.appendChild(item);
+            });
         }
 
-        function setupUploadForm() {
+        function setupForm() {
             document.getElementById('upload-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const statusDiv = document.getElementById('upload-status');
-                statusDiv.textContent = 'Publicando...';
-                
-                const type = document.getElementById('upload-type').value;
                 const formData = new FormData();
-                
+                const type = document.getElementById('upload-type').value;
+
                 formData.append('nombre_archivo', document.getElementById('nombre_archivo').value);
                 formData.append('curso', document.getElementById('curso').value);
                 formData.append('tipo', document.getElementById('tipo').value);
@@ -197,18 +194,10 @@
                     formData.append('youtube_url', document.getElementById('youtube_url').value);
                 }
 
-                try {
-                    const res = await fetch('/api/recursos', { method: 'POST', body: formData });
-                    if (res.ok) {
-                        statusDiv.textContent = '¡Listo! ✅';
-                        statusDiv.style.color = 'green';
-                        document.getElementById('upload-form').reset();
-                        cargarRecursos();
-                    } else { throw new Error('Error al subir'); }
-                } catch (error) {
-                    statusDiv.textContent = 'Error al publicar.';
-                    statusDiv.style.color = 'red';
-                }
+                await fetch('/api/recursos', { method: 'POST', body: formData });
+                alert('Publicado!');
+                cargarRecursos();
+                document.getElementById('upload-form').reset();
             });
         }
     </script>
