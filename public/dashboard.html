@@ -83,7 +83,7 @@
                 }
             } catch(e) {}
 
-            // HTML del Dashboard Estudiante
+            // HTML del Dashboard Estudiante (ESTILO UNIVIRTUAL)
             panel.innerHTML = `
                 <div class="welcome-banner">
                     <h2>👋 ¡Hola, ${usuario.nombres.split(' ')[0]}!</h2>
@@ -236,7 +236,7 @@
                             </div>
                         </div>
                         <div>
-                            <a href="mailto:${email}" class="btn btn-outline" style="padding: 5px 15px; font-size: 0.9rem;">
+                            <a href="mailto:${email}" class="btn btn-outline btn-sm">
                                 <i class="fas fa-envelope"></i> Contactar
                             </a>
                         </div>
@@ -245,7 +245,7 @@
                 });
             } catch (error) {
                 console.error(error);
-                document.getElementById('casos-lista').innerHTML = '<p style="color: red;">Error al cargar los casos.</p>';
+                document.getElementById('casos-lista').innerHTML = '<p style="color: red;">Error al cargar los casos. Verifica la conexión.</p>';
             }
         }
     </script>
