@@ -208,15 +208,10 @@ app.post('/api/recursos', upload.single('archivo'), async (req, res) => {
     try {
         const { nombre_archivo, curso, tipo, uploader_id, youtube_url } = req.body;
         const file = req.file;
-
-        // Validar permisos del usuario
-        const { data: usuario } = await supabase.from('usuarios').select('rol').eq('id', uploader_id).single();
-        if (usuario?.rol === 'estudiante') return res.status(403).json({ error: 'Sin permisos para subir' });
-
         let finalUrl = '';
 
+        // 1. Si hay archivo, lo subimos a Supabase
         if (file) {
-            // Subir archivo a Supabase Storage
             const fileName = `public/${Date.now()}-${file.originalname}`;
             const { error: upErr } = await supabase.storage
                 .from('recursos_academicos')
@@ -224,26 +219,29 @@ app.post('/api/recursos', upload.single('archivo'), async (req, res) => {
             
             if (upErr) throw upErr;
             
-            const { data: pubUrl } = supabase.storage
+            const { data } = supabase.storage
                 .from('recursos_academicos')
                 .getPublicUrl(fileName);
             
-            finalUrl = pubUrl.publicUrl;
-        } else if (youtube_url) {
+            finalUrl = data.publicUrl;
+        } 
+        // 2. Si NO hay archivo pero SÍ hay link de YouTube, usamos ese link
+        else if (youtube_url) {
             finalUrl = youtube_url;
         } else {
             return res.status(400).json({ error: 'Falta archivo o link' });
         }
 
+        // 3. Guardamos en la base de datos
         const { error: dbErr } = await supabase
             .from('recursos')
             .insert({
                 nombre_archivo, curso, tipo, uploader_id, 
-                url_descarga: finalUrl
+                url_descarga: finalUrl 
             });
 
         if (dbErr) throw dbErr;
-        res.json({ mensaje: 'Recurso publicado' });
+        res.json({ mensaje: 'Publicado' });
 
     } catch (e) {
         console.error(e);
@@ -358,3 +356,4 @@ app.get(/(.*)/, (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`🚀 Servidor listo en puerto ${PORT}`));
+
