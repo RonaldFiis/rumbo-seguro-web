@@ -3,138 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rumbo Seguro - FIIS UNI</title>
-    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    <title>Calculadora de Ponderado - 2do Ciclo</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Ajustes específicos para la calculadora */
+        body { background: #f0f2f5; font-family: 'Inter', sans-serif; }
+        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+        
+        .card { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .form-group { margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; }
+        .form-group label { font-weight: 600; color: #374151; flex: 1; }
+        .form-group input { width: 80px; padding: 8px; border: 1px solid #ddd; border-radius: 6px; text-align: center; font-size: 1.1rem; }
+        .weight-badge { font-size: 0.75rem; background: #e5e7eb; padding: 2px 6px; border-radius: 4px; color: #666; margin-left: 5px; }
+        
+        .result-box { background: #005A9C; color: white; text-align: center; padding: 1.5rem; border-radius: 10px; margin-top: 2rem; display: none; }
+        .result-number { font-size: 3rem; font-weight: 800; line-height: 1; }
+
+        .ranking-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        .ranking-table th { text-align: left; padding: 10px; border-bottom: 2px solid #eee; color: #888; font-size: 0.9rem; }
+        .ranking-table td { padding: 12px 10px; border-bottom: 1px solid #f3f3f3; font-weight: 500; }
+        .rank-num { font-weight: 800; color: #005A9C; width: 30px; display: inline-block; }
+        .top-3 { color: #d97706; } /* Dorado para el top */
+
+        @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr; } }
+    </style>
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="container nav-container">
-            <a href="#" class="nav-logo">
-                <img src="images/logo.svg" alt="Logo">
-                <span>RUMBO SEGURO</span>
-            </a>
-            <div class="nav-links">
-                <a href="login.html" class="btn btn-secondary" style="box-shadow: none; border: 1px solid #eee;">Intranet</a>
-                <a href="registro.html" class="btn btn-primary">Registrarse</a>
-            </div>
-        </div>
-    </nav>
-
-    <header class="hero">
-        <div class="container text-center">
-            <div class="hero-content" style="margin: 0 auto;">
-                <span style="background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; margin-bottom: 20px; display: inline-block;">Proyecto de Innovación FIIS</span>
-                <h1>Tu compañero integral para el éxito académico</h1>
-                <p>Recibe tutorías personalizadas, orientación psicológica y asistencia con IA para superar cualquier desafío en la FIIS.</p>
-                <div style="display: flex; gap: 15px; justify-content: center;">
-                    <a href="registro.html" class="btn btn-primary">Crear mi cuenta gratis</a>
-                    <a href="#servicios" class="btn btn-secondary">Saber más</a>
-                </div>
-            </div>
-        </div>
+    <header class="app-header" style="background: white; padding: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center;">
+        <h1 style="color: #005A9C; font-size: 1.5rem; margin: 0;"><i class="fas fa-calculator"></i> Ponderado 2do Ciclo</h1>
     </header>
 
-    <section id="servicios" class="section-padding">
-        <div class="container">
-            <div class="text-center" style="margin-bottom: 60px;">
-                <h2 class="section-title">¿Cómo te ayudamos?</h2>
-                <p style="color: var(--gray); max-width: 600px; margin: 0 auto;">Tres pilares fundamentales diseñados para acompañarte en cada paso de tu carrera.</p>
-            </div>
-            <div class="grid-3">
-                <div class="service-card">
-                    <div class="icon-box"><i class="fas fa-robot"></i></div>
-                    <h3>Asistente Virtual IA</h3>
-                    <p style="font-size: 0.95rem; color: var(--gray);">Acceso 24/7 a un asistente inteligente que resuelve tus dudas académicas y administrativas al instante.</p>
+    <div class="main-grid">
+        <div class="card">
+            <h2 style="margin-bottom: 1.5rem; border-bottom: 2px solid #f3f3f3; padding-bottom: 10px;">Ingresa tus Notas</h2>
+            <form id="calc-form">
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display:block; margin-bottom:5px; font-weight:bold;">Tu Nombre / Apodo:</label>
+                    <input type="text" id="nombre" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;" placeholder="Ej. El Cachimbo">
                 </div>
-                <div class="service-card">
-                    <div class="icon-box"><i class="fas fa-chalkboard-teacher"></i></div>
-                    <h3>Tutorías Personalizadas</h3>
-                    <p style="font-size: 0.95rem; color: var(--gray);">Conecta con tutores de ciclos superiores especializados en las materias que necesitas reforzar.</p>
-                </div>
-                <div class="service-card">
-                    <div class="icon-box"><i class="fas fa-heartbeat"></i></div>
-                    <h3>Apoyo Emocional</h3>
-                    <p style="font-size: 0.95rem; color: var(--gray);">Orientación psicológica y herramientas para el manejo del estrés y la ansiedad académica.</p>
-                </div>
+
+                <div class="form-group"><label>Cálculo Integral <span class="weight-badge">x5</span></label> <input type="number" step="0.1" min="0" max="20" id="n1" required></div>
+                <div class="form-group"><label>Álgebra Lineal <span class="weight-badge">x4</span></label> <input type="number" step="0.1" min="0" max="20" id="n2" required></div>
+                <div class="form-group"><label>Algoritmia <span class="weight-badge">x3</span></label> <input type="number" step="0.1" min="0" max="20" id="n3" required></div>
+                <div class="form-group"><label>Ética <span class="weight-badge">x2</span></label> <input type="number" step="0.1" min="0" max="20" id="n4" required></div>
+                <div class="form-group"><label>TCS <span class="weight-badge">x3</span></label> <input type="number" step="0.1" min="0" max="20" id="n5" required></div>
+                <div class="form-group"><label>Psicología <span class="weight-badge">x3</span></label> <input type="number" step="0.1" min="0" max="20" id="n6" required></div>
+                <div class="form-group"><label>Biología <span class="weight-badge">x2</span></label> <input type="number" step="0.1" min="0" max="20" id="n7" required></div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 1.1rem; margin-top: 10px; background: #005A9C; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                    Calcula y entra al Ranking 🚀
+                </button>
+            </form>
+
+            <div id="resultado" class="result-box">
+                <div>Tu Ponderado es:</div>
+                <div class="result-number" id="valor-ponderado">00.00</div>
             </div>
         </div>
-    </section>
 
-    <section class="section-padding" style="background-color: #f8f9fa;">
-        <div class="container">
-            <div class="grid-2">
-                <div>
-                    <span class="section-subtitle">Nuestra Misión</span>
-                    <h2 class="section-title">Innovación Sistémica</h2>
-                    <p style="margin-bottom: 20px; color: var(--gray);">
-                        "Rumbo Seguro" nace como una respuesta basada en la Metodología de Sistemas Blandos (MSB) para reducir la deserción estudiantil.
-                    </p>
-                    <ul class="check-list" style="margin-bottom: 20px;">
-                        <li><i class="fas fa-check-circle"></i> Detección temprana de riesgos.</li>
-                        <li><i class="fas fa-check-circle"></i> Conexión humana y digital.</li>
-                    </ul>
-                    <br>
-                    <a href="registro.html" class="btn btn-primary">Únete a la comunidad</a>
-                </div>
-                <div>
-                    <img src="images/estudiantes.png" alt="Estudiantes FIIS" style="width: 100%; border-radius: 20px; box-shadow: var(--shadow);">
-                </div>
+        <div class="card">
+            <h2 style="color: #d97706; margin-bottom: 1.5rem;"><i class="fas fa-trophy"></i> Ranking en Vivo</h2>
+            <div style="overflow-y: auto; max-height: 500px;">
+                <table class="ranking-table">
+                    <thead>
+                        <tr>
+                            <th width="50">#</th>
+                            <th>Estudiante</th>
+                            <th style="text-align: right;">Ponderado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ranking-body">
+                        <tr><td colspan="3" class="text-center">Cargando posiciones...</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
-    </section>
+    </div>
 
-    <section class="section-padding">
-        <div class="container">
-            <div class="cta-box">
-                <div class="cta-content">
-                    <h2 style="font-size: 2rem; margin-bottom: 20px; color: white;">Únete a la comunidad</h2>
-                    <p style="margin-bottom: 30px; opacity: 0.9; color: white;">Forma parte del cambio y mejora tu rendimiento académico.</p>
-                    <a href="registro.html" class="btn btn-secondary" style="border: none;">Crear Cuenta</a>
-                </div>
-                <div class="cta-image"></div>
-            </div>
-        </div>
-    </section>
+    <script>
+        const API_URL = window.location.origin + '/api';
 
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div>
-                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; color: white; font-weight: 800; font-size: 1.2rem;">
-                        <img src="images/logo.svg" alt="Logo" style="height: 40px; filter: brightness(0) invert(1);"> 
-                        RUMBO SEGURO
-                    </div>
-                    <p style="color: #a0aec0; font-size: 0.9rem;">Facultad de Ingeniería Industrial y de Sistemas<br>Universidad Nacional de Ingeniería</p>
-                </div>
+        // 1. CARGAR RANKING AL INICIO
+        document.addEventListener('DOMContentLoaded', cargarRanking);
+
+        // 2. MANEJAR EL FORMULARIO
+        document.getElementById('calc-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.textContent = "Calculando...";
+            btn.disabled = true;
+
+            const datos = {
+                nombre: document.getElementById('nombre').value,
+                n1: document.getElementById('n1').value,
+                n2: document.getElementById('n2').value,
+                n3: document.getElementById('n3').value,
+                n4: document.getElementById('n4').value,
+                n5: document.getElementById('n5').value,
+                n6: document.getElementById('n6').value,
+                n7: document.getElementById('n7').value
+            };
+
+            try {
+                const res = await fetch(API_URL + '/calcular', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datos)
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    // Mostrar resultado personal
+                    document.getElementById('valor-ponderado').textContent = data.ponderado;
+                    document.getElementById('resultado').style.display = 'block';
+                    
+                    // Actualizar tabla
+                    cargarRanking();
+                    
+                    // Resetear botón
+                    btn.textContent = "¡Calculado!";
+                    setTimeout(() => btn.textContent = "Calcular de nuevo", 2000);
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                alert("Error al conectar con el servidor");
+                btn.disabled = false;
+            }
+        });
+
+        // 3. FUNCIÓN PARA ACTUALIZAR TABLA
+        async function cargarRanking() {
+            try {
+                const res = await fetch(API_URL + '/ranking');
+                const ranking = await res.json();
+                const tbody = document.getElementById('ranking-body');
                 
-                <div>
-                    <h4 style="color: white; font-size: 1rem; margin-bottom: 15px; font-weight: 700;">Contacto</h4>
-                    <div style="color: #a0aec0; font-size: 0.9rem;">
-                        <p style="margin-bottom: 10px;"><i class="fas fa-map-marker-alt" style="margin-right: 8px;"></i> Av. Túpac Amaru 210, Rímac</p>
-                        <p style="margin-bottom: 10px;"><i class="fas fa-phone" style="margin-right: 8px;"></i> (01) 481-1070</p>
-                        <p style="margin-bottom: 10px;"><i class="fas fa-envelope" style="margin-right: 8px;"></i> rumboseguro@uni.edu.pe</p>
-                    </div>
-                </div>
-
-                <div>
-                    <h4 style="color: white; font-size: 1rem; margin-bottom: 15px; font-weight: 700;">Enlaces de Interés</h4>
-                    <ul class="footer-links">
-                        <li><a href="https://acreditacion.uni.edu.pe/es/cise/" target="_blank">Web FIIS <i class="fas fa-external-link-alt" style="font-size: 0.7rem;"></i></a></li>
-                        <li><a href="https://www.uni.edu.pe/" target="_blank">Web UNI <i class="fas fa-external-link-alt" style="font-size: 0.7rem;"></i></a></li>
-                        <li><a href="https://orce.uni.edu.pe/" target="_blank">ORCE <i class="fas fa-external-link-alt" style="font-size: 0.7rem;"></i></a></li>
-                        <li><a href="https://univirtual.uni.edu.pe/" target="_blank">Aula Virtual <i class="fas fa-external-link-alt" style="font-size: 0.7rem;"></i></a></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2025 Rumbo Seguro - FIIS UNI. Todos los derechos reservados.</p>
-            </div>
-        </div>
-    </footer>
-
+                tbody.innerHTML = '';
+                
+                ranking.forEach((item, index) => {
+                    const pos = index + 1;
+                    const esTop = pos <= 3 ? 'top-3' : '';
+                    const icono = pos === 1 ? '👑' : (pos === 2 ? '🥈' : (pos === 3 ? '🥉' : pos));
+                    
+                    const row = `
+                        <tr>
+                            <td><span class="rank-num ${esTop}">${icono}</span></td>
+                            <td>${item.nombre}</td>
+                            <td style="text-align: right; font-weight: bold; color: #005A9C;">${item.ponderado.toFixed(2)}</td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            } catch (e) {
+                console.error("Error cargando ranking");
+            }
+        }
+    </script>
 </body>
 </html>
