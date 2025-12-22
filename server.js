@@ -1,381 +1,84 @@
-// --- Archivo: server.js (VERSIÓN MAESTRA FINAL - SIN RECORTES) ---
+// --- Archivo: server.js (CALCULADORA PONDERADO + RANKING) ---
 const express = require('express');
 const cors = require('cors');
-const supabase = require('./database'); // Importamos la conexión a Supabase
+const { createClient } = require('@supabase/supabase-js');
 const path = require('path');
 require('dotenv').config();
-
-// --- Configuración para subir archivos (Multer en memoria) ---
-const multer = require('multer');
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
-
-// Verificaciones de seguridad en consola
-console.log("🔑 API Key IA:", process.env.API_KEY ? "OK" : "FALTA");
-console.log("🔑 Base de Datos:", process.env.SUPABASE_URL ? "OK" : "FALTA");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// --- Middlewares ---
+// Conexión a Supabase
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Ruta de prueba
-app.get('/api/status', (req, res) => res.send('✅ Servidor Rumbo Seguro funcionando'));
+// 1. GUARDAR NOTAS Y CALCULAR PONDERADO
+app.post('/api/calcular', async (req, res) => {
+    const { nombre, n1, n2, n3, n4, n5, n6, n7 } = req.body;
 
-/* =========================================
-   1. AUTENTICACIÓN (LOGIN / REGISTRO)
-   ========================================= */
-app.post('/api/registro', async (req, res) => {
-    const { nombres, email, password, rol, es_tutor, especialidad } = req.body;
+    // Convertimos a números (por seguridad)
+    const integral = parseFloat(n1) || 0;
+    const lineal = parseFloat(n2) || 0;
+    const algoritmia = parseFloat(n3) || 0;
+    const etica = parseFloat(n4) || 0;
+    const tcs = parseFloat(n5) || 0;
+    const psico = parseFloat(n6) || 0;
+    const biologia = parseFloat(n7) || 0;
+
+    // FÓRMULA SEGÚN TU EXCEL
+    // Suma de (Nota * Peso)
+    const sumaPuntos = (integral * 5) + (lineal * 4) + (algoritmia * 3) + (etica * 2) + (tcs * 3) + (psico * 3) + (biologia * 2);
+    const totalCreditos = 22; // 5+4+3+2+3+3+2
     
-    if (!nombres || !email || !password) {
-        return res.status(400).json({ error: 'Faltan datos obligatorios' });
-    }
+    const promedioFinal = (sumaPuntos / totalCreditos).toFixed(2); // Redondeado a 2 decimales
 
     try {
-        const { data, error } = await supabase
-            .from('usuarios')
+        // Guardamos en la base de datos
+        const { error } = await supabase
+            .from('ranking')
             .insert({
-                nombres,
-                email,
-                password, // Nota: En producción real, usar hash
-                rol: rol || 'estudiante',
-                es_tutor: es_tutor || false,
-                especialidad: especialidad
-            })
-            .select()
-            .single();
-
-        if (error) {
-            if (error.code === '23505') return res.status(409).json({ error: 'El correo ya está registrado' });
-            throw error;
-        }
-        res.status(201).json({ mensaje: 'Usuario registrado', id: data.id });
-    } catch (error) {
-        console.error('Error registro:', error.message);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.post('/api/login', async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        const { data: user, error } = await supabase
-            .from('usuarios')
-            .select('*')
-            .eq('email', email)
-            .single();
-
-        if (error || !user || String(user.password) !== String(password)) {
-            return res.status(401).json({ error: 'Credenciales incorrectas' });
-        }
-
-        res.status(200).json({
-            mensaje: 'Login exitoso',
-            usuario: { id: user.id, nombres: user.nombres, email: user.email, rol: user.rol }
-        });
-    } catch (error) {
-        console.error('Error login:', error.message);
-        res.status(500).json({ error: 'Error del servidor' });
-    }
-});
-
-/* =========================================
-   2. PERFIL DE USUARIO
-   ========================================= */
-app.get('/api/usuario/:id', async (req, res) => {
-    const { id } = req.params;
-    try {
-        const { data, error } = await supabase
-            .from('usuarios')
-            .select('nombres, especialidad')
-            .eq('id', id)
-            .single();
-        if (error) throw error;
-        res.json(data || {});
-    } catch (error) { res.status(500).json({ error: error.message }); }
-});
-
-app.patch('/api/usuario/:id', async (req, res) => {
-    const { id } = req.params;
-    try {
-        const { data, error } = await supabase
-            .from('usuarios')
-            .update(req.body)
-            .eq('id', id)
-            .select()
-            .single();
-        
-        if (error) throw error;
-        res.json(data);
-    } catch (error) { res.status(500).json({ error: error.message }); }
-});
-
-/* =========================================
-   3. RIESGO ACADÉMICO (LÓGICA CIENTÍFICA)
-   ========================================= */
-app.post('/api/riesgo', async (req, res) => {
-    const { estudiante_id, puntaje } = req.body;
-    const p = parseFloat(puntaje);
-
-    // Clasificación basada en el estudio IMRA (Escala 0-10)
-    let nivel = 'Bajo';
-    if (p >= 7.0) nivel = 'Crítico';
-    else if (p >= 5.0) nivel = 'Alto';
-    else if (p >= 3.0) nivel = 'Medio';
-
-    try {
-        const { data, error } = await supabase
-            .from('riesgo')
-            .upsert({ 
-                estudiante_id, 
-                nivel, 
-                puntaje: p, 
-                fecha_evaluacion: (new Date()).toISOString() 
-            }, { onConflict: 'estudiante_id' })
-            .select()
-            .single();
-
-        if (error) throw error;
-        res.json({ mensaje: 'Guardado', nivel: data.nivel, puntaje: data.puntaje });
-    } catch (error) {
-        console.error('Error riesgo:', error);
-        res.status(500).json({ error: 'Error al guardar riesgo' });
-    }
-});
-
-app.get('/api/riesgo/:id', async (req, res) => {
-    try {
-        const { data } = await supabase
-            .from('riesgo')
-            .select('*')
-            .eq('estudiante_id', req.params.id)
-            .single();
-        
-        if (!data) return res.status(404).json({ mensaje: 'Sin evaluación previa' });
-        res.json(data);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// --- RUTA PARA EL PSICÓLOGO (VER CASOS EN RIESGO) ---
-app.get('/api/casos-riesgo', async (req, res) => {
-    try {
-        // Obtiene riesgos Altos y Críticos junto con info del alumno
-        const { data, error } = await supabase
-            .from('riesgo')
-            .select(`
-                id, nivel, puntaje, fecha_evaluacion,
-                estudiante:usuarios!estudiante_id ( id, nombres, email )
-            `)
-            .in('nivel', ['Alto', 'Crítico', 'Medio'])
-            .order('puntaje', { ascending: false });
-
-        if (error) throw error;
-        res.json(data);
-    } catch (error) {
-        console.error('Error psicólogo:', error);
-        // Fallback si falla el JOIN
-        const { data } = await supabase.from('riesgo').select('*').in('nivel', ['Alto', 'Crítico']);
-        res.json(data || []);
-    }
-});
-
-/* =========================================
-   4. BIBLIOTECA (ARCHIVOS + YOUTUBE)
-   ========================================= */
-app.get('/api/biblioteca', async (req, res) => {
-    try {
-        const { data, error } = await supabase
-            .from('recursos')
-            .select(`
-                id, created_at, nombre_archivo, curso, tipo, url_descarga, 
-                usuarios ( nombres )
-            `)
-            .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        res.json(data);
-    } catch (error) { res.status(500).json({ error: error.message }); }
-});
-
-app.post('/api/recursos', upload.single('archivo'), async (req, res) => {
-    try {
-        const { nombre_archivo, curso, tipo, uploader_id, youtube_url } = req.body;
-        const file = req.file;
-        let finalUrl = '';
-
-        // 1. Si hay archivo, lo subimos a Supabase
-        if (file) {
-            const fileName = `public/${Date.now()}-${file.originalname}`;
-            const { error: upErr } = await supabase.storage
-                .from('recursos_academicos')
-                .upload(fileName, file.buffer, { contentType: file.mimetype });
-            
-            if (upErr) throw upErr;
-            
-            const { data } = supabase.storage
-                .from('recursos_academicos')
-                .getPublicUrl(fileName);
-            
-            finalUrl = data.publicUrl;
-        } 
-        // 2. Si NO hay archivo pero SÍ hay link de YouTube, usamos ese link
-        else if (youtube_url) {
-            finalUrl = youtube_url;
-        } else {
-            return res.status(400).json({ error: 'Falta archivo o link' });
-        }
-
-        // 3. Guardamos en la base de datos
-        const { error: dbErr } = await supabase
-            .from('recursos')
-            .insert({
-                nombre_archivo, curso, tipo, uploader_id, 
-                url_descarga: finalUrl 
+                nombre: nombre,
+                nota_integral: integral,
+                nota_lineal: lineal,
+                nota_algoritmia: algoritmia,
+                nota_etica: etica,
+                nota_tcs: tcs,
+                nota_psico: psico,
+                nota_biologia: biologia,
+                ponderado: parseFloat(promedioFinal)
             });
 
-        if (dbErr) throw dbErr;
-        res.json({ mensaje: 'Publicado' });
-
+        if (error) throw error;
+        
+        res.json({ mensaje: '¡Cálculo Exitoso!', ponderado: promedioFinal });
     } catch (e) {
         console.error(e);
+        res.status(500).json({ error: 'Error al guardar datos' });
+    }
+});
+
+// 2. OBTENER EL RANKING (TOP 50)
+app.get('/api/ranking', async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('ranking')
+            .select('nombre, ponderado')
+            .order('ponderado', { ascending: false }) // De mayor a menor
+            .limit(50);
+
+        if (error) throw error;
+        res.json(data);
+    } catch (e) {
         res.status(500).json({ error: e.message });
     }
 });
 
-/* =========================================
-   5. TUTORÍAS Y SOLICITUDES (¡AQUÍ ESTÁ TODO!)
-   ========================================= */
-app.get('/api/tutores', async (req, res) => {
-    try {
-        const { data, error } = await supabase
-            .from('usuarios')
-            .select('id, nombres, especialidad')
-            .eq('es_tutor', true);
-        
-        if (error) throw error;
-        res.json(data);
-    } catch (error) { res.status(500).json({ error: error.message }); }
-});
-
-app.post('/api/solicitar-tutoria', async (req, res) => {
-    try {
-        const { error } = await supabase
-            .from('tutorias')
-            .insert({ ...req.body, estado: 'solicitada' });
-        
-        if (error) throw error;
-        res.status(201).json({ mensaje: 'Solicitud enviada' });
-    } catch (error) { res.status(500).json({ error: error.message }); }
-});
-
-app.get('/api/solicitudes-tutor/:tutor_id', async (req, res) => {
-    try {
-        const { count, error } = await supabase
-            .from('tutorias')
-            .select('*', { count: 'exact', head: true })
-            .eq('tutor_id', req.params.tutor_id)
-            .eq('estado', 'solicitada');
-        
-        if (error) throw error;
-        res.json({ count: count || 0 });
-    } catch (error) { res.status(500).json({ error: error.message }); }
-});
-
-// Detalle de solicitudes
-app.get('/api/solicitudes-detalle/:tutor_id', async (req, res) => {
-    try {
-        const { data, error } = await supabase
-            .from('tutorias')
-            .select(`
-                id, created_at, curso, estado,
-                estudiante:usuarios!estudiante_id ( nombres, email )
-            `)
-            .eq('tutor_id', req.params.tutor_id)
-            .eq('estado', 'solicitada');
-        
-        if (error) throw error;
-        res.json(data);
-    } catch (error) { res.status(500).json({ error: error.message }); }
-});
-
-app.patch('/api/tutorias/:id', async (req, res) => {
-    try {
-        const { error } = await supabase
-            .from('tutorias')
-            .update({ estado: req.body.nuevo_estado })
-            .eq('id', req.params.id);
-        
-        if (error) throw error;
-        res.json({ mensaje: 'Estado actualizado' });
-    } catch (error) { res.status(500).json({ error: error.message }); }
-});
-
-// --- RUTA CHAT (CON MODO DEMO PARA VIDEO) ---
-app.post('/api/chat', async (req, res) => {
-    const userMessage = req.body.message.toLowerCase();
-
-    // 1. GUIÓN DE DEMOSTRACIÓN (Respuestas instantáneas)
-    if (userMessage.includes('hola') || userMessage.includes('buenos dias')) {
-        await new Promise(r => setTimeout(r, 1000)); // Pausa para realismo
-        return res.json({ 
-            reply: "¡Hola! Soy el asistente de Rumbo Seguro. Puedo ayudarte a encontrar tutores, recursos académicos o apoyo emocional. ¿En qué necesitas ayuda hoy?" 
-        });
-    }
-
-    if (userMessage.includes('jalar') || userMessage.includes('trica') || userMessage.includes('bika') || userMessage.includes('miedo') || userMessage.includes('ayuda')) {
-        await new Promise(r => setTimeout(r, 1500));
-        return res.json({ 
-            reply: "Entiendo tu preocupación, pero estamos aquí para evitar eso. Según tu perfil, te recomiendo agendar una tutoría de refuerzo o revisar los exámenes pasados en la Biblioteca. ¡Aún estás a tiempo!" 
-        });
-    }
-
-    if (userMessage.includes('tutor') || userMessage.includes('asesoria') || userMessage.includes('ver')) {
-        await new Promise(r => setTimeout(r, 1200));
-        return res.json({ 
-            reply: "¡Excelente decisión! Puedes encontrar la lista de compañeros disponibles en la sección 'Tutorías' de tu panel principal. Allí podrás ver sus horarios y especialidades." 
-        });
-    }
-    
-    // 2. FALLBACK: Si no es del guion, usa la IA real (si hay clave)
-    if (process.env.API_KEY) {
-        try {
-            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${process.env.API_KEY}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    "model": "openrouter/auto",
-                    "messages": [
-                        { "role": "system", "content": "Eres Rumbo Seguro, un asistente útil para estudiantes de ingeniería." },
-                        { "role": "user", "content": req.body.message }
-                    ]
-                })
-            });
-            const data = await response.json();
-            return res.json({ reply: data.choices?.[0]?.message?.content || "Intenta de nuevo." });
-        } catch (e) {
-            console.error(e);
-        }
-    }
-
-    // Respuesta por defecto si todo falla
-    res.json({ reply: "Lo siento, solo puedo responder preguntas sobre tutorías y riesgo académico en este momento." });
-});
-
-// --- RUTA COMODÍN ---
-app.get(/(.*)/, (req, res) => {
+// Servir la página
+app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(PORT, () => console.log(`🚀 Servidor listo en puerto ${PORT}`));
-
-
+app.listen(PORT, () => console.log(`🚀 Calculadora lista en puerto ${PORT}`));
