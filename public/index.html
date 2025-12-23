@@ -3,39 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ranking Ponderado - Con Retiros</title>
+    <title>Ranking Ponderado FIIS - 2do Ciclo</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f4f9; display: flex; justify-content: center; padding: 20px; }
-        .container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1100px; width: 100%; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
+        .container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1200px; width: 100%; }
         .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
-        h2 { text-align: center; color: #2c3e50; margin-top: 0; }
+        h2 { text-align: center; color: #1e3a8a; margin-top: 0; }
         
-        /* Estilos del Formulario */
-        .form-row { display: flex; align-items: center; margin-bottom: 12px; gap: 10px; }
-        .course-label { flex: 2; font-weight: 600; color: #34495e; font-size: 0.95rem; }
-        .badge { background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-left: 5px; }
-        
-        input[type="number"] { width: 70px; padding: 8px; text-align: center; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; }
-        input[type="number"]:disabled { background: #f3f4f6; color: #aaa; border-color: #eee; }
-        
-        /* Checkbox de Retiro */
-        .retiro-check { display: flex; align-items: center; gap: 5px; font-size: 0.8rem; color: #e74c3c; cursor: pointer; }
-        .retiro-check input { cursor: pointer; }
+        /* Select de Carrera */
+        .carrera-selector { margin-bottom: 20px; }
+        select { width: 100%; padding: 12px; font-size: 1rem; border-radius: 8px; border: 2px solid #3b82f6; background: #eff6ff; color: #1e3a8a; font-weight: bold; cursor: pointer; }
 
-        button { width: 100%; padding: 14px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1rem; font-weight: bold; margin-top: 15px; transition: 0.2s; }
-        button:hover { background: #2563eb; transform: translateY(-1px); }
+        /* Formulario */
+        .form-row { display: flex; align-items: center; margin-bottom: 12px; gap: 10px; animation: fadeIn 0.3s ease-in; }
+        .course-label { flex: 2; font-weight: 600; color: #34495e; font-size: 0.9rem; }
+        .badge { background: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-left: 5px; }
+        
+        input[type="number"] { width: 70px; padding: 8px; text-align: center; border: 1px solid #ccc; border-radius: 6px; }
+        input[type="number"]:disabled { background: #f3f4f6; color: transparent; }
+        
+        .retiro-check { font-size: 0.8rem; color: #e74c3c; cursor: pointer; display: flex; align-items: center; gap: 3px;}
+
+        button { width: 100%; padding: 14px; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1rem; font-weight: bold; margin-top: 15px; }
+        button:hover { background: #1d4ed8; }
 
         /* Resultado */
         #resultado-box { text-align: center; margin-top: 25px; padding: 15px; background: #eff6ff; border-radius: 8px; display: none; }
         .big-score { font-size: 3rem; font-weight: 800; color: #2563eb; line-height: 1; }
-        .credits-info { font-size: 0.9rem; color: #6b7280; margin-top: 5px; }
 
-        /* Tabla */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { text-align: left; padding: 12px 8px; border-bottom: 2px solid #eee; color: #888; font-size: 0.9rem; }
-        td { padding: 12px 8px; border-bottom: 1px solid #f9f9f9; font-weight: 500; }
-        .rank-num { font-weight: 800; color: #3b82f6; }
+        /* Tabs Ranking */
+        .tabs { display: flex; gap: 10px; margin-bottom: 15px; justify-content: center; }
+        .tab-btn { padding: 8px 15px; border: none; background: #e5e7eb; border-radius: 20px; cursor: pointer; font-size: 0.9rem; font-weight: 600; color: #666; transition: 0.2s; }
+        .tab-btn.active { background: #2563eb; color: white; box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3); }
 
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 10px; border-bottom: 2px solid #eee; color: #888; font-size: 0.85rem; }
+        td { padding: 10px; border-bottom: 1px solid #f9f9f9; font-weight: 500; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         @media(max-width: 768px) { .container { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -43,63 +48,46 @@
 
 <div class="container">
     <div class="card">
-        <h2>📊 Ingreso de Notas</h2>
+        <h2>📊 Calculadora FIIS</h2>
+        
+        <div class="carrera-selector">
+            <label style="display:block; margin-bottom:5px; font-weight:bold; color:#555;">Selecciona tu Carrera:</label>
+            <select id="select-carrera" onchange="renderizarFormulario()">
+                <option value="sistemas">Ingeniería de Sistemas</option>
+                <option value="industrial">Ingeniería Industrial</option>
+                <option value="software">Ingeniería de Software</option>
+            </select>
+        </div>
+
         <form id="form-notas">
-            <div style="margin-bottom: 20px;">
-                <label style="font-weight:bold; display:block; margin-bottom:5px;">Estudiante:</label>
-                <input type="text" id="nombre" required placeholder="Tu Nombre o Apodo" style="width: 100%; padding: 10px; border:1px solid #ccc; border-radius:6px;">
+            <div style="margin-bottom: 15px;">
+                <input type="text" id="nombre" required placeholder="Tu Nombre o Apodo" style="width: 100%; padding: 10px; border:1px solid #ccc; border-radius:6px; box-sizing: border-box;">
             </div>
 
-            <div class="form-row">
-                <div class="course-label">Cálculo Integral <span class="badge">x5</span></div>
-                <input type="number" id="n1" step="0.1" min="0" max="20" required placeholder="0-20">
-                <label class="retiro-check"><input type="checkbox" onchange="toggleRetiro('n1')"> Retiro</label>
-            </div>
-            <div class="form-row">
-                <div class="course-label">Álgebra Lineal <span class="badge">x4</span></div>
-                <input type="number" id="n2" step="0.1" min="0" max="20" required placeholder="0-20">
-                <label class="retiro-check"><input type="checkbox" onchange="toggleRetiro('n2')"> Retiro</label>
-            </div>
-            <div class="form-row">
-                <div class="course-label">Algoritmia <span class="badge">x3</span></div>
-                <input type="number" id="n3" step="0.1" min="0" max="20" required placeholder="0-20">
-                <label class="retiro-check"><input type="checkbox" onchange="toggleRetiro('n3')"> Retiro</label>
-            </div>
-            <div class="form-row">
-                <div class="course-label">Ética <span class="badge">x2</span></div>
-                <input type="number" id="n4" step="0.1" min="0" max="20" required placeholder="0-20">
-                <label class="retiro-check"><input type="checkbox" onchange="toggleRetiro('n4')"> Retiro</label>
-            </div>
-            <div class="form-row">
-                <div class="course-label">TCS <span class="badge">x3</span></div>
-                <input type="number" id="n5" step="0.1" min="0" max="20" required placeholder="0-20">
-                <label class="retiro-check"><input type="checkbox" onchange="toggleRetiro('n5')"> Retiro</label>
-            </div>
-            <div class="form-row">
-                <div class="course-label">Psicología <span class="badge">x3</span></div>
-                <input type="number" id="n6" step="0.1" min="0" max="20" required placeholder="0-20">
-                <label class="retiro-check"><input type="checkbox" onchange="toggleRetiro('n6')"> Retiro</label>
-            </div>
-            <div class="form-row">
-                <div class="course-label">Biología <span class="badge">x2</span></div>
-                <input type="number" id="n7" step="0.1" min="0" max="20" required placeholder="0-20">
-                <label class="retiro-check"><input type="checkbox" onchange="toggleRetiro('n7')"> Retiro</label>
-            </div>
+            <div id="cursos-container">
+                </div>
 
             <button type="submit">Calcular y Rankear 🚀</button>
         </form>
 
         <div id="resultado-box">
-            <div>Tu Ponderado Oficial:</div>
+            <div>Ponderado (Ciclo 2):</div>
             <div class="big-score" id="score-val">00.00</div>
-            <div class="credits-info" id="credits-val">Calculado sobre 22 créditos</div>
+            <div style="font-size:0.85rem; color:#666;" id="credits-val"></div>
         </div>
     </div>
 
     <div class="card">
-        <h2 style="color: #d97706;">🏆 Ranking Top 100</h2>
-        <div style="overflow-y: auto; max-height: 600px;">
-            <table>
+        <h2 style="color: #d97706;">🏆 Ranking por Carrera</h2>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="cambiarTab('sistemas')" id="tab-sistemas">Sistemas</button>
+            <button class="tab-btn" onclick="cambiarTab('industrial')" id="tab-industrial">Industrial</button>
+            <button class="tab-btn" onclick="cambiarTab('software')" id="tab-software">Software</button>
+        </div>
+
+        <div style="overflow-y: auto; max-height: 500px;">
+            <table id="ranking-table">
                 <thead>
                     <tr>
                         <th width="40">#</th>
@@ -118,16 +106,72 @@
 <script>
     const API = window.location.origin + '/api';
 
-    // 1. LÓGICA VISUAL DE RETIRO
+    // CONFIGURACIÓN DE CURSOS (Coincide con la BD y Server)
+    const MALLAS = {
+        sistemas: [
+            { id: 'nota_integral', label: 'Cálculo Integral', peso: 5 },
+            { id: 'nota_lineal', label: 'Álgebra Lineal', peso: 4 },
+            { id: 'nota_algoritmia', label: 'Algoritmia', peso: 3 },
+            { id: 'nota_etica', label: 'Ética', peso: 2 },
+            { id: 'nota_tcs', label: 'TCS', peso: 3 },
+            { id: 'nota_psico', label: 'Psicología', peso: 3 },
+            { id: 'nota_biologia', label: 'Biología', peso: 2 }
+        ],
+        industrial: [
+            { id: 'nota_integral', label: 'Cálculo Integral', peso: 5 },
+            { id: 'nota_lineal', label: 'Álgebra Lineal', peso: 4 },
+            { id: 'nota_intro_compu', label: 'Intro a Computación', peso: 2 },
+            { id: 'nota_tgs_industrial', label: 'TGS', peso: 2 },
+            { id: 'nota_desarrollo', label: 'Desarrollo Personal', peso: 2 },
+            { id: 'nota_realidad', label: 'Realidad Nacional', peso: 3 },
+            { id: 'nota_quimica2', label: 'Química 2', peso: 4 }
+        ],
+        software: [
+            { id: 'nota_integral', label: 'Cálculo Integral', peso: 5 },
+            { id: 'nota_lineal', label: 'Álgebra Lineal', peso: 4 },
+            { id: 'nota_algoritmia', label: 'Algoritmia', peso: 3 },
+            { id: 'nota_dibujo', label: 'Dibujo Técnico', peso: 3 },
+            { id: 'nota_discreta', label: 'Matemática Discreta', peso: 3 },
+            { id: 'nota_fisica1', label: 'Física 1', peso: 5 }
+        ]
+    };
+
+    let carreraActualRanking = 'sistemas';
+
+    // 1. DIBUJAR FORMULARIO SEGÚN CARRERA
+    function renderizarFormulario() {
+        const carrera = document.getElementById('select-carrera').value;
+        const container = document.getElementById('cursos-container');
+        const cursos = MALLAS[carrera];
+
+        container.innerHTML = ''; // Limpiar
+
+        cursos.forEach(c => {
+            const html = `
+                <div class="form-row">
+                    <div class="course-label">${c.label} <span class="badge">x${c.peso}</span></div>
+                    <input type="number" id="${c.id}" step="0.1" min="0" max="20" placeholder="0-20" required>
+                    <label class="retiro-check">
+                        <input type="checkbox" onchange="toggleRetiro('${c.id}')"> Retiro
+                    </label>
+                </div>
+            `;
+            container.innerHTML += html;
+        });
+
+        // Sincronizar tab de ranking con la selección (opcional)
+        cambiarTab(carrera);
+    }
+
+    // 2. LOGICA DE RETIRO
     window.toggleRetiro = (id) => {
         const input = document.getElementById(id);
         const checkbox = document.querySelector(`input[onchange="toggleRetiro('${id}')"]`);
-        
         if (checkbox.checked) {
             input.disabled = true;
-            input.value = ""; // Limpia visualmente
-            input.placeholder = "Retiro";
-            input.style.backgroundColor = "#fceceb"; // Rojo suave
+            input.value = ""; 
+            input.placeholder = "Ret.";
+            input.style.backgroundColor = "#fee2e2";
         } else {
             input.disabled = false;
             input.placeholder = "0-20";
@@ -135,86 +179,95 @@
         }
     };
 
-    // 2. ENVIAR FORMULARIO
+    // 3. ENVIAR DATOS
     document.getElementById('form-notas').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = e.target.querySelector('button');
-        const originalText = btn.textContent;
-        btn.textContent = "Calculando...";
+        btn.textContent = "Procesando...";
         btn.disabled = true;
 
-        // Función auxiliar para obtener valor: si está disabled, manda -1
-        const getVal = (id) => {
-            const input = document.getElementById(id);
-            return input.disabled ? -1 : input.value;
-        };
+        const carrera = document.getElementById('select-carrera').value;
+        const cursos = MALLAS[carrera];
+        const notasObj = {};
 
-        const data = {
+        // Recolectar notas dinámicamente
+        cursos.forEach(c => {
+            const input = document.getElementById(c.id);
+            notasObj[c.id] = input.disabled ? -1 : input.value;
+        });
+
+        const payload = {
             nombre: document.getElementById('nombre').value,
-            n1: getVal('n1'),
-            n2: getVal('n2'),
-            n3: getVal('n3'),
-            n4: getVal('n4'),
-            n5: getVal('n5'),
-            n6: getVal('n6'),
-            n7: getVal('n7')
+            carrera: carrera,
+            notas: notasObj
         };
 
         try {
             const res = await fetch(API + '/calcular', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
+                body: JSON.stringify(payload)
             });
+            const data = await res.json();
 
-            const result = await res.json();
-            
-            if (result.success) {
-                document.getElementById('score-val').textContent = result.ponderado;
-                document.getElementById('credits-val').textContent = `Calculado sobre ${result.creditos} créditos efectivos`;
+            if (data.success) {
+                document.getElementById('score-val').textContent = data.ponderado;
+                document.getElementById('credits-val').textContent = `Base: ${data.creditos} créditos`;
                 document.getElementById('resultado-box').style.display = 'block';
-                await cargarRanking(); 
-            } else {
-                alert('Error al guardar datos.');
+                cargarRanking(carrera); // Actualizar ranking de la carrera actual
             }
-        } catch (err) {
-            console.error(err);
-            alert('Error de conexión.');
-        }
+        } catch (err) { alert("Error de conexión"); }
         
         btn.disabled = false;
-        btn.textContent = originalText;
+        btn.textContent = "Calcular y Rankear 🚀";
     });
 
-    // 3. CARGAR RANKING
-    async function cargarRanking() {
-        try {
-            const res = await fetch(API + '/ranking');
-            const lista = await res.json();
-            const tbody = document.getElementById('tabla-body');
-            tbody.innerHTML = '';
+    // 4. CAMBIAR PESTAÑA RANKING
+    window.cambiarTab = (carrera) => {
+        carreraActualRanking = carrera;
+        // Estilos botones
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`tab-${carrera}`).classList.add('active');
+        // Cargar datos
+        cargarRanking(carrera);
+    };
 
-            lista.forEach((item, index) => {
+    async function cargarRanking(carrera) {
+        const tbody = document.getElementById('tabla-body');
+        tbody.innerHTML = '<tr><td colspan="3" class="text-center">Cargando...</td></tr>';
+        
+        try {
+            const res = await fetch(`${API}/ranking/${carrera}`);
+            const data = await res.json();
+            
+            tbody.innerHTML = '';
+            if(data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px;">Sin datos aún</td></tr>';
+                return;
+            }
+
+            data.forEach((item, index) => {
                 const puesto = index + 1;
-                let icono = `<span class="rank-num" style="color:#666">${puesto}</span>`;
-                if(puesto === 1) icono = '🥇';
-                if(puesto === 2) icono = '🥈';
-                if(puesto === 3) icono = '🥉';
+                let icono = `<span style="font-weight:800; color:#666">${puesto}</span>`;
+                if(puesto===1) icono = '🥇';
+                if(puesto===2) icono = '🥈';
+                if(puesto===3) icono = '🥉';
 
                 tbody.innerHTML += `
                     <tr>
-                        <td style="font-size:1.2rem; text-align:center;">${icono}</td>
+                        <td style="text-align:center; font-size:1.1rem;">${icono}</td>
                         <td>${item.nombre}</td>
                         <td style="text-align: right; font-weight: bold; color: #2563eb;">${parseFloat(item.ponderado).toFixed(2)}</td>
                     </tr>
                 `;
             });
-        } catch (e) {
-            console.error(e);
-        }
+        } catch (e) { console.error(e); }
     }
 
-    cargarRanking();
+    // INICIAR
+    document.addEventListener('DOMContentLoaded', () => {
+        renderizarFormulario(); // Carga Sistemas por defecto
+    });
 </script>
 
 </body>
