@@ -32,14 +32,25 @@
         .big-score { font-size: 3rem; font-weight: 800; color: #2563eb; line-height: 1; }
 
         /* Tabs Ranking */
-        .tabs { display: flex; gap: 10px; margin-bottom: 15px; justify-content: center; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 15px; justify-content: center; flex-wrap: wrap; }
         .tab-btn { padding: 8px 15px; border: none; background: #e5e7eb; border-radius: 20px; cursor: pointer; font-size: 0.9rem; font-weight: 600; color: #666; transition: 0.2s; }
+        .tab-btn:hover { background: #d1d5db; }
         .tab-btn.active { background: #2563eb; color: white; box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3); }
+        
+        /* Botón General Especial */
+        .tab-btn.general { background: #10b981; color: white; } 
+        .tab-btn.general.active { background: #059669; box-shadow: 0 2px 5px rgba(16, 185, 129, 0.3); }
 
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; padding: 10px; border-bottom: 2px solid #eee; color: #888; font-size: 0.85rem; }
-        td { padding: 10px; border-bottom: 1px solid #f9f9f9; font-weight: 500; }
+        td { padding: 10px; border-bottom: 1px solid #f9f9f9; font-weight: 500; font-size: 0.9rem; }
         
+        /* Etiquetas de carrera en tabla */
+        .tag-carrera { font-size: 0.7rem; padding: 3px 8px; border-radius: 10px; text-transform: uppercase; font-weight: bold; display: inline-block;}
+        .tag-sistemas { background: #dbeafe; color: #1e40af; }
+        .tag-industrial { background: #fce7f3; color: #9d174d; }
+        .tag-software { background: #e0e7ff; color: #3730a3; }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         @media(max-width: 768px) { .container { grid-template-columns: 1fr; } }
     </style>
@@ -67,7 +78,7 @@
             <div id="cursos-container">
                 </div>
 
-            <button type="submit">Calcular y Rankear 🚀</button>
+            <button type="submit">Calcular y Guardar 🚀</button>
         </form>
 
         <div id="resultado-box">
@@ -78,9 +89,10 @@
     </div>
 
     <div class="card">
-        <h2 style="color: #d97706;">🏆 Ranking por Carrera</h2>
+        <h2 style="color: #d97706;">🏆 Ranking General</h2>
         
         <div class="tabs">
+            <button class="tab-btn general" onclick="cambiarTab('general')" id="tab-general">🌎 General</button>
             <button class="tab-btn active" onclick="cambiarTab('sistemas')" id="tab-sistemas">Sistemas</button>
             <button class="tab-btn" onclick="cambiarTab('industrial')" id="tab-industrial">Industrial</button>
             <button class="tab-btn" onclick="cambiarTab('software')" id="tab-software">Software</button>
@@ -90,13 +102,14 @@
             <table id="ranking-table">
                 <thead>
                     <tr>
-                        <th width="40">#</th>
+                        <th width="35">#</th>
                         <th>Estudiante</th>
+                        <th>Carrera</th>
                         <th style="text-align: right;">Ponderado</th>
                     </tr>
                 </thead>
                 <tbody id="tabla-body">
-                    <tr><td colspan="3" style="text-align:center">Cargando...</td></tr>
+                    <tr><td colspan="4" class="text-center">Cargando...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -106,7 +119,7 @@
 <script>
     const API = window.location.origin + '/api';
 
-    // CONFIGURACIÓN DE CURSOS (Coincide con la BD y Server)
+    // CONFIGURACIÓN DE CURSOS
     const MALLAS = {
         sistemas: [
             { id: 'nota_integral', label: 'Cálculo Integral', peso: 5 },
@@ -120,10 +133,10 @@
         industrial: [
             { id: 'nota_integral', label: 'Cálculo Integral', peso: 5 },
             { id: 'nota_lineal', label: 'Álgebra Lineal', peso: 4 },
-            { id: 'nota_intro_compu', label: 'Intro a Computación', peso: 2 },
+            { id: 'nota_intro_compu', label: 'Intro a Compu', peso: 2 },
             { id: 'nota_tgs_industrial', label: 'TGS', peso: 2 },
-            { id: 'nota_desarrollo', label: 'Desarrollo Personal', peso: 2 },
-            { id: 'nota_realidad', label: 'Realidad Nacional', peso: 3 },
+            { id: 'nota_desarrollo', label: 'Des. Personal', peso: 2 },
+            { id: 'nota_realidad', label: 'Realidad Nac.', peso: 3 },
             { id: 'nota_quimica2', label: 'Química 2', peso: 4 }
         ],
         software: [
@@ -131,20 +144,18 @@
             { id: 'nota_lineal', label: 'Álgebra Lineal', peso: 4 },
             { id: 'nota_algoritmia', label: 'Algoritmia', peso: 3 },
             { id: 'nota_dibujo', label: 'Dibujo Técnico', peso: 3 },
-            { id: 'nota_discreta', label: 'Matemática Discreta', peso: 3 },
+            { id: 'nota_discreta', label: 'Mat. Discreta', peso: 3 },
             { id: 'nota_fisica1', label: 'Física 1', peso: 5 }
         ]
     };
 
-    let carreraActualRanking = 'sistemas';
-
-    // 1. DIBUJAR FORMULARIO SEGÚN CARRERA
+    // 1. DIBUJAR FORMULARIO
     function renderizarFormulario() {
         const carrera = document.getElementById('select-carrera').value;
         const container = document.getElementById('cursos-container');
         const cursos = MALLAS[carrera];
 
-        container.innerHTML = ''; // Limpiar
+        container.innerHTML = ''; 
 
         cursos.forEach(c => {
             const html = `
@@ -152,18 +163,15 @@
                     <div class="course-label">${c.label} <span class="badge">x${c.peso}</span></div>
                     <input type="number" id="${c.id}" step="0.1" min="0" max="20" placeholder="0-20" required>
                     <label class="retiro-check">
-                        <input type="checkbox" onchange="toggleRetiro('${c.id}')"> Retiro
+                        <input type="checkbox" onchange="toggleRetiro('${c.id}')"> Ret.
                     </label>
                 </div>
             `;
             container.innerHTML += html;
         });
-
-        // Sincronizar tab de ranking con la selección (opcional)
-        cambiarTab(carrera);
     }
 
-    // 2. LOGICA DE RETIRO
+    // 2. LÓGICA DE RETIRO (CHECKBOX)
     window.toggleRetiro = (id) => {
         const input = document.getElementById(id);
         const checkbox = document.querySelector(`input[onchange="toggleRetiro('${id}')"]`);
@@ -179,7 +187,7 @@
         }
     };
 
-    // 3. ENVIAR DATOS
+    // 3. ENVIAR FORMULARIO
     document.getElementById('form-notas').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = e.target.querySelector('button');
@@ -190,7 +198,6 @@
         const cursos = MALLAS[carrera];
         const notasObj = {};
 
-        // Recolectar notas dinámicamente
         cursos.forEach(c => {
             const input = document.getElementById(c.id);
             notasObj[c.id] = input.disabled ? -1 : input.value;
@@ -214,18 +221,18 @@
                 document.getElementById('score-val').textContent = data.ponderado;
                 document.getElementById('credits-val').textContent = `Base: ${data.creditos} créditos`;
                 document.getElementById('resultado-box').style.display = 'block';
-                cargarRanking(carrera); // Actualizar ranking de la carrera actual
+                // Después de calcular, mostramos el ranking general para que vea dónde quedó
+                cambiarTab('general'); 
             }
         } catch (err) { alert("Error de conexión"); }
         
         btn.disabled = false;
-        btn.textContent = "Calcular y Rankear 🚀";
+        btn.textContent = "Calcular y Guardar 🚀";
     });
 
     // 4. CAMBIAR PESTAÑA RANKING
     window.cambiarTab = (carrera) => {
-        carreraActualRanking = carrera;
-        // Estilos botones
+        // Estilos de botones
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(`tab-${carrera}`).classList.add('active');
         // Cargar datos
@@ -234,7 +241,7 @@
 
     async function cargarRanking(carrera) {
         const tbody = document.getElementById('tabla-body');
-        tbody.innerHTML = '<tr><td colspan="3" class="text-center">Cargando...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center">Cargando...</td></tr>';
         
         try {
             const res = await fetch(`${API}/ranking/${carrera}`);
@@ -242,7 +249,7 @@
             
             tbody.innerHTML = '';
             if(data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px;">Sin datos aún</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Sin datos aún</td></tr>';
                 return;
             }
 
@@ -253,10 +260,21 @@
                 if(puesto===2) icono = '🥈';
                 if(puesto===3) icono = '🥉';
 
+                // Etiqueta bonita para la carrera
+                let tagClass = 'tag-sistemas';
+                if (item.carrera === 'industrial') tagClass = 'tag-industrial';
+                if (item.carrera === 'software') tagClass = 'tag-software';
+                
+                // Texto corto carrera
+                let carreraTexto = 'Sist.';
+                if(item.carrera === 'industrial') carreraTexto = 'Ind.';
+                if(item.carrera === 'software') carreraTexto = 'Soft.';
+
                 tbody.innerHTML += `
                     <tr>
                         <td style="text-align:center; font-size:1.1rem;">${icono}</td>
                         <td>${item.nombre}</td>
+                        <td><span class="tag-carrera ${tagClass}">${carreraTexto}</span></td>
                         <td style="text-align: right; font-weight: bold; color: #2563eb;">${parseFloat(item.ponderado).toFixed(2)}</td>
                     </tr>
                 `;
@@ -264,9 +282,10 @@
         } catch (e) { console.error(e); }
     }
 
-    // INICIAR
+    // Inicialización
     document.addEventListener('DOMContentLoaded', () => {
-        renderizarFormulario(); // Carga Sistemas por defecto
+        renderizarFormulario(); 
+        cambiarTab('sistemas'); // Empezamos mostrando ranking sistemas
     });
 </script>
 
