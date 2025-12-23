@@ -1,4 +1,3 @@
-// --- Archivo: server.js (VERSIÓN CON RETIRO DE CURSOS) ---
 const express = require('express');
 const cors = require('cors');
 const { createClient } = require('@supabase/supabase-js');
@@ -8,89 +7,106 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Conexión a Supabase
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// CONFIGURACIÓN DE PESOS (CRÉDITOS)
-const PESOS = {
-    n1: 5, // Integral
-    n2: 4, // Lineal
-    n3: 3, // Algoritmia
-    n4: 2, // Ética
-    n5: 3, // TCS
-    n6: 3, // Psico
-    n7: 2  // Biología
+// --- CONFIGURACIÓN DE PESOS POR CARRERA ---
+const MALLA_CURRICULAR = {
+    sistemas: {
+        nota_integral: 5,
+        nota_lineal: 4,
+        nota_algoritmia: 3,
+        nota_etica: 2,
+        nota_tcs: 3,
+        nota_psico: 3,
+        nota_biologia: 2
+    },
+    industrial: {
+        nota_integral: 5, // Asumido estándar FIIS
+        nota_lineal: 4,   // Asumido estándar FIIS
+        nota_intro_compu: 2,
+        nota_tgs_industrial: 2,
+        nota_desarrollo: 2,
+        nota_realidad: 3,
+        nota_quimica2: 4
+    },
+    software: {
+        nota_integral: 5, // Asumido estándar FIIS
+        nota_lineal: 4,   // Asumido estándar FIIS
+        nota_algoritmia: 3, // Asumido estándar FIIS
+        nota_dibujo: 3,
+        nota_discreta: 3,
+        nota_fisica1: 5
+    }
 };
 
-// 1. CALCULAR Y GUARDAR (CON LÓGICA DE RETIRO)
+// 1. CALCULAR Y GUARDAR
 app.post('/api/calcular', async (req, res) => {
     try {
-        const { nombre, n1, n2, n3, n4, n5, n6, n7 } = req.body;
-        
-        // Recibimos las notas. Si es -1, significa RETIRADO.
-        const notas = { n1, n2, n3, n4, n5, n6, n7 };
-        
+        const { nombre, carrera, notas } = req.body; // 'notas' es un objeto { nota_integral: 15, ... }
+
+        if (!MALLA_CURRICULAR[carrera]) {
+            return res.status(400).json({ error: 'Carrera no válida' });
+        }
+
+        const planEstudios = MALLA_CURRICULAR[carrera];
         let sumaProducto = 0;
         let creditosTotales = 0;
 
-        // Iteramos cada curso para calcular dinámicamente
-        for (const [key, val] of Object.entries(notas)) {
-            const nota = parseFloat(val);
-            
-            // Si la nota es -1, el curso se ignora (Retirado)
-            if (nota !== -1) {
-                const peso = PESOS[key];
-                sumaProducto += (nota * peso);
+        // Iterar sobre los cursos de esa carrera
+        for (const [columna, peso] of Object.entries(planEstudios)) {
+            const valorNota = parseFloat(notas[columna]);
+
+            // Si la nota es válida y NO es -1 (retiro)
+            if (!isNaN(valorNota) && valorNota !== -1) {
+                sumaProducto += (valorNota * peso);
                 creditosTotales += peso;
             }
         }
 
-        // Evitar división por cero si retiró todo
-        const promedioPonderado = creditosTotales === 0 ? 0 : (sumaProducto / creditosTotales).toFixed(4);
+        const promedio = creditosTotales === 0 ? 0 : (sumaProducto / creditosTotales).toFixed(4);
 
-        // Guardar en Supabase (Guardamos -1 para saber que retiró)
-        const { error } = await supabase
-            .from('ranking')
-            .insert({
-                nombre: nombre,
-                nota_integral: parseFloat(n1),
-                nota_lineal: parseFloat(n2),
-                nota_algoritmia: parseFloat(n3),
-                nota_etica: parseFloat(n4),
-                nota_tcs: parseFloat(n5),
-                nota_psico: parseFloat(n6),
-                nota_biologia: parseFloat(n7),
-                ponderado: parseFloat(promedioPonderado)
-            });
+        // Preparar objeto para guardar en BD (mezclamos datos básicos con las notas)
+        const datosParaGuardar = {
+            nombre,
+            carrera,
+            ponderado: parseFloat(promedio),
+            ...notas // Guardamos las notas individuales
+        };
+
+        const { error } = await supabase.from('ranking').insert(datosParaGuardar);
 
         if (error) throw error;
 
-        res.json({ success: true, ponderado: promedioPonderado, creditos: creditosTotales });
+        res.json({ success: true, ponderado: promedio, creditos: creditosTotales, carrera });
 
     } catch (e) {
         console.error("Error:", e.message);
-        res.status(500).json({ error: 'Error al procesar notas' });
+        res.status(500).json({ error: 'Error interno' });
     }
 });
 
-// 2. OBTENER RANKING (TOP 100)
-app.get('/api/ranking', async (req, res) => {
-    const { data, error } = await supabase
-        .from('ranking')
-        .select('nombre, ponderado')
-        .order('ponderado', { ascending: false })
-        .limit(100);
+// 2. OBTENER RANKING POR CARRERA
+app.get('/api/ranking/:carrera', async (req, res) => {
+    const { carrera } = req.params;
     
-    if (error) return res.status(500).json({ error: error.message });
-    res.json(data);
+    try {
+        const { data, error } = await supabase
+            .from('ranking')
+            .select('nombre, ponderado')
+            .eq('carrera', carrera) // Filtramos por carrera
+            .order('ponderado', { ascending: false })
+            .limit(50);
+        
+        if (error) throw error;
+        res.json(data);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
 });
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-app.listen(PORT, () => console.log(`🚀 Calculadora (Con Retiros) lista en puerto ${PORT}`));
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+app.listen(PORT, () => console.log(`🚀 Servidor FIIS Multi-Carrera listo en puerto ${PORT}`));
