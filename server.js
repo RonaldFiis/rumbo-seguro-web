@@ -7,6 +7,7 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Conexión a Supabase
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 app.use(cors());
@@ -25,8 +26,8 @@ const MALLA_CURRICULAR = {
         nota_biologia: 2
     },
     industrial: {
-        nota_integral: 5, // Asumido estándar FIIS
-        nota_lineal: 4,   // Asumido estándar FIIS
+        nota_integral: 5,
+        nota_lineal: 4,
         nota_intro_compu: 2,
         nota_tgs_industrial: 2,
         nota_desarrollo: 2,
@@ -34,19 +35,19 @@ const MALLA_CURRICULAR = {
         nota_quimica2: 4
     },
     software: {
-        nota_integral: 5, // Asumido estándar FIIS
-        nota_lineal: 4,   // Asumido estándar FIIS
-        nota_algoritmia: 3, // Asumido estándar FIIS
+        nota_integral: 5,
+        nota_lineal: 4,
+        nota_algoritmia: 3,
         nota_dibujo: 3,
         nota_discreta: 3,
         nota_fisica1: 5
     }
 };
 
-// 1. CALCULAR Y GUARDAR
+// 1. CALCULAR Y GUARDAR NOTAS
 app.post('/api/calcular', async (req, res) => {
     try {
-        const { nombre, carrera, notas } = req.body; // 'notas' es un objeto { nota_integral: 15, ... }
+        const { nombre, carrera, notas } = req.body; 
 
         if (!MALLA_CURRICULAR[carrera]) {
             return res.status(400).json({ error: 'Carrera no válida' });
@@ -69,7 +70,7 @@ app.post('/api/calcular', async (req, res) => {
 
         const promedio = creditosTotales === 0 ? 0 : (sumaProducto / creditosTotales).toFixed(4);
 
-        // Preparar objeto para guardar en BD (mezclamos datos básicos con las notas)
+        // Preparar objeto para guardar en BD
         const datosParaGuardar = {
             nombre,
             carrera,
@@ -89,17 +90,24 @@ app.post('/api/calcular', async (req, res) => {
     }
 });
 
-// 2. OBTENER RANKING POR CARRERA
+// 2. OBTENER RANKING (POR CARRERA O GENERAL)
 app.get('/api/ranking/:carrera', async (req, res) => {
     const { carrera } = req.params;
     
     try {
-        const { data, error } = await supabase
+        // Iniciamos la consulta base
+        let query = supabase
             .from('ranking')
-            .select('nombre, ponderado')
-            .eq('carrera', carrera) // Filtramos por carrera
+            .select('nombre, ponderado, carrera') // Importante: Traemos la carrera para mostrarla en la tabla
             .order('ponderado', { ascending: false })
             .limit(50);
+        
+        // Solo filtramos SI NO es "general"
+        if (carrera !== 'general') {
+            query = query.eq('carrera', carrera);
+        }
+        
+        const { data, error } = await query;
         
         if (error) throw error;
         res.json(data);
@@ -108,5 +116,7 @@ app.get('/api/ranking/:carrera', async (req, res) => {
     }
 });
 
+// Servir frontend
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-app.listen(PORT, () => console.log(`🚀 Servidor FIIS Multi-Carrera listo en puerto ${PORT}`));
+
+app.listen(PORT, () => console.log(`🚀 Servidor FIIS con Ranking General listo en puerto ${PORT}`));
